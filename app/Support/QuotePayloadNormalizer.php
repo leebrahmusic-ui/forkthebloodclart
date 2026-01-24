@@ -19,6 +19,9 @@ class QuotePayloadNormalizer
         $c = $form['customer_details'] ?? [];
         $v = $form['visit_time'] ?? [];
 
+        \Log::warning('DEBUG: customer_details', $c);
+        \Log::warning('DEBUG: visit_time', $v);
+
         return [
             'full_name' => $c['name'] ?? $v['name'] ?? null,
             'email' => $c['email'] ?? $v['email'] ?? null,
