@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import { FiCreditCard, FiLoader } from "react-icons/fi";
 
 export default function InstallPage({ booking }) {
-    const { symbol } = usePage().props;
+    const { symbol, title } = usePage().props;
     console.log("Postcode ", booking);
 
     const [selectedDate, setSelectedDate] = useState("");
@@ -377,7 +377,7 @@ export default function InstallPage({ booking }) {
 
     return (
         <>
-            <Head title="Book Installation" />
+            <Head title={title} />
             <PageHeader />
 
             <div className="min-h-screen bg-slate-50">

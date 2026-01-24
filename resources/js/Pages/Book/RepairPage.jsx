@@ -110,14 +110,14 @@ const STEPS = [
 ];
 
 export default function RepairQuote() {
-    const { basePrice, symbol } = usePage().props;
+    const { basePrice, symbol, title } = usePage().props;
 
     const onSubmit = () => {
         console.log();
     };
     return (
         <>
-            <Head title="Boiler Repair" />
+            <Head title={title} />
             <Stepper
                 title="Boiler Repair Quote"
                 basePrice={basePrice}

@@ -1,12 +1,13 @@
 import QuoteResultsPage from "@/Components/extra/QuoteResultsPage";
 import { PageHeader } from "@/Components/ui/page-header";
-import { usePage } from "@inertiajs/react";
+import { usePage, Head } from "@inertiajs/react";
 
 export default function ServiceResults() {
-    const { answers } = usePage().props;
+    const { answers, title } = usePage().props;
     console.log("ServiceResults answers:", answers);
     return (
         <>
+            <Head title={title} />
             <PageHeader />
             <QuoteResultsPage answers={answers} />{" "}
         </>

@@ -4,7 +4,7 @@ import { Footer } from "@/Components/boiler/footer";
 import WhyChooseUs from "@/Components/boiler/WhyChooseUs";
 import { ServiceCards } from "@/Components/boiler/service-cards";
 import Faq from "@/Components/boiler/Faq";
-import { router } from "@inertiajs/react";
+import { router, Head, usePage } from "@inertiajs/react";
 
 /**
  * UK postcode (broadly accepted) regex
@@ -63,6 +63,7 @@ function isAllowedOutcode(value) {
 export default function Home() {
     const [postcode, setPostcode] = useState("");
     const [touched, setTouched] = useState(false);
+    const { title } = usePage().props;
 
     const normalized = useMemo(() => normalizeUkPostcode(postcode), [postcode]);
 
@@ -91,6 +92,7 @@ export default function Home() {
 
     return (
         <>
+            <Head title={title} />
             <Header />
 
             {/* ================= HERO ================= */}

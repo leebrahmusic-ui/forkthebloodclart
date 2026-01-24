@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { Head, usePage } from "@inertiajs/react";
 
 export default function OrderSummary() {
+    const { title } = usePage().props;
     const [mounted, setMounted] = useState(false);
     const [pulseIndex, setPulseIndex] = useState(0);
     const [particles, setParticles] = useState([]);
@@ -53,7 +55,9 @@ export default function OrderSummary() {
     };
 
     return (
-        <div className="min-h-screen bg-white relative overflow-hidden">
+        <>
+            <Head title={title} />
+            <div className="min-h-screen bg-white relative overflow-hidden">
             {/* Animated mesh gradient background */}
             <div className="fixed inset-0 opacity-40">
                 <div
@@ -337,6 +341,7 @@ export default function OrderSummary() {
                     }
                 }
             `}</style>
-        </div>
+            </div>
+        </>
     );
 }

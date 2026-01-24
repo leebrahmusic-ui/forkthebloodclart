@@ -2,6 +2,7 @@ import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import Stepper from "@/Components/extra/Stepper";
 import { SERVICE_QUESTIONS } from "@/Components/extra/boilerSteps";
 import { useMemo } from "react";
+import { Head, usePage } from "@inertiajs/react";
 
 /* -----------------------------
    Read postcode only
@@ -16,6 +17,7 @@ function getInitialData() {
 
 export default function NewBoilerQuote() {
     const { postcode } = getInitialData();
+    const { title } = usePage().props;
 
     const baseSteps = SERVICE_QUESTIONS?.new || [];
 
@@ -35,11 +37,14 @@ export default function NewBoilerQuote() {
     }
 
     return (
-        <Stepper
-            title="New boiler quote"
-            steps={steps}
-            basePrice={0}
-            serviceKey={SERVICES_KEY_VALUE.NEW_BOILER_QUOTE}
-        />
+        <>
+            <Head title={title} />
+            <Stepper
+                title="New boiler quote"
+                steps={steps}
+                basePrice={0}
+                serviceKey={SERVICES_KEY_VALUE.NEW_BOILER_QUOTE}
+            />
+        </>
     );
 }

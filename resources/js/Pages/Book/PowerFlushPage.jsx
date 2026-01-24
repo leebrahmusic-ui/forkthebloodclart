@@ -1,10 +1,10 @@
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import Stepper from "@/Components/extra/Stepper";
-import { usePage } from "@inertiajs/react";
+import { usePage, Head } from "@inertiajs/react";
 import React from "react";
 
 export default function PowerflushQuote() {
-    const { basePrice, symbol,radiatorPrices } = usePage().props;
+    const { basePrice, symbol, radiatorPrices, title } = usePage().props;
 
     const STEPS = [
         {
@@ -70,12 +70,15 @@ export default function PowerflushQuote() {
     ];
 
     return (
-        <Stepper
-            title="Power Flush"
-            basePrice={basePrice}
-            steps={STEPS}
-            currency={symbol}
-            serviceKey={SERVICES_KEY_VALUE.POWER_FLUSH}
-        />
+        <>
+            <Head title={title} />
+            <Stepper
+                title="Power Flush"
+                basePrice={basePrice}
+                steps={STEPS}
+                currency={symbol}
+                serviceKey={SERVICES_KEY_VALUE.POWER_FLUSH}
+            />
+        </>
     );
 }

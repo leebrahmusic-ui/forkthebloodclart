@@ -27,11 +27,15 @@ class BookController extends Controller
 
 
     public function index(){
-        return Inertia::render('Book/Home');
+        return Inertia::render('Book/Home', [
+            'title' => 'Book a Service',
+        ]);
     }
 
     public function quote(){
-        return Inertia::render('Book/QuotePage');
+        return Inertia::render('Book/QuotePage', [
+            'title' => 'Get a Quote',
+        ]);
     }
 
  // GET /book/quote/repair
@@ -40,7 +44,11 @@ class BookController extends Controller
         // renders resources/js/Pages/Book/RepairPage.jsx
         $basePrice = BasePrice::boilerRepair()->value('price');
         $symbol = config('services.currency.symbol');
-        return Inertia::render('Book/RepairPage', compact('basePrice', 'symbol'));
+        return Inertia::render('Book/RepairPage', [
+            'basePrice' => $basePrice,
+            'symbol' => $symbol,
+            'title' => 'Boiler Repair Quote',
+        ]);
     }
 
     // GET /book/quote/new
@@ -48,7 +56,9 @@ class BookController extends Controller
     {
         // renders resources/js/Pages/Book/NewBoilerPage.jsx
         $this->reset($request);
-        return Inertia::render('Book/NewBoilerPage');
+        return Inertia::render('Book/NewBoilerPage', [
+            'title' => 'New Boiler Installation Quote',
+        ]);
     }
 
     // GET /book/quote/powerflush
@@ -64,6 +74,7 @@ class BookController extends Controller
             'basePrice' => $basePrice,
             'symbol' => $symbol,
             'radiatorPrices' => $radiatorPrices,
+            'title' => 'Power Flush Quote',
         ]);
     }
 
@@ -74,7 +85,11 @@ class BookController extends Controller
         // renders resources/js/Pages/Book/ServicePage.jsx
         $basePrice = BasePrice::boilerService()->value('price');
         $symbol = config('services.currency.symbol');
-        return Inertia::render('Book/ServicePage', compact('basePrice', 'symbol'));
+        return Inertia::render('Book/ServicePage', [
+            'basePrice' => $basePrice,
+            'symbol' => $symbol,
+            'title' => 'Boiler Service Quote',
+        ]);
     }
 
     public function serviceResults(Request $request)
@@ -108,6 +123,7 @@ class BookController extends Controller
 
         return Inertia::render('Book/ServiceResults', [
             'answers' => $quote,
+            'title' => 'Installation Results',
         ]);
     }
 
@@ -155,6 +171,7 @@ class BookController extends Controller
         return Inertia::render('Book/InstallPage', [
             'booking' => $data,
             'symbol' => $symbol,
+            'title' => 'Select Your Boiler',
             // 'answers' => $data
         ]);
     }

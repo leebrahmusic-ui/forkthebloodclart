@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { Head, usePage } from "@inertiajs/react";
 
 export default function ComingSoon() {
+    const { title } = usePage().props;
     const [mounted, setMounted] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
     const [waveOffset, setWaveOffset] = useState(0);
@@ -49,16 +51,18 @@ export default function ComingSoon() {
     }));
 
     return (
-        <div
-            className="min-h-screen relative overflow-hidden"
-            style={{
-                "--primary": "#0067ff",
-                "--secondary": "#172a44",
-                background:
-                    "linear-gradient(135deg, var(--secondary), #0f1f33, var(--secondary))",
-            }}
-            onMouseMove={handleMouseMove}
-        >
+        <>
+            <Head title={title} />
+            <div
+                className="min-h-screen relative overflow-hidden"
+                style={{
+                    "--primary": "#0067ff",
+                    "--secondary": "#172a44",
+                    background:
+                        "linear-gradient(135deg, var(--secondary), #0f1f33, var(--secondary))",
+                }}
+                onMouseMove={handleMouseMove}
+            >
             {/* Floating orbs */}
             {floatingElements.map((el) => (
                 <div
@@ -286,6 +290,7 @@ export default function ComingSoon() {
                     to { background-position: 200% center; }
                 }
             `}</style>
-        </div>
+            </div>
+        </>
     );
 }

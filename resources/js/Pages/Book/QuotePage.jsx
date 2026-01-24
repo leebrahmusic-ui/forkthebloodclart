@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { PageHeader } from "@/Components/ui/page-header";
 import { GoogleReview } from "@/Components/GoogleReview";
 import { TechnicianButton } from "@/Components/TechnicianButton";
@@ -103,6 +103,7 @@ function getServiceFromUrl() {
 export default function QuotePage() {
     const radius = 14;
     const [serviceKey, setServiceKey] = useState(getServiceFromUrl());
+    const { title } = usePage().props;
 
     useEffect(() => {
         const onChange = () => setServiceKey(getServiceFromUrl());
@@ -123,7 +124,7 @@ export default function QuotePage() {
 
     return (
         <>
-            <Head title="Get a Quote" />
+            <Head title={title} />
 
             {/* ✅ FIXED: no black bottom gap */}
             <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white overflow-x-hidden">
