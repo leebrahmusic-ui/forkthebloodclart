@@ -20,7 +20,8 @@ router.on("navigate", () => {
     pushPageView();
 });
 
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+const appName =
+    import.meta.env.VITE_APP_NAME || document.title || "MD GAS SERVICES";
 
 function syncPricingOverridesFromPage(page) {
     const props = page?.props || {};
@@ -28,7 +29,7 @@ function syncPricingOverridesFromPage(page) {
 }
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,
