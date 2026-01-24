@@ -21,15 +21,15 @@ export default defineConfig({
         },
     },
     server: {
-        host: "192.168.0.173",
+        host: "0.0.0.0",
         port: 5173,
-        strictPort: true,
+        strictPort: false,
         cors: {
-            origin: "http://192.168.0.173:8000",
+            origin: "*",
             credentials: true,
         },
         hmr: {
-            host: "192.168.0.173",
+            host: process.env.VITE_HMR_HOST || "localhost",
             port: 5173,
         },
     },
