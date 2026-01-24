@@ -100,7 +100,7 @@ class QuoteCheckoutService
             $productDetails = CustomerOrderProduct::query()->updateOrCreate(
                 [
                     'booking_id' => $booking->id,
-                    'boiler_id'  => $product['boiler_id'],
+                    'boiler_id'  => $product['boiler_id'] ?? null,
                 ],
                 [
                     'brand'          => $product['brand'] ?? null,
