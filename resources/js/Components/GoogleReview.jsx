@@ -1,13 +1,31 @@
 import { FcGoogle } from "react-icons/fc";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { usePage } from "@inertiajs/react";
 
 export function GoogleReview() {
+    const { googleBusiness } = usePage().props || {};
+
+    const fallbackUrl =
+        "https://www.google.com/search?q=MD+Gas+Leeds&stick=H4sIAAAAAAAA_-NgU1I1qDBKTTRJMTAxTjFMMU21NDS3MqgwT7GwMEu0TElNSTY1MEgxWcTK4-ui4J5YrOCTmppSDAANgsr0OAAAAA&hl=en&mat=CTqTWGe_fFeMElYBTVDHnuqbxBwblP2-pewRSIB9v7Fc6NCQG6UfLVSP74OfKisuAjMmgaJcWLuFK7U2ex7ZhbotIUBPgoph_nxGgcDyJ_DVWmnBoVgMPu1HC_P4dtCQFQ&authuser=0#cobssid=s&mpd=~10112688649798193978/customers/reviews";
+
+    const profileUrl = isSafeHttpsUrl(googleBusiness?.profileUrl)
+        ? googleBusiness.profileUrl
+        : fallbackUrl;
+
+    const hasRating =
+        typeof googleBusiness?.rating === "number" &&
+        typeof googleBusiness?.reviewCount === "number";
+
+    const formattedReviewCount = hasRating
+        ? googleBusiness.reviewCount.toLocaleString()
+        : null;
+
     return (
         <div className="mt-20 flex justify-center">
             <a
-                href="https://share.google/JhykkBzwvNl7jPnwU"
+                href={profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Read MD Gas reviews on Google"
                 className="
                     group relative
                     flex items-center
@@ -24,7 +42,6 @@ export function GoogleReview() {
                     cursor-pointer
                 "
             >
-                {/* Ambient glow */}
                 <div
                     className="
                         pointer-events-none
@@ -36,7 +53,6 @@ export function GoogleReview() {
                 />
 
                 <div className="relative flex items-center gap-5">
-                    {/* Google */}
                     <div className="flex items-center gap-4">
                         <div
                             className="
@@ -53,36 +69,19 @@ export function GoogleReview() {
 
                         <div className="flex flex-col leading-tight">
                             <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
-                                Rated on
+                                Reviews on
                             </span>
                             <span className="text-[15px] font-semibold text-dark">
                                 Google
                             </span>
+                            {hasRating && (
+                                <span className="text-xs text-slate-500 mt-1">
+                                    Rated {googleBusiness.rating}/5 from {formattedReviewCount} reviews
+                                </span>
+                            )}
                         </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="h-7 w-px bg-secondary/40" />
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-3">
-                        <span className="text-xl font-semibold text-slate-900">
-                            4.5
-                        </span>
-
-                        <div className="flex items-center gap-0.5 text-amber-400/90">
-                            <FaStar />
-                            <FaStar />
-                            <FaStar />
-                            <FaStar />
-                            <FaStarHalfAlt />
-                        </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="h-7 w-px bg-secondary/40" />
-
-                    {/* Review count */}
                     <div
                         className="
                             rounded-full
@@ -93,15 +92,17 @@ export function GoogleReview() {
                             group-hover:ring-primary/40
                         "
                     >
-                        <span className="text-sm text-slate-600">
-                            <span className="font-semibold text-slate-900">
-                                120+
-                            </span>{" "}
-                            reviews
+                        <span className="text-sm font-semibold text-slate-900">
+                            Read our reviews
                         </span>
                     </div>
                 </div>
             </a>
         </div>
     );
+}
+
+function isSafeHttpsUrl(url) {
+    if (typeof url !== "string") return false;
+    return url.startsWith("https://");
 }

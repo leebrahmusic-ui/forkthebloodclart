@@ -1,9 +1,6 @@
 // lib/quoteEngine.js
-// import { PRODUCTS } from "./productsCatalog";
-// import { ADDONS, RULES } from "./quoteConfig";
 import { PRODUCTS as DEFAULT_PRODUCTS } from "./productsCatalog";
 import { ADDONS as DEFAULT_ADDONS, RULES as DEFAULT_RULES } from "./quoteConfig";
-
 
 const getOverrides = () => {
   if (typeof window === "undefined") return {};
@@ -22,14 +19,12 @@ const applyEffectiveConfig = () => {
   const oAddons = o.addons || {};
   const oProducts = o.products || {};
 
-  // RULES (same shape)
   const RULES = {
     ...DEFAULT_RULES,
     MIN_MARGIN_SYSTEM_HEAT: numOr(oRules.MIN_MARGIN_SYSTEM_HEAT, DEFAULT_RULES.MIN_MARGIN_SYSTEM_HEAT),
     TRV_MAX_QTY: numOr(oRules.TRV_MAX_QTY, DEFAULT_RULES.TRV_MAX_QTY),
   };
 
-  // ADDONS (same keys & objects; override unitPrice)
   const ADDONS = JSON.parse(JSON.stringify(DEFAULT_ADDONS));
   Object.keys(ADDONS).forEach((k) => {
     const key = `${k}.unitPrice`;
@@ -38,7 +33,6 @@ const applyEffectiveConfig = () => {
     }
   });
 
-  // PRODUCTS (override by id.field)
   const PRODUCTS = DEFAULT_PRODUCTS.map((p) => {
     const next = { ...p };
 
@@ -85,7 +79,7 @@ function questionMap(questions = []) {
 }
 
 /* ===========================
-  1) Parse spec buckets (keep)
+  1) Parse spec buckets
 =========================== */
 
 function parseRadsBucket(lab) {
@@ -99,15 +93,13 @@ function parseRadsBucket(lab) {
 
 function parseBaths(lab) {
     if (!lab) return null;
-    if (lab === "1") return 1;
-    if (lab === "1.5") return 1.5;
-    if (lab === "2") return 2;
-    if (lab.includes("3")) return 3;
+    const n = parseFloat(lab);
+    if (Number.isFinite(n)) return n;
     return null;
 }
 
 /* ===========================
-  2) Eligibility + sizing (keep)
+  2) Eligibility + sizing
 =========================== */
 
 function combiAllowed(radsBucket, baths) {
@@ -124,19 +116,19 @@ function combiTargetKw(radsBucket, baths) {
     if (radsBucket === "UP_TO_6") {
         if (baths === 1) return 24;
         if (baths === 1.5) return 30;
-        return DEFAULT_KW; // 2 or 3+
+        return DEFAULT_KW;
     }
 
     if (radsBucket === "R7_12") {
         if (baths === 1) return 30;
         if (baths === 1.5) return 30;
-        if (baths === 2) return 35;
-        return DEFAULT_KW; // 3+
+        if (baths === 2) return 30;   // << keep 30 kW for 7-12 rads + 2 baths
+        return DEFAULT_KW;
     }
 
     if (radsBucket === "R13_20") {
         if (baths <= 1.5) return 35;
-        return DEFAULT_KW; // 2+
+        return DEFAULT_KW;
     }
 
     return DEFAULT_KW;
@@ -173,55 +165,42 @@ function pickKwForSystemHeat(productsOfType, band) {
 }
 
 /* ===========================
-  3) Boiler type resolution (NEW)
+  3) Boiler type resolution
 =========================== */
 
 function resolveBoilerTypeFromAnswers(answers, { combiOk, combiKw }) {
-    // Hard override: if user wants to move to combi -> show combi only
     if (isYes(answers?.move_to_combi)) return "combi";
 
     const typeKnown = (answers?.boiler_type_known?.label || "").toLowerCase() === "yes";
     const currentType = (answers?.current_boiler_type?.label || "").toLowerCase();
 
-    // If boiler type is known: direct mapping
     if (typeKnown) {
         if (currentType.includes("combi")) return "combi";
         if (currentType.includes("system")) return "system";
-        // regular/standard/back -> heat_only bucket
         if (currentType.includes("regular") || currentType.includes("standard") || currentType.includes("back")) {
             return "heat_only";
         }
     }
 
-    // If unknown boiler type:
-    const tank = (answers?.has_water_tank?.label || "").toLowerCase(); // yes/no
-    const gauge = (answers?.pressure_gauge?.label || "").toLowerCase(); // yes/no
+    const tank = (answers?.has_water_tank?.label || "").toLowerCase();
+    const gauge = (answers?.pressure_gauge?.label || "").toLowerCase();
 
     if (tank === "yes") {
-        // Tank implies system or regular/standard:
-        // Gauge Yes -> system, Gauge No -> heat-only
         if (gauge === "yes") return "system";
         if (gauge === "no") return "heat_only";
-
-        // If gauge unanswered, safe fallback: system
         return "system";
     }
 
-    // If tank is "no": likely combi (fallback)
-    // But only auto-select combi if eligible by your combi rules; otherwise choose system
     if (tank === "no") {
         if (combiOk && combiKw != null) return "combi";
         return "system";
     }
 
-    // final fallback
     return combiOk && combiKw != null ? "combi" : "system";
 }
 
 /* ===========================
-  4) Flue logic (LATEST RULE)
-  - flue_wall No => vertical add-on
-  - flue_wall Yes => no add-on required
+  4) Flue logic
 =========================== */
 
 function resolveFlueType(answers) {
@@ -231,13 +210,12 @@ function resolveFlueType(answers) {
 }
 
 /* ===========================
-  5) Add-ons (UPDATED)
+  5) Add-ons
 =========================== */
 
 function computeAddOns(answers, boilerType, { ADDONS, RULES }) {
     const items = [];
 
-    // Smart stat (+100)
     if ((answers?.thermostat_type?.label || "Basic").toLowerCase() === "smart") {
         items.push({
             key: ADDONS.SMART_STAT.key,
@@ -248,7 +226,6 @@ function computeAddOns(answers, boilerType, { ADDONS, RULES }) {
         });
     }
 
-    // TRVs (£35 x qty)
     if ((answers?.trv_required?.label || "No") === "Yes") {
         const qty = clampInt(answers?.trv_qty?.value ?? 0, 0, RULES.TRV_MAX_QTY);
         if (qty > 0) {
@@ -262,7 +239,6 @@ function computeAddOns(answers, boilerType, { ADDONS, RULES }) {
         }
     }
 
-    // Flue add-on: only vertical when flue_wall = No
     const flue = resolveFlueType(answers);
     if (flue === "vertical") {
         const verticalKey =
@@ -279,7 +255,6 @@ function computeAddOns(answers, boilerType, { ADDONS, RULES }) {
         });
     }
 
-    // Boiler relocation (+£800)
     if (isYes(answers?.boiler_move_location)) {
         items.push({
             key: ADDONS.BOILER_RELOCATION.key,
@@ -290,8 +265,6 @@ function computeAddOns(answers, boilerType, { ADDONS, RULES }) {
         });
     }
 
-    // Conversion to combi (+£800)
-    // Only if they want combi AND current boiler is not combi
     const currentType = (answers?.current_boiler_type?.label || "").toLowerCase();
     const currentlyCombi = currentType.includes("combi");
     if (isYes(answers?.move_to_combi) && !currentlyCombi) {
@@ -340,11 +313,8 @@ export function buildBoilerQuote({ answers, questions = [] }) {
         heat_only: true,
     };
 
-
-    // ✅ NEW: choose boiler type using your rules
     const selectedBoilerType = resolveBoilerTypeFromAnswers(answers, { combiOk, combiKw });
 
-    // Sizing
     let sizing = null;
     if (selectedBoilerType === "combi") {
         sizing = { type: "combi", targetKw: combiKw };
@@ -355,17 +325,13 @@ export function buildBoilerQuote({ answers, questions = [] }) {
         sizing = { type: selectedBoilerType, band, targetKw: chosenKw };
     }
 
-    // Add-ons
     const addOns = computeAddOns(answers, selectedBoilerType, { ADDONS, RULES });
 
-    // Filter products
     let products = PRODUCTS.filter((p) => p.type === selectedBoilerType);
 
     if (selectedBoilerType === "combi") {
         const wantsCombi = isYes(answers?.move_to_combi);
         const filtered = combiKw != null ? products.filter((p) => combiKwMatch(p.kw, combiKw)) : [];
-
-        // If user forces combi but sizing blocks, show all combi
         products = (wantsCombi && !filtered.length) ? products : (filtered.length ? filtered : products);
     } else {
         const band = sizing.band;
@@ -373,7 +339,6 @@ export function buildBoilerQuote({ answers, questions = [] }) {
         products = inBand.length ? inBand : products.sort((a, b) => a.kw - b.kw).slice(0, 3);
     }
 
-    // Price products (supports your new catalog shape)
     const pricedProducts = products.map((p) => {
         const base =
             selectedBoilerType === "combi"
@@ -381,9 +346,7 @@ export function buildBoilerQuote({ answers, questions = [] }) {
                 : money(Number(p.boilerCost || 0) + RULES.MIN_MARGIN_SYSTEM_HEAT);
 
         const marginApplied = selectedBoilerType === "combi" ? 0 : RULES.MIN_MARGIN_SYSTEM_HEAT;
-
         const pricingComplete = selectedBoilerType === "combi" ? true : p.boilerCost != null;
-
         const total = pricingComplete ? money(base + addOns.total) : null;
 
         return {
