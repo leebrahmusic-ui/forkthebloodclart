@@ -15,25 +15,25 @@ const homeTypes = [
         name: "Terrace",
         icon: Home,
         tag: "Home type",
-        description: "Compact heating solutions designed for smaller terraces.",
+        description: "Compact, efficient boilers for Leeds terrace homes.",
     },
     {
         name: "Semi-detached",
         icon: Building2,
         tag: "Home type",
-        description: "Efficient boiler systems for mid-size family homes.",
+        description: "Balanced options for everyday family heating.",
     },
     {
         name: "Detached",
         icon: Castle,
         tag: "Home type",
-        description: "High-capacity heating for larger detached properties.",
+        description: "High-capacity systems for larger Leeds properties.",
     },
     {
         name: "Flat",
         icon: Building,
         tag: "Home type",
-        description: "Space-saving boilers perfect for apartments and flats.",
+        description: "Space‑saving installs for flats and apartments.",
     },
 ];
 
@@ -94,25 +94,23 @@ export function HomeTypesStrip() {
     }, []);
 
     return (
-        <section className="py-20">
+        <section className="bg-white py-20">
             {/* FLEX ROW ON DESKTOP — BOTH SIDES EXACT 50% */}
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0 lg:flex lg:items-center lg:gap-16">
                 {/* LEFT = 50% WIDTH */}
                 <div className="w-full lg:w-[40%] flex flex-col justify-between gap-10 mb-12 lg:mb-0">
                     <div>
-                        <p className="mb-4 text-sm font-semibold tracking-wide text-primary">
-                            We service all home types
+                        <p className="mb-4 text-sm font-semibold tracking-wide text-emerald-600">
+                            Tailored for Leeds & Surrounding homes
                         </p>
 
-                        <h2 className="text-3xl font-bold leading-tight text-light-background sm:text-4xl lg:text-5xl">
-                            The right boiler for{" "}
-                            <span className="text-primary">every home</span>.
+                        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
+                            The right boiler for every Leeds & Surrounding home.
                         </h2>
 
-                        <p className="mt-5 max-w-xl text-sm leading-relaxed text-light-grey/80">
-                            From compact terraces to larger detached homes, our
-                            engineers recommend and install boilers that match
-                            your property, usage, and budget.
+                        <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-600">
+                            We match your home size, usage and budget with a
+                            fixed‑price quote and a clean install.
                         </p>
                     </div>
 
@@ -120,14 +118,14 @@ export function HomeTypesStrip() {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={handlePrev}
-                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-light-background/30 text-light-background transition hover:bg-light-background hover:text-dark"
+                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </button>
 
                         <button
                             onClick={handleNext}
-                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-light-background/30 text-light-background transition hover:bg-light-background hover:text-dark"
+                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white"
                         >
                             <ArrowRight className="h-5 w-5" />
                         </button>
@@ -163,25 +161,25 @@ export function HomeTypesStrip() {
                                         xl:basis-[45%]
                                     "
                                 >
-                                    <div className="flex h-full relative flex-col justify-between rounded-3xl bg-dark/60 p-6 sm:p-8 ">
+                                    <div className="flex h-full relative flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                                         <div>
                                             {/* Top-right badge */}
-                                            <div className="absolute top-4 right-4 z-50 w-12 text-center h-12 inline-flex items-center justify-center rounded-full border border-primary/40 bg-primary/20 px-3 py-1 text-[8px] font-medium text-foreground leading-2.5">
+                                            <div className="absolute top-4 right-4 z-50 w-12 text-center h-12 inline-flex items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[8px] font-medium text-emerald-700 leading-2.5">
                                                 {type.tag}
                                             </div>
 
                                             <div className="mb-5 flex items-center gap-4">
                                                 {/* Icon wrapper – don't let it stretch */}
-                                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/35 shrink-0">
-                                                    <type.icon className="h-6 w-6 text-foreground" />
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 shrink-0">
+                                                    <type.icon className="h-6 w-6 text-emerald-700" />
                                                 </div>
 
-                                                <h3 className="text-2xl font-bold leading-7 max-w-32 text-light-background sm:text-3xl">
+                                                <h3 className="text-2xl font-bold leading-7 max-w-32 text-slate-900 sm:text-3xl">
                                                     {type.name} homes
                                                 </h3>
                                             </div>
 
-                                            <p className="max-w-md text-sm leading-relaxed text-neutral">
+                                            <p className="max-w-md text-sm leading-relaxed text-slate-600">
                                                 {type.description}
                                             </p>
                                         </div>

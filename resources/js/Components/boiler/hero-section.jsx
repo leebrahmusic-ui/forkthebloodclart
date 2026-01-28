@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import { GoogleReview } from "../GoogleReview";
 import { HeroServices } from "../HeroService";
 
@@ -6,41 +5,105 @@ export function HeroSection() {
     return (
         <section
             id="services"
-            className="relative overflow-hidden py-20 rounded-b-[45px] bg-light-grey pt-40"
+            className="relative overflow-hidden py-20 rounded-b-[45px] bg-slate-50 pt-40"
         >
             <div className="relative z-10 mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
-                <div className="relative mx-auto mb-10 text-center">
+                <div className="relative mb-12">
                     {/* Background decorative element */}
-                    <div className="absolute top-0 left-5 -translate-x-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-primary via-secondary/20 to-transparent blur-xl"></div>
+                    <div className="absolute -top-8 left-0 h-32 w-32 rounded-full bg-gradient-to-br from-emerald-200 via-emerald-100/40 to-transparent blur-2xl" />
 
-                    <div className="relative flex items-center justify-between">
-                        <h2 className="text-4xl sm:text-[40px] lg:text-[45px] font-bold tracking-tight text-slate-900 mb-6">
-                            <span className="relative">
-                                Let's Take Care of{" "}
-                                <span className="relative inline-block">
-                                    Your Boiler
-                                    <svg
-                                        width="118"
-                                        height="14"
-                                        viewBox="0 0 118 14"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="absolute -bottom-[15px] left-10 w-full scale-110"
-                                    >
-                                        <path
-                                            d="M101.992 4.34893C93.4576 2.71542 84.7474 2.23937 76.0816 1.77516C75.1495 1.85756 74.2176 1.80286 73.2865 1.74821C72.2639 1.68819 71.2425 1.62823 70.2233 1.7501C68.9183 1.75842 67.6129 1.75643 66.3074 1.75444C63.7424 1.75053 61.1767 1.74663 58.612 1.82086C56.9659 2.02015 55.3079 2.06054 53.6514 2.0813C50.5664 2.18806 47.4891 2.43338 44.4118 2.6787C43.0887 2.78418 41.7656 2.88966 40.4418 2.98412C39.2747 3.19702 38.0955 3.28183 36.9167 3.36662C35.5818 3.46264 34.2472 3.55864 32.9308 3.8406C26.4858 4.5214 20.081 5.61998 13.7274 6.95662C13.1161 7.10891 12.5034 7.25847 11.8905 7.40812C8.24899 8.2971 4.59479 9.1892 1.12186 10.6759C1.09073 10.8399 1.02847 11.1681 0.99999 11.3324C1.61906 11.3569 2.24821 11.354 2.84503 11.1454C6.82619 10.2378 10.8101 9.36423 14.8236 8.6622C15.8594 8.3854 16.9156 8.2416 17.9718 8.09783C18.885 7.97351 19.7981 7.8492 20.6977 7.63894C21.6191 7.428 22.554 7.32028 23.4885 7.21261C24.4494 7.1019 25.4099 6.99124 26.355 6.76847C27.1118 6.59953 27.8795 6.53875 28.6474 6.47795C29.1613 6.43726 29.6754 6.39656 30.1864 6.32342C32.0012 6.00008 33.8308 5.8207 35.6609 5.64129C36.8302 5.52665 37.9997 5.412 39.1655 5.25977C40.3225 5.10525 41.4856 5.03639 42.6487 4.96753C44.0432 4.88497 45.4375 4.80242 46.8209 4.57225C47.9164 4.49158 49.0139 4.45141 50.1115 4.41125C51.2801 4.36848 52.4488 4.32571 53.6156 4.23403C55.3437 4.05603 57.0773 4.02745 58.8111 3.99887C60.1603 3.97664 61.5096 3.9544 62.8567 3.86174C63.5661 3.89715 64.275 3.87348 64.9834 3.84984C65.8921 3.8195 66.8001 3.78919 67.7079 3.88358C70.4209 3.74309 73.1333 3.85345 75.8461 3.96382C77.3711 4.02586 78.8962 4.08791 80.4216 4.10541C89.1913 4.6396 97.9759 5.43447 106.547 7.4573C106.917 7.54018 107.288 7.61901 107.66 7.69792C109.338 8.05399 111.024 8.41164 112.593 9.14988C111.841 9.19013 111.098 9.08707 110.357 8.98421C110.025 8.93815 109.693 8.89213 109.361 8.85902C108.739 8.7808 108.115 8.71942 107.491 8.65806C106.177 8.52893 104.865 8.39991 103.574 8.11428C98.014 7.56178 92.4394 7.16897 86.8657 6.83547C84.8069 6.8854 82.7468 6.80839 80.687 6.73139C77.7652 6.62217 74.8442 6.51297 71.9286 6.7662C66.6683 6.76123 61.4045 6.97886 56.1564 7.40929C54.5766 7.45132 53.0046 7.61475 51.4325 7.77818C50.023 7.9247 48.6134 8.07124 47.198 8.13033C45.9342 8.37195 44.6579 8.49962 43.3811 8.62734C42.098 8.75569 40.8145 8.88408 39.543 9.12821C38.6327 9.30628 37.7132 9.41469 36.7939 9.52309C35.6258 9.6608 34.458 9.7985 33.3093 10.079C27.0488 10.4818 28.1215 13.3945 31.0593 12.6571C31.4738 12.6309 34.7193 12.6043 35.1335 12.5777C37.6768 12.4145 37.3895 12.2449 39.9339 12.0748C40.3255 12.0486 40.7171 12.0225 41.1088 11.9963C42.8789 11.6575 44.6532 11.3412 46.4508 11.2277C48.6012 10.8611 50.7745 10.7411 52.9459 10.6213C53.6291 10.5835 54.312 10.5458 54.994 10.5005C57.6714 10.2037 60.3591 10.1387 63.0456 10.0738C64.1615 10.0468 65.2772 10.0198 66.3919 9.9762C67.2218 9.82877 68.0577 9.83236 68.8945 9.83595C69.4033 9.83813 69.9125 9.84032 70.4207 9.80855C73.5399 9.82847 76.6534 9.81693 79.767 9.80539C80.5892 9.67894 81.413 9.73055 82.2375 9.7822C82.7055 9.81153 83.1738 9.84086 83.6421 9.83764C85.0517 9.75476 86.4598 9.83448 87.8685 9.91423C88.9692 9.97654 90.0701 10.0389 91.1724 10.0237C95.1868 10.1238 99.1858 10.4622 103.185 10.8007C106.117 11.0488 109.05 11.297 111.989 11.4513C112.402 11.4069 112.835 11.4088 113.272 11.4107C114.481 11.4159 115.717 11.4212 116.614 10.4515C116.696 9.76089 116.474 9.06973 116.027 8.56462C114.507 7.31973 112.647 6.8384 110.804 6.36153C110.221 6.21055 109.639 6.06002 109.07 5.88585C107.634 5.36968 106.139 5.11425 104.644 4.85894C103.756 4.70715 102.867 4.5554 101.992 4.34893Z"
-                                            fill="#0067ff"
-                                            stroke="#0067ff"
-                                        ></path>
-                                    </svg>
+                    <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
+                        <div className="space-y-6">
+                            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-700">
+                                Leeds & Surrounding · Fixed‑price quotes
+                            </p>
+
+                            <h2 className="text-4xl sm:text-[40px] lg:text-[52px] font-semibold tracking-tight text-slate-900">
+                                New boiler installs in Leeds & Surrounding — fixed price, no sales visit.
+                                <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
+                                    Book this week. Next‑day installs available when ordered before 3pm.
                                 </span>
-                            </span>
-                        </h2>
+                            </h2>
 
-                        <div className="p-3 border-[2px] border-dark rounded-full inline-flex items-center justify-center cursor-pointer group">
-                            <span className="transform rotate-45 transition-all duration-300 group-hover:rotate-0">
-                                <ArrowRight size={20} />
-                            </span>
+
+                            <div className="flex flex-wrap items-center gap-3">
+                                <a
+                                    href="/book"
+                                    className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                                >
+                                    Get a fixed quote
+                                </a>
+                                <a
+                                    href="#service-cards"
+                                    className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-400 hover:bg-white"
+                                >
+                                    See services below
+                                </a>
+                            </div>
+
+                            <p className="text-xs text-slate-500">
+                                Big blue prices? Not here. Local engineers, fixed quotes.
+                            </p>
+
+                            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                                Repairs · Servicing · Magnacleanse
+                            </p>
+                        </div>
+
+                        <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                            <div className="space-y-5">
+                                <div className="flex items-center gap-3">
+                                    <img
+                                        src="/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png"
+                                        alt="Gas Safe Register"
+                                        className="h-9 w-9"
+                                    />
+                                    <div>
+                                        <div className="text-sm font-semibold text-slate-900">
+                                            Gas Safe Register 636354
+                                        </div>
+                                        <div className="text-xs text-slate-500">
+                                            Certified engineers
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <span className="text-sm font-semibold text-slate-900">Order before 3pm</span>
+                                    <span className="text-xs font-semibold text-emerald-600">Next‑day installs</span>
+                                </div>
+
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                                            Fully insured
+                                        </div>
+                                        <div className="text-sm font-semibold text-slate-900">
+                                            Work protected
+                                        </div>
+                                        <div className="mt-1 text-xs text-slate-500">
+                                            Insurance details available on request
+                                        </div>
+                                    </div>
+                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                                            Trusted brand installer
+                                        </div>
+                                        <div className="mt-1 flex items-center gap-2">
+                                            <img
+                                                src="/images/idealheating.png"
+                                                alt="Ideal Heating"
+                                                className="h-6 w-16 object-contain"
+                                            />
+                                            <span className="text-xs text-slate-500">Ideal Heating</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+                                    WhatsApp chat 24/7 or request a callback from an engineer. Clean installs, clear pricing, local support.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

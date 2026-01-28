@@ -4,32 +4,32 @@ import { IoChevronDown } from "react-icons/io5";
 
 const FAQ_LIST = [
     {
-        q: "Who are MD Gas?",
-        a: "MD Gas is a trusted home heating specialist providing boiler installations, repairs, servicing, and energy-efficient heating solutions across the region.",
+        q: "Who do you cover?",
+        a: "Leeds and surrounding areas only, so we can keep response times fast and local.",
     },
     {
-        q: "Do you offer finance options for boiler installations?",
-        a: "Yes, we offer flexible finance plans to help you spread the cost of your boiler installation easily and affordably.",
+        q: "How can I contact you?",
+        a: "WhatsApp chat 24/7 or request an engineer callback. We don’t use phone queues or email forms.",
     },
     {
-        q: "What services does MD Gas provide?",
-        a: "We provide boiler installation, servicing, repairs, central heating upgrades, smart thermostat setup, and emergency call-outs.",
+        q: "What services do you provide?",
+        a: "Boiler installation, servicing, repairs, power flushes, and heating upgrades.",
     },
     {
-        q: "Who carries out the installation?",
-        a: "All installations are completed by fully qualified Gas Safe registered engineers with years of professional experience.",
+        q: "Are you Gas Safe registered?",
+        a: "Yes — Gas Safe Register number 636354. All work is completed by qualified engineers.",
     },
     {
-        q: "Are my payments and purchases protected?",
-        a: "Yes, all installations and products come with full protection, warranties, and transparent pricing.",
+        q: "Do you offer fixed prices?",
+        a: "Yes. Fixed‑price quotes with clear breakdowns and no hidden extras.",
     },
     {
-        q: "How quickly can you install a new boiler?",
-        a: "In many cases, we offer next-day installation depending on availability.",
+        q: "How fast can you install?",
+        a: "Often within days, depending on availability and boiler choice.",
     },
     {
-        q: "Do you provide emergency boiler repairs?",
-        a: "Yes, we provide same-day emergency boiler repair services.",
+        q: "Do you do emergency repairs?",
+        a: "We’ll always try to help quickly. WhatsApp us and we’ll advise the fastest option.",
     },
 ];
 
@@ -40,23 +40,20 @@ export default function Faq() {
     const displayedFaqs = showAll ? FAQ_LIST : FAQ_LIST.slice(0, 5);
 
     return (
-        <section className="bg-foreground py-20 rounded-b-[45px]">
+        <section className="bg-slate-50 py-20 rounded-b-[45px]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
                 {/* Header */}
                 <div className="mb-16 max-w-3xl">
-                    <span className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                        Support
+                    <span className="text-xs uppercase tracking-[0.3em] text-emerald-600">
+                        Leeds & Surrounding support
                     </span>
                     <h2 className="mt-3 text-4xl sm:text-5xl font-bold text-slate-900">
-                        Frequently asked questions
+                        Questions, answered
                     </h2>
                 </div>
 
                 {/* FAQ List */}
                 <div className="relative">
-                    {/* Vertical rail */}
-                    <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-slate-300 to-transparent" />
-
                     <div className="space-y-6">
                         {displayedFaqs.map((item, index) => {
                             const isOpen = openIndex === index;
@@ -92,8 +89,8 @@ export default function Faq() {
                                             transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]
                                             ${
                                                 isOpen
-                                                    ? "bg-slate-50/70 border-slate-300 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.35)] translate-x-1"
-                                                    : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md"
+                                                    ? "bg-white border-emerald-200 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)] translate-x-1"
+                                                    : "bg-white border-slate-200 hover:border-emerald-200 hover:shadow-md"
                                             }
                                         `}
                                     >
@@ -105,8 +102,8 @@ export default function Faq() {
                                                 transition-all duration-300
                                                 ${
                                                     isOpen
-                                                        ? "bg-slate-900 ring-4 ring-slate-900/10"
-                                                        : "bg-slate-300"
+                                                        ? "bg-emerald-500 ring-4 ring-emerald-100"
+                                                        : "bg-emerald-200"
                                                 }
                                             `}
                                         />
@@ -133,8 +130,8 @@ export default function Faq() {
                                                 transition-all duration-300
                                                 ${
                                                     isOpen
-                                                        ? "bg-slate-900 text-white rotate-180"
-                                                        : "bg-slate-100 text-slate-500"
+                                                        ? "bg-emerald-600 text-white rotate-180"
+                                                        : "bg-emerald-50 text-emerald-700"
                                                 }
                                             `}
                                         >
@@ -153,7 +150,7 @@ export default function Faq() {
                                             }
                                         `}
                                     >
-                                        <div className="ml-14 mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 border border-slate-200 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.25)]">
+                                        <div className="ml-14 mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 border border-slate-200 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]">
                                             {item.a}
                                         </div>
                                     </div>
@@ -178,7 +175,7 @@ export default function Faq() {
                             px-6 py-3
                             text-sm font-semibold text-slate-900
                             transition-all duration-300
-                            hover:border-slate-400 hover:shadow-md
+                            hover:border-emerald-300 hover:shadow-md
                         "
                     >
                         {showAll ? "Show less questions" : "View all questions"}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
-import { Flame, Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { AiOutlineWhatsApp } from "react-icons/ai";
 
 // Content for each tab's mega section
@@ -9,19 +9,19 @@ const MEGA_SECTIONS = {
         {
             title: "Boiler installation",
             description:
-                "Efficient new boiler installations tailored to your home.",
+                "Fixed-price installs by engineers across Leeds & Surrounding.",
             href: "/#services",
         },
         {
             title: "Boiler repair & servicing",
             description:
-                "Fast, reliable repairs and annual servicing for peace of mind.",
+                "Fast repairs and servicing with clear, upfront pricing.",
             href: "/#services",
         },
         {
             title: "Gas safety certificates",
             description:
-                "Landlord & homeowner gas safety checks and certificates.",
+                "Landlord and homeowner safety checks by qualified engineers.",
             href: "/#services",
         },
     ],
@@ -29,39 +29,39 @@ const MEGA_SECTIONS = {
         {
             title: "Why choose MD Gas?",
             description:
-                "Experienced, friendly engineers with a focus on safety and quality.",
+                "Local engineers focused on safety, clarity and care.",
             href: "/about",
         },
         {
             title: "Our qualifications",
             description:
-                "Fully Gas Safe registered and compliant with UK regulations.",
+                "Gas Safe Register 636354. Fully certified and insured.",
             href: "/about#qualification",
         },
         {
             title: "Our service areas",
             description:
-                "Reliable boiler services across your local surrounding areas.",
+                "Leeds & Surrounding areas only — fast local support.",
             href: "/about#services-area",
         },
     ],
     contact: [
         {
-            title: "Request a call back",
+            title: "Engineer callback",
             description:
-                "Leave your details and we’ll get back to you as soon as possible.",
+                "Request a callback and a local engineer will phone you back.",
             href: "/#contact",
         },
         {
-            title: "Emergency support",
+            title: "WhatsApp chat 24/7",
             description:
-                "24/7 emergency boiler breakdown and gas leak assistance.",
+                "Message us any time on WhatsApp for quick, clear help.",
             href: "/#contact",
         },
         {
-            title: "Free quote",
+            title: "Fixed-price quotes",
             description:
-                "Tell us about your boiler needs and get a no-obligation quote.",
+                "Simple questions, clear pricing, no pushy sales visits.",
             href: "/#contact",
         },
     ],
@@ -112,7 +112,7 @@ export default function Header({
                 <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 sm:px-2 lg:px-6">
                     {/* Logo */}
                     <Link href="/" className="w-[170px]">
-                        <img src="/logo.png" alt="MD Gas Logo" />
+                        <img src="/images/logo%20FIXED.png" alt="MD Gas Leeds" />
                     </Link>
 
                     {/* Centre nav (desktop) */}
@@ -137,15 +137,6 @@ export default function Header({
 
                     {/* Right side */}
                     <div className="ml-auto flex items-center gap-4">
-                        {/* Gas Safe logo */}
-                        <img
-                            src="/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png"
-                            alt="Gas Safe Register"
-                            width={32}
-                            height={32}
-                            className="hidden sm:block"
-                            onClick={closeMega}
-                        />
 
                         {/* Call button */}
                         <button
@@ -159,7 +150,7 @@ export default function Header({
                             className={`hidden gap-2 items-center rounded-full px-4 py-2 text-sm font-medium cursor-pointer ${buttonBg} ${buttonText} hover:opacity-80 transition sm:flex`}
                         >
                             <AiOutlineWhatsApp className="h-4 w-4" />
-                            <span>Chat Now</span>
+                            <span>WhatsApp 24/7</span>
                         </button>
 
                         {/* Mobile menu toggle */}

@@ -10,71 +10,69 @@ import {
 
 const BENEFITS = [
     {
-        title: "Trusted installer.",
+        title: "Leeds specialists.",
         description:
-            "Experienced engineers delivering professional boiler installations you can rely on.",
+            "Local engineers who know Leeds homes and install cleanly.",
         icon: FiAward,
-        iconColor: "text-sky-400",
+        iconColor: "text-emerald-500",
     },
     {
-        title: "All-inclusive aftercare.",
+        title: "WhatsApp-first support.",
         description:
-            "Ongoing support and workmanship cover to give you confidence after installation.",
+            "Chat 24/7 on WhatsApp or request a callback.",
         icon: FiHeart,
-        iconColor: "text-blue-400",
+        iconColor: "text-emerald-500",
     },
     {
         title: "Transparent pricing.",
         description:
-            "Clear, upfront quotes with no hidden costs or unexpected surprises.",
+            "Fixed‑price quotes with no hidden extras.",
         icon: FiTag,
-        iconColor: "text-violet-400",
+        iconColor: "text-emerald-500",
     },
     {
-        title: "Customer-focused service.",
+        title: "Engineer callbacks.",
         description:
-            "We prioritise clear communication and a smooth experience from start to finish.",
+            "Need a call? A local engineer will call you back.",
         icon: FiStar,
-        iconColor: "text-emerald-400",
+        iconColor: "text-emerald-500",
     },
     {
-        title: "Energy-efficient solutions.",
+        title: "Efficiency focused.",
         description:
-            "Modern boiler options designed to improve efficiency and reduce energy waste.",
+            "Modern options that improve efficiency and reduce waste.",
         icon: FiShield,
-        iconColor: "text-pink-400",
+        iconColor: "text-emerald-500",
     },
     {
-        title: "A safe choice.",
-        description:
-            "Gas Safe registered engineers fully certified for boiler and heating work.",
+        title: "Certified engineers.",
+        description: "Fully qualified for boiler and heating work.",
         icon: FiZap,
-        iconColor: "text-amber-400",
+        iconColor: "text-emerald-500",
     },
 ];
 
 export default function WhyChooseUs() {
     return (
-        <section className="relative bg-dark/90 py-16 sm:py-20">
+        <section className="relative bg-white py-16 sm:py-20">
             {/* background fade */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-sky-500/10 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-100/40 via-transparent to-transparent" />
 
             <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
                 {/* heading */}
                 <header className="mx-auto max-w-3xl text-center">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-primary bg-dark/30 px-3 py-1">
-                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-200">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-700">
                             Why choose us
                         </span>
                     </div>
 
-                    <h2 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold text-white">
-                        Benefits that come as standard
+                    <h2 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-900">
+                        Built for Leeds & Surrounding homeowners
                     </h2>
-                    <p className="mt-2 text-sm sm:text-base text-slate-300/90">
-                        Everything we do is built around peace of mind, clear
-                        pricing and long-term support.
+                    <p className="mt-2 text-sm sm:text-base text-slate-600">
+                        Clear pricing, direct contact, and tidy installs.
                     </p>
                 </header>
 
@@ -87,13 +85,12 @@ export default function WhyChooseUs() {
                                 key={item.title}
                                 className="
                                     relative flex h-full items-center gap-4 
-                                    rounded-2xl border border-slate-800/80 
-                                    bg-background/20
+                                    rounded-2xl border border-slate-200 
+                                    bg-white
                                     p-5 sm:p-6 
-                                    shadow-[0_10px_30px_rgba(0,0,0,0.4)] 
-                                    backdrop-blur-md 
+                                    shadow-[0_10px_30px_rgba(15,23,42,0.08)] 
                                     transition-colors duration-300 
-                                    hover:border-primary
+                                    hover:border-emerald-300
                                 "
                             >
                                 {/* Accent bar that always matches card height */}
@@ -103,14 +100,14 @@ export default function WhyChooseUs() {
                                         absolute inset-y-2 left-0
                                         w-[3px]
                                         rounded-full 
-                                        bg-primary
-                                        shadow-[0_0_8px_rgba(56,189,248,0.45)]
+                                        bg-emerald-400
+                                        shadow-[0_0_8px_rgba(16,185,129,0.35)]
                                     "
                                 />
 
                                 {/* Icon tile */}
-                                <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950">
+                                <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-emerald-100">
                                         <Icon
                                             className={`h-6 w-6 ${item.iconColor}`}
                                         />
@@ -119,11 +116,11 @@ export default function WhyChooseUs() {
 
                                 {/* Text area */}
                                 <div className="flex flex-col flex-1">
-                                    <h3 className="text-sm sm:text-[15px] font-semibold text-white">
+                                    <h3 className="text-sm sm:text-[15px] font-semibold text-slate-900">
                                         {item.title}
                                     </h3>
 
-                                    <p className="mt-1 text-[13px] sm:text-sm leading-relaxed text-slate-300/90">
+                                    <p className="mt-1 text-[13px] sm:text-sm leading-relaxed text-slate-600">
                                         {item.description}
                                     </p>
 
@@ -135,8 +132,8 @@ export default function WhyChooseUs() {
                     })}
                 </div>
 
-                <p className="mt-10 text-center text-xl text-foreground/80">
-                    …so, why wouldn't you choose us?
+                <p className="mt-10 text-center text-base text-slate-500">
+                    Local, transparent, and engineer‑led.
                 </p>
             </div>
         </section>

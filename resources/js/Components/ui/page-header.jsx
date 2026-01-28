@@ -14,7 +14,7 @@ export function PageHeader({ variant = "default", currentStep = 4 }) {
                 <div className="flex h-[75px] items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="w-[120px]">
-                        <img src="/logo.png" alt="MD Gas Logo" />
+                        <img src="/images/logo%20FIXED.png" alt="MD Gas Leeds" />
                     </Link>
 
                     {variant === "results" && (

@@ -1,6 +1,7 @@
 import Faq from "@/Components/boiler/Faq";
 import { HeroSection } from "@/Components/boiler/hero-section";
 import { HomeTypesStrip } from "@/Components/boiler/home-types-strip";
+import { InstagramFeed } from "@/Components/boiler/InstagramFeed";
 import { ServiceCards } from "@/Components/boiler/service-cards";
 import WhyChooseUs from "@/Components/boiler/WhyChooseUs";
 import GuestLayout from "@/Layouts/GuestLayout";
@@ -17,6 +18,7 @@ export default function Home() {
                     <HomeTypesStrip />
                     <ServiceCards />
                     <WhyChooseUs />
+                    <InstagramFeed />
                     <Faq />
                 </GuestLayout>
                 {/* <Footer /> */}

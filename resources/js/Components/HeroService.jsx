@@ -12,185 +12,182 @@ const services = [
     {
         id: "repair",
         title: "Boiler Repair",
-        description: "Fast boiler repairs with fixed labour.",
+        description: "Same‑week slots for Leeds boiler repairs.",
         image: "/images/product_boiler.png",
-        highlight: "instant booking",
+        highlight: "Same‑week slots",
         href: "/book/quote?service=repair",
-        featured: true,
         theme: {
-            hoverBg: "hover:bg-[#E5F1FF]",
-            hoverBorder: "hover:border-[#2358FF]",
-            labelBg: "bg-[#2358FF]",
-            rippleColor: "text-[#7190F5]",
-            arrowHoverBg: "group-hover:bg-[#2358FF]",
+            hoverBg: "hover:bg-emerald-50",
+            hoverBorder: "hover:border-emerald-400",
+            labelBg: "bg-emerald-600",
+            rippleColor: "text-emerald-200",
+            arrowHoverBg: "group-hover:bg-emerald-600",
         },
     },
     {
         id: "service",
         title: "Boiler Service",
-        description: "Annual service to keep your boiler safe.",
+        description: "Gas Safe servicing with clear, upfront pricing.",
         image: "/images/product_boiler.png",
-        highlight: "Yearly Service",
+        highlight: "Gas Safe",
         href: "/book/quote?service=service",
         theme: {
-            hoverBg: "hover:bg-[#FFECA9]",
-            hoverBorder: "hover:border-[#FFC727]",
-            labelBg: "bg-[#FFC727]",
-            rippleColor: "text-[#FFC727]",
-            arrowHoverBg: "group-hover:bg-[#2358FF]",
+            hoverBg: "hover:bg-emerald-50",
+            hoverBorder: "hover:border-emerald-400",
+            labelBg: "bg-emerald-600",
+            rippleColor: "text-emerald-200",
+            arrowHoverBg: "group-hover:bg-emerald-600",
         },
     },
     {
         id: "quote",
         title: "New Boiler Quote",
-        description: "Instant online quote for a new boiler.",
-        image: "/images/product_boiler.png",
-        highlight: "Instant Quote",
+        description: "Worcester Bosch Greenstar 1000",
+        priceLine: "Installed from £1895 (24kW)",
+        specs: [
+            "5-year warranty included",
+            "Filter included",
+            "Chemical flush",
+            "Wireless room thermostat",
+        ],
+        image: "/assets/productImages/greenstar-boiler.png",
+        highlight: "Next‑day install",
         href: "/book",
+        featured: true,
 
         theme: {
-            hoverBg: "hover:bg-[#E6F9EC]",
-            hoverBorder: "hover:border-[#17A44A]",
-            labelBg: "bg-[#17A44A]",
-            rippleColor: "text-[#17A44A]",
-            arrowHoverBg: "group-hover:bg-[#2358FF]",
+            hoverBg: "hover:bg-emerald-50",
+            hoverBorder: "hover:border-emerald-400",
+            labelBg: "bg-emerald-600",
+            rippleColor: "text-emerald-200",
+            arrowHoverBg: "group-hover:bg-emerald-600",
         },
     },
     {
         id: "powerflush",
-        title: "Power Flush",
-        description: "Deep clean for radiators and pipework.",
+        title: "Magnacleanse",
+        description: "A gentler system cleanse for radiators and pipework.",
         image: "/images/product_boiler.png",
-        highlight: "instant booking",
+        highlight: "Cleaner system",
         href: "/book/quote?service=powerflush",
         theme: {
-            hoverBg: "hover:bg-[#F3E9FF]",
-            hoverBorder: "hover:border-[#8B4DFF]",
-            labelBg: "bg-[#8B4DFF]",
-            rippleColor: "text-[#8B4DFF]",
-            arrowHoverBg: "group-hover:bg-[#2358FF]",
+            hoverBg: "hover:bg-emerald-50",
+            hoverBorder: "hover:border-emerald-400",
+            labelBg: "bg-emerald-600",
+            rippleColor: "text-emerald-200",
+            arrowHoverBg: "group-hover:bg-emerald-600",
         },
     },
 ];
 
-// SVG ripple using currentColor so we can tint it per card
-function GlowRipple({ className }) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="203"
-            height="205"
-            viewBox="0 0 243 225"
-            fill="none"
-            className={className}
-            aria-hidden="true"
-        >
-            <g opacity="0.2">
-                <ellipse
-                    cx="121.282"
-                    cy="112.153"
-                    rx="106.355"
-                    ry="98.3498"
-                    fill="currentColor"
-                    fillOpacity="0.4"
-                />
-                <ellipse
-                    cx="121.282"
-                    cy="112.153"
-                    rx="121.282"
-                    ry="112.153"
-                    fill="currentColor"
-                    fillOpacity="0.2"
-                />
-                <ellipse
-                    cx="121.283"
-                    cy="112.154"
-                    rx="94.0935"
-                    ry="87.0113"
-                    fill="currentColor"
-                    fillOpacity="0.4"
-                />
-                <ellipse
-                    cx="121.282"
-                    cy="112.154"
-                    rx="77.0341"
-                    ry="71.2358"
-                    fill="currentColor"
-                    fillOpacity="0.6"
-                />
-            </g>
-        </svg>
-    );
-}
-
 export function HeroServices() {
-    return (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {services.map((service) => (
-                <Card
-                    key={service.id}
-                    className={`group relative flex flex-col items-start overflow-hidden rounded-[30px]
-    border-[3px]
-    ${
-        service.featured
-            ? "border-[#2358FF] shadow-[0_24px_60px_rgba(15,23,42,0.35)]"
-            : "border-[#EFEFEF] shadow-[0_18px_45px_rgba(15,23,42,0.06)]"
-    }
-    bg-white px-7 pt-7 pb-6
-    transition-all duration-300
-    hover:shadow-[0_24px_60px_rgba(15,23,42,0.35)]
-    ${service.theme.hoverBg}
-    ${service.theme.hoverBorder}`}
-                >
-                    {/* label pill */}
-                    <div
-                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white ${service.theme.labelBg}`}
-                    >
-                        {service.highlight}
-                    </div>
+    const featuredService = services.find((service) => service.featured);
+    const otherServices = services.filter((service) => !service.featured);
 
-                    {/* image + ripple */}
-                    <div className="relative mt-1 flex h-44 w-full items-center justify-center">
-                        {/* ripple perfectly centered */}
-                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <GlowRipple
-                                className={`${service.theme.rippleColor}`}
+    return (
+        <div className="space-y-6">
+            {featuredService && (
+                <Card className="group relative flex flex-col overflow-hidden rounded-[28px] border border-emerald-200 bg-white p-7 shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
+                    {/* label pill */}
+                        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+                            {featuredService.highlight}
+                        </div>
+
+                    <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+                        <div className="space-y-3">
+                            <CardHeader className="p-0">
+                                <CardTitle className="text-[22px] font-semibold text-slate-900">
+                                    {featuredService.title}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <CardDescription className="text-[14px] leading-relaxed text-slate-600">
+                                    {featuredService.description}
+                                </CardDescription>
+                                {featuredService.priceLine && (
+                                    <p className="mt-2 text-[15px] font-semibold text-slate-900">
+                                        {featuredService.priceLine}
+                                    </p>
+                                )}
+                                {featuredService.specs?.length > 0 && (
+                                    <ul className="mt-3 space-y-1 text-sm text-slate-600">
+                                        {featuredService.specs.map((spec) => (
+                                            <li key={spec} className="flex items-start gap-2">
+                                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                <span>{spec}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </CardContent>
+
+                            <div className="mt-4 inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-600">
+                                Example package shown • Final selection happens in your quote
+                            </div>
+
+                            <Link
+                                href={featuredService.href}
+                                className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                            >
+                                Get fixed quote
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
+
+                        <div className="relative flex h-48 items-center justify-center rounded-2xl bg-slate-50">
+                            <img
+                                src={featuredService.image}
+                                alt={featuredService.title}
+                                className="max-h-36 object-contain"
+                            />
+                        </div>
+                    </div>
+                </Card>
+            )}
+
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {otherServices.map((service) => (
+                    <Card
+                        key={service.id}
+                        className="group relative flex flex-col overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
+                    >
+                        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
+                            {service.highlight}
+                        </div>
+
+                        <div className="relative mt-4 flex h-32 w-full items-center justify-center rounded-2xl bg-slate-50">
+                            <img
+                                src={service.image}
+                                alt={service.title}
+                                className="max-h-24 object-contain"
                             />
                         </div>
 
-                        {/* image perfectly centered */}
-                        <img
-                            src={service.image}
-                            alt={service.title}
-                            className="relative z-10 max-h-32 object-contain mx-auto"
-                        />
-                    </div>
-
-                    {/* text + round arrow bottom-right */}
-                    <div className="flex items-end justify-between gap-4 mt-1">
-                        <div>
+                        <div className="mt-4 w-full">
                             <CardHeader className="p-0">
                                 <CardTitle className="text-[18px] font-semibold text-slate-900">
                                     {service.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className=" p-0">
+                            <CardContent className="p-0">
                                 <CardDescription className="text-[14px] leading-relaxed text-slate-600">
                                     {service.description}
                                 </CardDescription>
                             </CardContent>
-                        </div>
 
-                        <Link href={service.href} className="shrink-0">
-                            <div
-                                className={`flex h-11 w-11 items-center justify-center rounded-full bg-black text-white transition-all duration-300 group-hover:translate-x-1 ${service.theme.arrowHoverBg}`}
-                            >
-                                <ArrowRight className="h-5 w-5" />
+                            <div className="mt-5">
+                                <Link
+                                    href={service.href}
+                                    className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:border-slate-400"
+                                >
+                                    Book now
+                                    <ArrowRight className="h-4 w-4" />
+                                </Link>
                             </div>
-                        </Link>
-                    </div>
-                </Card>
-            ))}
+                        </div>
+                    </Card>
+                ))}
+            </div>
         </div>
     );
 }
