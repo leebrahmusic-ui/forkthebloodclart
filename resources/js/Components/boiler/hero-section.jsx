@@ -14,10 +14,6 @@ export function HeroSection() {
 
                     <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="space-y-6">
-                            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-700">
-                                Leeds & Surrounding · Fixed‑price quotes
-                            </p>
-
                             <h2 className="text-4xl sm:text-[40px] lg:text-[52px] font-semibold tracking-tight text-slate-900">
                                 New boiler installs in Leeds & Surrounding — fixed price, no sales visit.
                                 <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
@@ -33,25 +29,19 @@ export function HeroSection() {
                                 >
                                     Get a fixed quote
                                 </a>
-                                <a
-                                    href="#service-cards"
-                                    className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-400 hover:bg-white"
-                                >
+                                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700">
                                     See services below
-                                </a>
+                                </span>
                             </div>
 
                             <p className="text-xs text-slate-500">
                                 Big blue prices? Not here. Local engineers, fixed quotes.
                             </p>
 
-                            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                                Repairs · Servicing · Magnacleanse
-                            </p>
                         </div>
 
-                        <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                            <div className="space-y-5">
+                        <div className="rounded-[24px] border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                            <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <img
                                         src="/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png"
@@ -68,13 +58,13 @@ export function HeroSection() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2">
                                     <span className="text-sm font-semibold text-slate-900">Order before 3pm</span>
                                     <span className="text-xs font-semibold text-emerald-600">Next‑day installs</span>
                                 </div>
 
                                 <div className="grid gap-3 sm:grid-cols-2">
-                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2">
                                         <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
                                             Fully insured
                                         </div>
@@ -85,7 +75,7 @@ export function HeroSection() {
                                             Insurance details available on request
                                         </div>
                                     </div>
-                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2">
                                         <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
                                             Trusted brand installer
                                         </div>
@@ -100,8 +90,8 @@ export function HeroSection() {
                                     </div>
                                 </div>
 
-                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                                    WhatsApp chat 24/7 or request a callback from an engineer. Clean installs, clear pricing, local support.
+                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
+                                    WhatsApp chat 24/7 or request a callback from an engineer.
                                 </div>
                             </div>
                         </div>
