@@ -33,7 +33,7 @@ const getActiveIdFromHash = () => {
 export default function PrivacyPolicyPage() {
     const { props } = usePage();
     const pageTitle = props.pageTitle ?? "Privacy Policy";
-    const lastUpdated = "12 December 2025";
+    const lastUpdated = "28 January 2026";
 
     const [activeSectionId, setActiveSectionId] = useState(
         getActiveIdFromHash()
@@ -159,11 +159,11 @@ export default function PrivacyPolicyPage() {
                                 <p>
                                     Our priority at <strong>MD Gas</strong> is
                                     keeping your data secure and treating it
-                                    with respect. We aim to handle your data
-                                    fairly and lawfully at all times. This
-                                    statement explains how we collect, use,
-                                    transfer and store personal data and
-                                    outlines your rights under UK GDPR.
+                                    with respect. We handle your data fairly and
+                                    lawfully at all times. This statement
+                                    explains how we collect, use and store
+                                    personal data and outlines your rights
+                                    under UK GDPR.
                                 </p>
                             </PolicyTimelineSection>
 
@@ -173,10 +173,9 @@ export default function PrivacyPolicyPage() {
                                 isActive={activeSectionId === "who-we-are"}
                             >
                                 <p>
-                                    MD Gas Limited (Glebe Business Park, Widnes,
-                                    Cheshire, WA8 5SQ) is the data controller.
-                                    We comply with the UK Data Protection Act
-                                    2018 and UK GDPR.
+                                    MD Gas is the data controller. We comply
+                                    with the UK Data Protection Act 2018 and UK
+                                    GDPR.
                                 </p>
                             </PolicyTimelineSection>
 
@@ -186,10 +185,9 @@ export default function PrivacyPolicyPage() {
                                 isActive={activeSectionId === "contacting-us"}
                             >
                                 <p>
-                                    You can reach our Data Protection Officer or
-                                    customer support via the details provided in
-                                    the **Contact us** section at the bottom of
-                                    this policy.
+                                    You can reach us via the details in the
+                                    **Contact us** section at the bottom of this
+                                    policy.
                                 </p>
                             </PolicyTimelineSection>
 
@@ -203,38 +201,35 @@ export default function PrivacyPolicyPage() {
                                         <strong className="text-primary">
                                             Personal data:
                                         </strong>{" "}
-                                        Name, address, email, phone, and date of
-                                        birth.
+                                        Name, address, email, and phone.
                                     </li>
                                     <li>
                                         <strong className="text-primary">
                                             Vulnerability info:
                                         </strong>{" "}
-                                        Health or disability information you
-                                        choose to provide us for service
-                                        accommodation.
+                                        Any information you choose to share so
+                                        we can accommodate your service safely.
                                     </li>
                                     <li>
                                         <strong className="text-primary">
                                             Financial info:
                                         </strong>{" "}
                                         Payment details and finance application
-                                        history.
+                                        status (when using third‑party finance).
                                     </li>
                                     <li>
                                         <strong className="text-primary">
                                             Property info:
                                         </strong>{" "}
-                                        House details and energy systems (boiler
-                                        type, size) from quoting tools.
+                                        Property details and heating system
+                                        information needed to provide a quote.
                                     </li>
                                     <li>
                                         <strong className="text-primary">
                                             Communications:
                                         </strong>{" "}
-                                        Call recordings, emails, and webchat
-                                        transcripts for quality and training
-                                        purposes.
+                                        Messages and chat history for support
+                                        and service delivery.
                                     </li>
                                 </ul>
                                 <p className="mt-4 border-l-4 border-gray-200 pl-4 text-sm text-gray-500 italic">
@@ -251,12 +246,12 @@ export default function PrivacyPolicyPage() {
                                 isActive={activeSectionId === "how-we-use"}
                             >
                                 <p className="text-base text-gray-700">
-                                    We use data to: deliver requested services
+                                    We use data to deliver requested services
                                     (installation/repair), provide accurate
                                     quotes, manage orders, register products for
                                     warranty, process secure payments, improve
-                                    services, and send relevant marketing
-                                    communications where consent has been given.
+                                    services, and send marketing only where
+                                    consent has been given.
                                 </p>
                                 <div className="mt-4 border-l-4 border-secondary bg-secondary/5 p-4 text-base text-primary rounded-r-lg">
                                     <strong>Legal Basis:</strong> Our primary
@@ -274,7 +269,7 @@ export default function PrivacyPolicyPage() {
                                 <p>
                                     We do not sell or rent your data. Sharing
                                     occurs only with trusted providers strictly
-                                    as required to fulfill services or legal
+                                    as required to fulfil services or legal
                                     duties.
                                 </p>
                             </PolicyTimelineSection>
@@ -343,9 +338,9 @@ export default function PrivacyPolicyPage() {
                                 isActive={activeSectionId === "cookies"}
                             >
                                 <p>
-                                    We use cookies for functionality, analytics,
-                                    and marketing. Details are available in our
-                                    **Cookie Policy**.
+                                    We use cookies for functionality and basic
+                                    analytics. You can control cookies through
+                                    your browser settings.
                                 </p>
                             </PolicyTimelineSection>
 
@@ -366,7 +361,7 @@ export default function PrivacyPolicyPage() {
                                 isActive={activeSectionId === "third-party"}
                             >
                                 <p>
-                                    We are not responsible for third-party
+                                    We are not responsible for third‑party
                                     privacy practices.
                                 </p>
                             </PolicyTimelineSection>
@@ -390,20 +385,11 @@ export default function PrivacyPolicyPage() {
                             >
                                 <div className="mt-4 p-5 rounded-lg border border-primary/60 bg-primary/5 space-y-3">
                                     <p>
-                                        <strong>Email:</strong> hello@MD
-                                        Gas.co.uk
+                                        <strong>Contact:</strong> WhatsApp chat
+                                        or request an engineer callback.
                                     </p>
                                     <p>
-                                        <strong>DPO:</strong> privacy@MD
-                                        Gas.co.uk
-                                    </p>
-                                    <p>
-                                        <strong>Phone:</strong> 0330 113 1333
-                                    </p>
-                                    <p>
-                                        <strong>Address:</strong> MD Gas
-                                        Limited, Glebe Business Park, Widnes,
-                                        Cheshire, WA8 5SQ
+                                        <strong>Email:</strong> info@mdgasleeds.co.uk
                                     </p>
                                 </div>
                             </PolicyTimelineSection>

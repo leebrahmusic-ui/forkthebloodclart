@@ -28,7 +28,7 @@ const getActiveIdFromHash = () => {
 export default function TermsConditionsPage() {
     const { props } = usePage();
     const pageTitle = props.pageTitle ?? "Terms & Conditions";
-    const lastUpdated = "12 December 2025";
+    const lastUpdated = "28 January 2026";
 
     const [activeSectionId, setActiveSectionId] = useState(
         getActiveIdFromHash()
@@ -161,19 +161,20 @@ export default function TermsConditionsPage() {
                                 <ul className="list-disc pl-5 space-y-2">
                                     <li>
                                         <strong>Boiler Repairs:</strong> Fixed
-                                        £75 labour charge (parts extra).
+                                        labour rates with parts priced separately
+                                        where required.
                                     </li>
                                     <li>
                                         <strong>Servicing:</strong> Annual
-                                        servicing from £75.
+                                        servicing with clear fixed pricing.
                                     </li>
                                     <li>
-                                        <strong>Installations:</strong> Pricing
-                                        varies.
+                                        <strong>Installations:</strong> Fixed‑price
+                                        online quotes and packages.
                                     </li>
                                     <li>
                                         <strong>Power Flush:</strong> Price
-                                        based on radiator count.
+                                        based on radiator count and system size.
                                     </li>
                                 </ul>
                             </TermsSection>
@@ -187,7 +188,7 @@ export default function TermsConditionsPage() {
                                     <li>Provide accurate booking details.</li>
                                     <li>An adult must be present.</li>
                                     <li>Ensure safe access.</li>
-                                    <li>24h notice required.</li>
+                                    <li>Please give notice if you need to reschedule.</li>
                                 </ul>
                             </TermsSection>
 
@@ -197,10 +198,10 @@ export default function TermsConditionsPage() {
                                 isActive={activeSectionId === "pricing"}
                             >
                                 <ul className="list-disc pl-5 space-y-2">
-                                    {/* <li>Prices include VAT.</li> */}
-                                    <li>Labour fixed, parts extra.</li>
-                                    <li>Payment due on completion.</li>
-                                    <li>Cash, card, bank transfer accepted.</li>
+                                    <li>All prices include VAT.</li>
+                                    <li>Labour fixed, parts extra where required.</li>
+                                    <li>Payment is taken upfront.</li>
+                                    <li>We accept card payments and Klarna.</li>
                                 </ul>
                             </TermsSection>
 
@@ -221,8 +222,9 @@ export default function TermsConditionsPage() {
                                 isActive={activeSectionId === "liability"}
                             >
                                 <p>
-                                    Liability is limited to service cost and
-                                    excludes pre-existing faults.
+                                    Liability is limited to the cost of the
+                                    service provided and excludes pre‑existing
+                                    faults.
                                 </p>
                             </TermsSection>
 
@@ -242,8 +244,9 @@ export default function TermsConditionsPage() {
                                 isActive={activeSectionId === "complaints"}
                             >
                                 <p>
-                                    Contact us within 14 days if unhappy with
-                                    service.
+                                    Contact us as soon as possible if you are
+                                    unhappy with a service and we will work to
+                                    put it right.
                                 </p>
                             </TermsSection>
 
@@ -262,9 +265,9 @@ export default function TermsConditionsPage() {
                                 isContact
                             >
                                 <div className="mt-4 p-5 rounded-lg border border-primary/60 bg-primary-5 space-y-3">
-                                    <p>Email: info@mdgas.co.uk</p>
-                                    <p>Phone: 0800 123 4567</p>
-                                    <p>MD Gas Ltd, Greater London</p>
+                                    <p>Contact: WhatsApp chat or request a callback.</p>
+                                    <p>Email: info@mdgasleeds.co.uk</p>
+                                    <p>Service area: Leeds & Surrounding.</p>
                                 </div>
                             </TermsSection>
                         </article>
