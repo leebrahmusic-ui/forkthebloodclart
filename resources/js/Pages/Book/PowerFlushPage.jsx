@@ -6,15 +6,37 @@ import React from "react";
 export default function PowerflushQuote() {
     const { basePrice, symbol, radiatorPrices, title } = usePage().props;
 
+    const radiatorRows = Array.isArray(radiatorPrices)
+        ? radiatorPrices
+        : Array.isArray(radiatorPrices?.data)
+            ? radiatorPrices.data
+            : [];
+
+    const baseValue = Number(basePrice || 525);
+    const basePriceForStepper = 0;
+
+    const radiatorOptions = radiatorRows.length
+        ? radiatorRows.map((item) => {
+              const addOn = Number(item.price) || 0;
+              return {
+                  label: item.label,
+                  price: baseValue + addOn,
+              };
+          })
+        : [
+              { label: "1–5 radiators", price: baseValue },
+              { label: "6–10 radiators", price: baseValue },
+              { label: "11–15 radiators", price: baseValue },
+              { label: "16–20 radiators", price: baseValue },
+              { label: "21+ radiators", price: baseValue },
+          ];
+
     const STEPS = [
         {
             id: "radiators",
             type: "select",
             question: "How many radiators are in your property?",
-            options: radiatorPrices.map(item => ({
-                label: item.label,
-                price: Number(item.price),
-            })),
+            options: radiatorOptions,
         },
 
         {
@@ -74,7 +96,7 @@ export default function PowerflushQuote() {
             <Head title={title} />
             <Stepper
                 title="Power Flush"
-                basePrice={basePrice}
+                basePrice={basePriceForStepper}
                 steps={STEPS}
                 currency={symbol}
                 serviceKey={SERVICES_KEY_VALUE.POWER_FLUSH}

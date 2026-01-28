@@ -56,17 +56,17 @@ const SERVICE_CONTENT = {
 
     [SERVICE_KEYS.POWERFLUSH]: {
         slug: SERVICE_KEYS.POWERFLUSH,
-        heroTitle: "Power flush — deep clean for radiators & pipework.",
+        heroTitle: "Magnacleanse — deep clean for radiators & pipework.",
         heroDesc:
-            "Remove sludge and improve circulation to restore performance and reduce breakdowns.",
-        badge: "Power Flush",
-        sampleJobLabel: "Power Flush • From £180",
+            "A professional system clean using Magnacleanse equipment to lift sludge, improve heat flow, and protect your boiler.",
+        badge: "System Clean",
+        sampleJobLabel: "Magnacleanse • From £525 inc VAT",
         estimateLabel: "System clean",
-        labour: "£120",
+        labour: "£525",
         parts: "—",
         gaugeLabel: "Flow restored",
         gaugeValueText: "88%",
-        cta: "Book a power flush",
+        cta: "Get Magnacleanse quote",
         pricingType: "estimate",
     },
 
@@ -74,15 +74,15 @@ const SERVICE_CONTENT = {
         slug: SERVICE_KEYS.SERVICE,
         heroTitle: "Annual boiler service — safety checks & reliability.",
         heroDesc:
-            "Annual safety inspection, combustion check and preventative maintenance.",
+            "A full annual check to keep your boiler safe, efficient, and compliant.",
         badge: "Boiler Service",
-        sampleJobLabel: "Boiler Service • From £65",
+        sampleJobLabel: "Boiler Service • £89 inc VAT",
         estimateLabel: "Annual check",
-        labour: "£65",
+        labour: "£89",
         parts: "—",
         gaugeLabel: "Pass rate",
         gaugeValueText: "99%",
-        cta: "Schedule service",
+        cta: "Book a service",
         pricingType: "estimate",
 
         // ✅ CORRECT PLACE
@@ -135,16 +135,16 @@ export default function QuotePage() {
                         {/* LEFT */}
                         <div className="md:col-span-7">
                             {/* Modern Badge with icon and animation */}
-                            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-primary/10 to-blue-100 border border-primary/20">
-                                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                                <span className="text-sm font-medium text-primary">
+                            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
+                                <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse"></div>
+                                <span className="text-sm font-medium text-emerald-700">
                                     {content.badge}
                                 </span>
                             </div>
 
                             {/* Hero Title with modern typography */}
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.1]">
-                                <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
                                     {content.heroTitle
                                         .split(" ")
                                         .slice(0, 2)
@@ -160,7 +160,7 @@ export default function QuotePage() {
 
                             {/* Description with modern styling */}
                             <div className="relative mt-6">
-                                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/20 to-secondary/20 rounded-full"></div>
+                                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-200 to-emerald-100 rounded-full"></div>
                                 <p className="pl-6 text-lg text-slate-600 max-w-xl leading-relaxed">
                                     {content.heroDesc}
                                 </p>
@@ -170,7 +170,7 @@ export default function QuotePage() {
                             <div className="mt-10 flex flex-col sm:flex-row gap-4">
                                 <Link
                                     href={route(`book.quote.${content.slug}`)}
-                                    className="group/primary relative inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-primary to-blue-600 px-7 py-4 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-primary/25 transition-all duration-300 hover:scale-[1.02]"
+                                    className="group/primary relative inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-7 py-4 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 hover:scale-[1.02]"
                                 >
                                     <span className="relative z-10">
                                         {content.cta}
@@ -178,7 +178,7 @@ export default function QuotePage() {
                                     <span className="relative z-10 transition-transform group-hover/primary:translate-x-1">
                                         →
                                     </span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-blue-700 rounded-xl opacity-0 group-hover/primary:opacity-100 transition-opacity duration-300"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-emerald-700 rounded-xl opacity-0 group-hover/primary:opacity-100 transition-opacity duration-300"></div>
                                 </Link>
 
                                 <TechnicianButton />
@@ -187,10 +187,8 @@ export default function QuotePage() {
                             {/* Trust indicators matching right side design */}
                             <div className="mt-12 flex flex-wrap items-center gap-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 flex items-center justify-center">
-                                        <span className="text-green-600">
-                                            ✓
-                                        </span>
+                                    <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                                        <span className="text-emerald-600">✓</span>
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-slate-900">
@@ -202,10 +200,8 @@ export default function QuotePage() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 flex items-center justify-center">
-                                        <span className="text-blue-600">
-                                            💰
-                                        </span>
+                                    <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                                        <span className="text-emerald-600">💷</span>
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-slate-900">
@@ -229,211 +225,236 @@ export default function QuotePage() {
                                         <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="text-xl font-bold text-slate-900">
-                                                    Common Repair Costs
+                                                    How boiler repairs work
                                                 </h3>
                                                 <p className="text-slate-600 text-sm mt-1">
-                                                    Transparent pricing with no
-                                                    hidden fees
+                                                    Simple, local, and clear — no jargon.
                                                 </p>
                                             </div>
-                                            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                                <span className="text-blue-600">
-                                                    💰
+                                            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                                <span className="text-emerald-600 animate-[spin_8s_linear_infinite]">
+                                                    🔧
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Pricing Grid - 2 items per row */}
+                                    {/* 3-step flow */}
                                     <div className="px-6 pb-6">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {/* Item 1 */}
-                                            <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <p className="text-sm text-slate-500 mb-1">
-                                                            Senior
-                                                        </p>
-                                                        <p className="font-medium text-slate-900">
-                                                            Boiler Electrodes
-                                                        </p>
-                                                    </div>
-                                                    <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
-                                                        Common
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                                    <div>
-                                                        <p className="text-lg font-bold text-slate-900">
-                                                            £120
-                                                        </p>
-                                                        <p className="text-xs text-slate-500">
-                                                            Fixed price
-                                                        </p>
-                                                    </div>
-                                                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <span className="text-green-600 text-xs">
-                                                            ✓
+                                        <div className="grid gap-4 sm:grid-cols-3">
+                                            {[
+                                                {
+                                                    step: "STEP 01",
+                                                    title: "Book your repair",
+                                                    text: "Your booking covers a full inspection visit of up to 1 hour.",
+                                                },
+                                                {
+                                                    step: "STEP 02",
+                                                    title: "Engineer inspection",
+                                                    text: "If it’s fixed within the hour with no parts, there are no further charges.",
+                                                },
+                                                {
+                                                    step: "STEP 03",
+                                                    title: "If parts are needed",
+                                                    text: "We explain fixed parts pricing before doing any extra work. You choose how to proceed.",
+                                                },
+                                            ].map((item) => (
+                                                <div
+                                                    key={item.step}
+                                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm"
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-600">
+                                                            {item.step}
                                                         </span>
+                                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
                                                     </div>
+                                                    <h4 className="mt-4 text-base font-semibold text-slate-900">
+                                                        {item.title}
+                                                    </h4>
+                                                    <p className="mt-2 text-sm text-slate-600">
+                                                        {item.text}
+                                                    </p>
                                                 </div>
-                                            </div>
-
-                                            {/* Item 2 */}
-                                            <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <p className="text-sm text-slate-500 mb-1">
-                                                            Boiler
-                                                        </p>
-                                                        <p className="font-medium text-slate-900">
-                                                            Electrodes
-                                                        </p>
-                                                    </div>
-                                                    <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
-                                                        Common
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                                    <div>
-                                                        <p className="text-lg font-bold text-slate-900">
-                                                            £130
-                                                        </p>
-                                                        <p className="text-xs text-slate-500">
-                                                            Fixed price
-                                                        </p>
-                                                    </div>
-                                                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <span className="text-green-600 text-xs">
-                                                            ✓
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Item 3 */}
-                                            <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <p className="text-sm text-slate-500 mb-1">
-                                                            Boiler
-                                                        </p>
-                                                        <p className="font-medium text-slate-900">
-                                                            Fan
-                                                        </p>
-                                                    </div>
-                                                    <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
-                                                        Complex
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                                    <div>
-                                                        <p className="text-lg font-bold text-slate-900">
-                                                            £260
-                                                        </p>
-                                                        <p className="text-xs text-slate-500">
-                                                            Fixed price
-                                                        </p>
-                                                    </div>
-                                                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <span className="text-green-600 text-xs">
-                                                            ✓
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Item 4 */}
-                                            <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <p className="text-sm text-slate-500 mb-1">
-                                                            Boiler
-                                                        </p>
-                                                        <p className="font-medium text-slate-900">
-                                                            Fan
-                                                        </p>
-                                                    </div>
-                                                    <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
-                                                        Complex
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                                    <div>
-                                                        <p className="text-lg font-bold text-slate-900">
-                                                            £300
-                                                        </p>
-                                                        <p className="text-xs text-slate-500">
-                                                            Fixed price
-                                                        </p>
-                                                    </div>
-                                                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <span className="text-green-600 text-xs">
-                                                            ✓
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Item 5 - Full width */}
-                                            <div className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 transition-colors sm:col-span-2">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div>
-                                                        <p className="text-sm text-slate-500 mb-1">
-                                                            Controls
-                                                        </p>
-                                                        <p className="font-medium text-slate-900">
-                                                            Thermostat (not
-                                                            smart controls)
-                                                        </p>
-                                                    </div>
-                                                    <span className="px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
-                                                        Advanced
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                                    <div>
-                                                        <p className="text-lg font-bold text-slate-900">
-                                                            £180
-                                                        </p>
-                                                        <p className="text-xs text-slate-500">
-                                                            Fixed price
-                                                        </p>
-                                                    </div>
-                                                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <span className="text-green-600 text-xs">
-                                                            ✓
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            ))}
                                         </div>
+                                    <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600">
+                                        If we can’t resolve the boiler issue after a full inspection, we’ll refund the inspection fee. If access is restricted or the fault is outside the boiler system, the inspection fee applies.
+                                    </div>
                                     </div>
 
                                     {/* Footer - Compact */}
                                     <div className="px-6 py-5 bg-slate-50 border-t border-slate-100">
-                                        {/* Note */}
-                                        <div className="flex items-start gap-2 mb-4">
-                                            <div className="w-5 h-5 rounded-md bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                <span className="text-blue-600 text-xs">
-                                                    ℹ️
-                                                </span>
-                                            </div>
-                                            <p className="text-sm text-slate-700">
-                                                <span className="font-medium text-slate-900">
-                                                    Note:
-                                                </span>{" "}
-                                                These prices exclude your £89
-                                                inspection
-                                            </p>
-                                        </div>
-
-                                        {/* Trust badges and CTA in one line */}
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                            <button className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity sm:w-auto w-full">
-                                                Get your personalised quote
+                                            <div className="space-y-1">
+                                                <p className="text-sm text-slate-600">
+                                                    Repair booking includes a full inspection visit for up to 1 hour.
+                                                </p>
+                                                <p className="text-sm text-slate-600">
+                                                    Book instantly online after the questions — no waiting, no calling, no callbacks unless you want one.
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href={route(`book.quote.${content.slug}`)}
+                                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity sm:w-auto w-full"
+                                            >
+                                                Book a repair
                                                 <span>→</span>
-                                            </button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : content.slug === SERVICE_KEYS.SERVICE ? (
+                                <div className="relative rounded-2xl bg-white border border-slate-100 shadow-lg overflow-hidden">
+                                    <div className="px-6 pt-6 pb-4">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div>
+                                                <h3 className="text-xl font-bold text-slate-900">
+                                                    How boiler servicing works
+                                                </h3>
+                                                <p className="text-slate-600 text-sm mt-1">
+                                                    Straight‑forward annual care, no fluff.
+                                                </p>
+                                            </div>
+                                            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                                <span className="text-emerald-600 animate-[spin_8s_linear_infinite]">🧰</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="px-6 pb-6">
+                                        <div className="grid gap-4 sm:grid-cols-3">
+                                            {[
+                                                {
+                                                    step: "STEP 01",
+                                                    title: "Book your service",
+                                                    text: "£89 inc VAT for a full annual boiler service.",
+                                                },
+                                                {
+                                                    step: "STEP 02",
+                                                    title: "Full safety checks",
+                                                    text: "We inspect, test, and service your boiler for safe, efficient running.",
+                                                },
+                                                {
+                                                    step: "STEP 03",
+                                                    title: "If a kit is needed",
+                                                    text: "Manufacturer service kits are a fixed £25 extra, only if required.",
+                                                },
+                                            ].map((item) => (
+                                                <div
+                                                    key={item.step}
+                                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm"
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-600">
+                                                            {item.step}
+                                                        </span>
+                                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                                    </div>
+                                                    <h4 className="mt-4 text-base font-semibold text-slate-900">
+                                                        {item.title}
+                                                    </h4>
+                                                    <p className="mt-2 text-sm text-slate-600">
+                                                        {item.text}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="px-6 py-5 bg-slate-50 border-t border-slate-100">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                            <div className="space-y-1">
+                                                <p className="text-sm text-slate-600">
+                                                    Fixed £89 service fee. Parts kits only if required.
+                                                </p>
+                                                <p className="text-sm text-slate-600">
+                                                    Book instantly online after the questions — no waiting, no calling, no callbacks unless you want one.
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href={route(`book.quote.${content.slug}`)}
+                                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity sm:w-auto w-full"
+                                            >
+                                                Book a service
+                                                <span>→</span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : content.slug === SERVICE_KEYS.POWERFLUSH ? (
+                                <div className="relative rounded-2xl bg-white border border-slate-100 shadow-lg overflow-hidden">
+                                    <div className="px-6 pt-6 pb-4">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div>
+                                                <h3 className="text-xl font-bold text-slate-900">
+                                                    How Magnacleanse works
+                                                </h3>
+                                                <p className="text-slate-600 text-sm mt-1">
+                                                    We use Magnacleanse, not a generic power flush.
+                                                </p>
+                                            </div>
+                                            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                                <span className="text-emerald-600 animate-[spin_8s_linear_infinite]">🧲</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="px-6 pb-6">
+                                        <div className="grid gap-4 sm:grid-cols-3">
+                                            {[
+                                                {
+                                                    step: "STEP 01",
+                                                    title: "Complete the questionnaire",
+                                                    text: "We use your answers to size the job and give an accurate quote.",
+                                                },
+                                                {
+                                                    step: "STEP 02",
+                                                    title: "Magnacleanse clean",
+                                                    text: "We remove sludge and restore heat flow across the system.",
+                                                },
+                                                {
+                                                    step: "STEP 03",
+                                                    title: "Protect with inhibitor",
+                                                    text: "We treat the system with inhibitor to help prevent future build‑up.",
+                                                },
+                                            ].map((item) => (
+                                                <div
+                                                    key={item.step}
+                                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm"
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-600">
+                                                            {item.step}
+                                                        </span>
+                                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                                    </div>
+                                                    <h4 className="mt-4 text-base font-semibold text-slate-900">
+                                                        {item.title}
+                                                    </h4>
+                                                    <p className="mt-2 text-sm text-slate-600">
+                                                        {item.text}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600">
+                                            Prices start at £525 inc VAT and vary by system size and radiator count. If we believe the service won’t benefit you, we’ll let you know and cancel with a full refund.
+                                        </div>
+                                    </div>
+
+                                    <div className="px-6 py-5 bg-slate-50 border-t border-slate-100">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                            <p className="text-sm text-slate-600">
+                                                Complete the multiple‑choice questionnaire to get your quote and book instantly online — no waiting, no calling, no callbacks unless you want one.
+                                            </p>
+                                            <Link
+                                                href={route(`book.quote.${content.slug}`)}
+                                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity sm:w-auto w-full"
+                                            >
+                                                Get Magnacleanse quote
+                                                <span>→</span>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
