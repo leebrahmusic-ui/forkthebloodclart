@@ -1151,10 +1151,16 @@ export default function InstallPage({ booking }) {
                                                 )}
                                             </button>
 
-                                            <div className="mt-4 flex justify-center gap-3 opacity-30 grayscale">
-                                                <div className="h-6 w-10 bg-white rounded-sm"></div>
-                                                <div className="h-6 w-10 bg-white rounded-sm"></div>
-                                                <div className="h-6 w-10 bg-white rounded-sm"></div>
+                                            <div className="mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
+                                                <span className="rounded-full border border-white/30 bg-white/95 text-slate-900 px-3 py-1 shadow-sm">
+                                                    Visa
+                                                </span>
+                                                <span className="rounded-full border border-white/30 bg-white/95 text-slate-900 px-3 py-1 shadow-sm">
+                                                    Mastercard
+                                                </span>
+                                                <span className="rounded-full border border-white/30 bg-white/95 text-slate-900 px-3 py-1 shadow-sm">
+                                                    Klarna
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
