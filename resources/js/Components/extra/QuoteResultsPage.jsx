@@ -55,6 +55,25 @@ export default function QuoteResultsPage({ answers }) {
         return base + margin + addons;
     };
 
+    const getTierLabel = (index) => {
+        if (index === 0) return "Budget";
+        if (index === 1) return "Best seller";
+        if (index === 2) return "Premium";
+        return "";
+    };
+
+    const calculateMonthlyFrom = (totalPrice) => {
+        if (!totalPrice || Number.isNaN(Number(totalPrice))) return null;
+        const principal = Number(totalPrice);
+        const annualRate = 0.099;
+        const monthlyRate = annualRate / 12;
+        const months = 48;
+        const monthly =
+            (principal * monthlyRate) /
+            (1 - Math.pow(1 + monthlyRate, -months));
+        return Math.ceil(monthly);
+    };
+
     return (
         <div className="min-h-screen bg-light-background px-4 py-12 md:px-6 md:py-16">
             {/* HEADER */}
@@ -69,6 +88,13 @@ export default function QuoteResultsPage({ answers }) {
                                 <h1 className="text-3xl font-bold text-dark">
                                     Your Personalized Quotes
                                 </h1>
+                                <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
+                                    <span>Gas Safe registered engineers</span>
+                                    <span className="hidden sm:inline">•</span>
+                                    <span>Fixed price, no hidden extras</span>
+                                    <span className="hidden sm:inline">•</span>
+                                    <span>Warranty included</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -80,6 +106,8 @@ export default function QuoteResultsPage({ answers }) {
                 {products.slice(0, visibleCount).map((product, index) => {
                     const style = getCardStyle(index);
                     const finalPrice = calculatePrice(product);
+                    const tierLabel = getTierLabel(index);
+                    const monthlyFrom = calculateMonthlyFrom(finalPrice);
 
                     return (
                         <div
@@ -94,10 +122,10 @@ export default function QuoteResultsPage({ answers }) {
                                 <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent" />
 
                                 <div className="relative p-6 flex justify-between items-start">
-                                    {product.id === recommendedProductId && (
-                                        <div className="inline-flex items-center gap-2 rounded-full bg-dark px-4 py-2 text-white shadow-xl shadow-dark/30">
+                                    {tierLabel && (
+                                        <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-slate-800 shadow-sm border border-slate-200">
                                             <span className="text-[14px] font-semibold tracking-wide">
-                                                Recommended
+                                                {tierLabel}
                                             </span>
                                         </div>
                                     )}
@@ -234,6 +262,20 @@ export default function QuoteResultsPage({ answers }) {
                                                     {finalPrice.toLocaleString()}
                                                 </div>
                                             </div>
+
+                                            {monthlyFrom && (
+                                                <div className="text-right">
+                                                    <div className="text-xs uppercase tracking-wider text-white/70">
+                                                        Finance
+                                                    </div>
+                                                    <div className="text-lg font-semibold">
+                                                        from £{monthlyFrom}/mo
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-2 text-xs text-white/70">
+                                            Includes installation, materials & certification
                                         </div>
                                     </div>
                                 </div>
@@ -256,16 +298,10 @@ export default function QuoteResultsPage({ answers }) {
                                                     product.warrantyYears,
 
                                                 // badge / tier
-                                                tier:
-                                                    product.id ===
-                                                        recommendedProductId
-                                                        ? "Recommended"
-                                                        : "",
-                                                badge:
-                                                    product.id ===
-                                                        recommendedProductId
-                                                        ? "bg-primary text-white"
-                                                        : "",
+                                                tier: tierLabel,
+                                                badge: tierLabel
+                                                    ? "bg-primary text-white"
+                                                    : "",
 
                                                 // pricing (VERY IMPORTANT)
                                                 price: finalPrice,

@@ -6,7 +6,10 @@ export const SERVICE_QUESTIONS = {
             id: "mains_gas",
             question: "Does your boiler run on mains gas?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/fuel-mains-gas.svg" },
+                { label: "No", image: "/images/stepper/fuel-no-gas.svg" },
+            ],
             infoBox: {
                 badge: "Tip",
                 text:
@@ -21,7 +24,10 @@ export const SERVICE_QUESTIONS = {
             id: "boiler_fuel",
             question: "What fuel does your boiler run on?",
             type: "select",
-            options: [{ label: "LPG Gas" }, { label: "Other" }],
+            options: [
+                { label: "LPG Gas", image: "/images/stepper/fuel-lpg.svg" },
+                { label: "Other", image: "/images/stepper/fuel-other.svg" },
+            ],
             showIf: (a) => a.mains_gas?.label === "No",
         },
 
@@ -38,7 +44,10 @@ export const SERVICE_QUESTIONS = {
             id: "boiler_type_known",
             question: "Do you know the type of boiler currently installed?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/option-yes.svg" },
+                { label: "No", image: "/images/stepper/option-no.svg" },
+            ],
             infoBox: {
                 badge: "Tip",
                 text:
@@ -81,7 +90,10 @@ export const SERVICE_QUESTIONS = {
             id: "has_water_tank",
             question: "Does your home have a water tank or hot water cylinder?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/option-yes.svg" },
+                { label: "No", image: "/images/stepper/option-no.svg" },
+            ],
             showIf: (a) => a.boiler_type_known?.label === "No",
         },
 
@@ -89,7 +101,10 @@ export const SERVICE_QUESTIONS = {
             id: "pressure_gauge",
             question: "Can you see a pressure gauge on your boiler?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/option-yes.svg" },
+                { label: "No", image: "/images/stepper/option-no.svg" },
+            ],
             showIf: (a) => a.has_water_tank?.label === "Yes",
         },
 
@@ -97,7 +112,10 @@ export const SERVICE_QUESTIONS = {
             id: "move_to_combi",
             question: "Are you thinking about moving to a combi boiler?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/option-yes.svg" },
+                { label: "No", image: "/images/stepper/option-no.svg" },
+            ],
             showIf: (a) =>
                 ["Regular / Standard boiler", "System boiler"].includes(
                     a.current_boiler_type?.label
@@ -108,7 +126,10 @@ export const SERVICE_QUESTIONS = {
             id: "boiler_move_location",
             question: "Are you planning to move the boiler to a different location?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/option-yes.svg" },
+                { label: "No", image: "/images/stepper/option-no.svg" },
+            ],
             showIf: (a) =>
                 a.move_to_combi?.label ||
                 a.has_water_tank?.label === "No" ||
@@ -120,10 +141,22 @@ export const SERVICE_QUESTIONS = {
             question: "What is the preferred location for the boiler?",
             type: "select",
             options: [
-                { label: "In the airing cupboard" },
-                { label: "New place within the same room" },
-                { label: "Another room on the same floor" },
-                { label: "Another floor or loft" },
+                {
+                    label: "In the airing cupboard",
+                    image: "/images/stepper/location-cupboard.svg",
+                },
+                {
+                    label: "New place within the same room",
+                    image: "/images/stepper/location-same-room.svg",
+                },
+                {
+                    label: "Another room on the same floor",
+                    image: "/images/stepper/location-other-room.svg",
+                },
+                {
+                    label: "Another floor or loft",
+                    image: "/images/stepper/location-loft.svg",
+                },
             ],
             showIf: (a) =>
                 a.boiler_move_location?.label === "Yes" ||
@@ -135,9 +168,9 @@ export const SERVICE_QUESTIONS = {
             question: "What type of property do you live in?",
             type: "select",
             options: [
-                { label: "House" },
-                { label: "Bungalow" },
-                { label: "Flat / Apartment" },
+                { label: "House", image: "/images/stepper/property-house.svg" },
+                { label: "Bungalow", image: "/images/stepper/property-bungalow.svg" },
+                { label: "Flat / Apartment", image: "/images/stepper/property-flat.svg" },
             ],
             showIf: (a) =>
                 a.boiler_move_location?.label === "No" || !!a.preferred_location,
@@ -147,7 +180,10 @@ export const SERVICE_QUESTIONS = {
             id: "flat_upper_floor",
             question: "Is the property on the second floor or higher?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/option-yes.svg" },
+                { label: "No", image: "/images/stepper/option-no.svg" },
+            ],
             showIf: (a) => a.property_type?.label === "Flat / Apartment",
         },
 
@@ -155,7 +191,10 @@ export const SERVICE_QUESTIONS = {
             id: "flue_reachable",
             question: "Can the flue be reached from outside?",
             type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
+            options: [
+                { label: "Yes", image: "/images/stepper/outside_wall.png" },
+                { label: "No", image: "/images/stepper/flue_roof.jpg" },
+            ],
             showIf: (a) => a.flat_upper_floor?.label === "Yes",
         },
 
@@ -172,7 +211,12 @@ export const SERVICE_QUESTIONS = {
             id: "bathrooms",
             question: "How many bathrooms are in your property?",
             type: "select",
-            options: [{ label: "1" }, { label: "1.5" }, { label: "2" }, { label: "3+" }],
+            options: [
+                { label: "1", image: "/images/stepper/bath-1.svg" },
+                { label: "1.5", image: "/images/stepper/bath-1-5.svg" },
+                { label: "2", image: "/images/stepper/bath-2.svg" },
+                { label: "3+", image: "/images/stepper/bath-3plus.svg" },
+            ],
             showIf: (a) =>
                 (a.property_type?.label === "House" ||
                     a.property_type?.label === "Bungalow" ||
@@ -185,7 +229,12 @@ export const SERVICE_QUESTIONS = {
             id: "bedrooms",
             question: "How many bedrooms are in your property?",
             type: "select",
-            options: [{ label: "1" }, { label: "2" }, { label: "3" }, { label: "4+" }],
+            options: [
+                { label: "1", image: "/images/stepper/bed-1.svg" },
+                { label: "2", image: "/images/stepper/bed-2.svg" },
+                { label: "3", image: "/images/stepper/bed-3.svg" },
+                { label: "4+", image: "/images/stepper/bed-4plus.svg" },
+            ],
             showIf: (a) => !!a.bathrooms || a.pressure_gauge?.label === "No",
         },
 
@@ -195,10 +244,10 @@ export const SERVICE_QUESTIONS = {
             question: "How many radiators are in your home?",
             type: "select",
             options: [
-                { label: "Up to 6" },
-                { label: "7–12" },
-                { label: "13–20" },
-                { label: "21+" },
+                { label: "Up to 6", image: "/images/stepper/rads-6.svg" },
+                { label: "7–12", image: "/images/stepper/rads-7-12.svg" },
+                { label: "13–20", image: "/images/stepper/rads-13-20.svg" },
+                { label: "21+", image: "/images/stepper/rads-21plus.svg" },
             ],
             showIf: (a) => !!a.bedrooms,
         },
@@ -214,7 +263,7 @@ export const SERVICE_QUESTIONS = {
                     image: "/images/stepper/Is your flue coming out of the wall - YES.jpeg",
                 },
                 {
-                    label: "No",
+                    label: "No, it comes out the roof",
                     image: "/images/stepper/Is your flue coming out of the wall - NO.jpeg",
                 }
             ],
@@ -274,7 +323,10 @@ If you’re happy to keep your existing thermostat, please select Basic.
 
                 `
             },
-            options: [{ label: "No" }, { label: "Yes", image: "/images/stepper/TRV-removebg-preview.png", }],
+            options: [
+                { label: "No", image: "/images/stepper/option-no.svg" },
+                { label: "Yes", image: "/images/stepper/TRV-removebg-preview.png" },
+            ],
             preset: { label: "No" },
             showIf: (a) => !!a.thermostat_type,
         },
@@ -290,12 +342,6 @@ If you’re happy to keep your existing thermostat, please select Basic.
             showIf: (a) => a.trv_required?.label === "Yes",
         },
 
-        {
-            id: "water_meter",
-            question: "Is your property fitted with a water meter?",
-            type: "select",
-            options: [{ label: "Yes" }, { label: "No" }],
-            showIf: (a) => !!a.trv_required, // keep it as the final merge point
-        },
+        
     ],
 };

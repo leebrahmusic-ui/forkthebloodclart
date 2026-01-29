@@ -47,6 +47,20 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
 
     const finalPrice = calculatePrice(product);
 
+    const calculateMonthlyFrom = (totalPrice) => {
+        if (!totalPrice || Number.isNaN(Number(totalPrice))) return null;
+        const principal = Number(totalPrice);
+        const annualRate = 0.099;
+        const monthlyRate = annualRate / 12;
+        const months = 48;
+        const monthly =
+            (principal * monthlyRate) /
+            (1 - Math.pow(1 + monthlyRate, -months));
+        return Math.ceil(monthly);
+    };
+
+    const monthlyFrom = calculateMonthlyFrom(finalPrice);
+
     const carouselImages = Array.isArray(productImages)
         ? productImages
         : productImages
@@ -74,63 +88,30 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
         <>
             <div
                 onClick={onClose}
-                className="fixed inset-0 bg-gradient-to-br from-slate-900/80 to-slate-800/70 z-40"
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             />
 
-            <aside className="fixed right-0 top-0 h-full w-full overflow-y-auto lg:w-[1000px] bg-gradient-to-b from-slate-900 to-slate-800 z-50 border-l border-slate-700/50 shadow-2xl animate-slideFromRight">
+            <aside className="fixed right-0 top-0 h-full w-full overflow-y-auto lg:w-[1000px] bg-white z-50 border-l border-slate-200 shadow-2xl animate-slideFromRight">
                 <div className="h-full flex flex-col">
                     {/* HEADER */}
-                    <div className="sticky top-0 z-30 bg-dark/90 backdrop-blur-xl border-b border-dark/50">
-                        <div className="relative px-8 py-6 flex justify-between items-center overflow-hidden">
-                            {/* Background decorative gradient */}
-                            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
-
-                            <div className="flex gap-4 items-center z-10">
-                                {/* Tier Badge - Technical Tag Style */}
+                    <div className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+                        <div className="px-8 py-6 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-lg font-semibold text-slate-900">
+                                    Full breakdown
+                                </h2>
                                 {tier && (
-                                    <div className="flex flex-col items-start justify-center pl-3 border-l-2 border-emerald-500/50">
-                                        <span className="text-[9px] uppercase text-emerald-500/80 leading-none mb-1">
-                                            Current Tier
-                                        </span>
-                                        <span className="text-xs font-mono font-bold text-emerald-100 tracking-widest uppercase">
-                                            {tier}
-                                        </span>
-                                    </div>
-                                )}
-
-                                {/* Save Button - Glass Panel */}
-                                <button
-                                    className="
-            group relative flex items-center gap-3
-            px-6 py-3
-            bg-gradient-to-b from-slate-800/50 to-slate-900/50
-            border border-slate-700 hover:border-emerald-500/50
-            backdrop-blur-sm rounded-lg
-            transition-all duration-300
-        "
-                                >
-                                    {/* Hover Glow Effect */}
-                                    <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                                    <FiSave className="text-emerald-500/70 group-hover:text-emerald-400 text-lg transition-colors" />
-                                    <span className="text-sm font-medium text-slate-300 group-hover:text-white group-hover:translate-x-0.5 transition-all">
-                                        Save Quote
+                                    <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-semibold">
+                                        {tier}
                                     </span>
-                                </button>
+                                )}
                             </div>
 
-                            {/* Close Button - Red Accent Hover */}
                             <button
                                 onClick={onClose}
-                                className="
-            group relative h-10 w-10 cursor-pointer
-            flex items-center justify-center
-            rounded-lg border border-slate-800 bg-slate-900/50
-            hover:border-red-500/30 hover:bg-red-500/10
-            transition-all duration-300
-        "
+                                className="h-9 w-9 rounded-full cursor-pointer bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
                             >
-                                <FiX className="text-slate-400 group-hover:text-red-400 transition-colors" />
+                                <FiX className="text-slate-600" />
                             </button>
                         </div>
                     </div>
@@ -139,12 +120,12 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                     <div className="flex-1 flex overflow-hidden">
                         {/* LEFT: CAROUSEL */}
                         <div className="hidden lg:block w-[400px] p-6">
-                            <div className="rounded-2xl bg-dark/80 border border-white/10">
-                                <div className="px-6 py-4 border-b border-white/10 flex justify-between">
+                            <div className="rounded-2xl bg-slate-50 border border-slate-200">
+                                <div className="px-6 py-4 border-b border-slate-200 flex justify-between">
                                     <div className="flex gap-3 items-center">
-                                        <FiCamera className="text-emerald-400" />
-                                        <h3 className="text-white font-bold">
-                                            Visual Overview
+                                        <FiCamera className="text-slate-700" />
+                                        <h3 className="text-slate-900 font-semibold">
+                                            Visual overview
                                         </h3>
                                     </div>
                                 </div>
@@ -170,23 +151,28 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                         >
                             {/* STACKED CARD LAYOUT */}
                             <div className="space-y-4 mb-8">
-                                <div className="bg-dark/50 rounded-2xl border border-white/10 p-6">
+                                <div className="bg-white rounded-2xl border border-slate-200 p-6">
                                     <div className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] lg:items-center gap-6 lg:gap-8">
-                                        <div className="lg:border-r border-white/10 lg:pr-8">
+                                        <div className="lg:border-r border-slate-200 lg:pr-8">
                                             <p className="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-2">
                                                 {model}
                                             </p>
-                                            <h1 className="text-3xl lg:text-4xl font-bold text-white break-words leading-tight">
+                                            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 break-words leading-tight">
                                                 {brand}
                                             </h1>
                                         </div>
-                                        <div className="text-left lg:text-right lg:min-w-[200px] pt-4 lg:pt-0 border-t lg:border-t-0 border-white/10">
-                                            <div className="text-xs text-slate-400 mb-2 uppercase tracking-wider">
+                                        <div className="text-left lg:text-right lg:min-w-[200px] pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-200">
+                                            <div className="text-xs text-slate-500 mb-2 uppercase tracking-wider">
                                                 Total Package
                                             </div>
-                                            <div className="text-4xl lg:text-5xl font-bold text-white">
+                                            <div className="text-4xl lg:text-5xl font-bold text-slate-900">
                                                 £{safePrice.toLocaleString()}
                                             </div>
+                                            {monthlyFrom && (
+                                                <div className="mt-2 text-sm text-slate-700">
+                                                    Finance from £{monthlyFrom}/mo
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -213,20 +199,20 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                                                 }
                                             )
                                         }
-                                    className="group relative cursor-pointer w-full flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-secondary/30 to-secondary/15 border border-secondary/20 hover:border-secondary/50 hover:from-secondary/30 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+                                    className="group relative cursor-pointer w-full flex items-center gap-4 p-5 rounded-2xl bg-slate-900 border border-slate-900 hover:bg-slate-800 transition-all duration-300"
                                 >
-                                    <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-secondary text-black shadow-lg shadow-secondary/20 shrink-0">
+                                    <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-white text-slate-900 shadow-sm shrink-0">
                                         <FiCalendar className="text-2xl" />
                                     </div>
                                     <div className="flex flex-col text-left flex-1 min-w-0">
-                                        <span className="text-xs text-secondary font-medium uppercase tracking-wider">
-                                            Action
+                                        <span className="text-xs text-white/80 font-medium uppercase tracking-wider">
+                                            Ready to book
                                         </span>
                                         <span className="text-white font-bold text-xl">
-                                            Book Now
+                                            Book now
                                         </span>
                                     </div>
-                                    <FiArrowRight className="text-secondary group-hover:translate-x-1 transition-transform text-2xl shrink-0" />
+                                    <FiArrowRight className="text-white group-hover:translate-x-1 transition-transform text-2xl shrink-0" />
                                 </button>
                             </div>
 

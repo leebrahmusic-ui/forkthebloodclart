@@ -44,6 +44,7 @@ export default function NewBoilerQuote() {
                 steps={steps}
                 basePrice={0}
                 serviceKey={SERVICES_KEY_VALUE.NEW_BOILER_QUOTE}
+                autoAdvance
             />
         </>
     );

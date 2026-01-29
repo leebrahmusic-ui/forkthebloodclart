@@ -34,6 +34,7 @@ export default function Stepper({
     currency = "£",
     onSubmit,
     serviceKey,
+    autoAdvance = false,
 }) {
     const [index, setIndex] = useState(0);
     const [answers, setAnswers] = useState({});
@@ -45,6 +46,8 @@ export default function Stepper({
     const [showProcessing, setShowProcessing] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [mouse, setMouse] = useState({ x: 50, y: 50 });
+    const lastAutoAdvanceRef = useRef(null);
+    const skipAutoAdvanceRef = useRef(false);
 
     /* -------------------------------------------------------
        dropdown positioning
@@ -131,6 +134,11 @@ export default function Stepper({
     function choose(option) {
         if (!current) return;
 
+        const shouldAutoAdvance =
+            autoAdvance &&
+            ["select", "dropdown"].includes(current.type) &&
+            !option.requiresText;
+
         setAnswers((s) => {
             const updated = {
                 ...s,
@@ -143,9 +151,61 @@ export default function Stepper({
 
             console.log("All answers state:", updated); // ✅ FULL STATE
 
+            if (shouldAutoAdvance) {
+                const key = `${current.id}:${option.label ?? option.value ?? JSON.stringify(option)}`;
+                lastAutoAdvanceRef.current = key;
+
+                const nextVisibleSteps = steps.filter((step) => {
+                    if (!step.showIf) return true;
+                    return step.showIf(updated);
+                });
+
+                const currentIndex = nextVisibleSteps.findIndex(
+                    (step) => step.id === current.id
+                );
+
+                if (currentIndex >= 0) {
+                    if (currentIndex >= nextVisibleSteps.length - 1) {
+                        if (
+                            SERVICES_WITH_INSTANT_QUOTE.includes(
+                                serviceKey?.key
+                            )
+                        ) {
+                            setShowInstantQuote(true);
+                            setShowProcessing(false);
+                        } else {
+                            setShowProcessing(true);
+                            setShowInstantQuote(false);
+                        }
+                    } else {
+                        setIndex(currentIndex + 1);
+                    }
+                }
+            }
+
             return updated;
         });
+
     }
+
+    useEffect(() => {
+        if (!autoAdvance || !current) return;
+        if (skipAutoAdvanceRef.current) {
+            skipAutoAdvanceRef.current = false;
+            return;
+        }
+
+        if (!["select", "dropdown"].includes(current.type)) return;
+
+        const ans = answers[current.id];
+        if (!ans || ans.requiresText) return;
+
+        const key = `${current.id}:${ans.label ?? ans.value ?? JSON.stringify(ans)}`;
+        if (lastAutoAdvanceRef.current === key) return;
+        lastAutoAdvanceRef.current = key;
+
+        setIndex((i) => Math.min(i + 1, visibleSteps.length - 1));
+    }, [autoAdvance, current, answers, visibleSteps.length]);
 
 
     function updateText(value) {
@@ -181,6 +241,10 @@ export default function Stepper({
     }
 
     function back() {
+        if (autoAdvance) {
+            skipAutoAdvanceRef.current = true;
+            lastAutoAdvanceRef.current = null;
+        }
         setIndex((i) => Math.max(0, i - 1));
     }
 
@@ -574,10 +638,10 @@ export default function Stepper({
                                     <div className="mt-5 w-full lg:max-w-5xl mx-auto">
                                         {/* Unique side-by-side with perfect bridge */}
                                         <div className="w-full relative flex flex-col lg:flex-row gap-8">
-                                            {/* Live Chat */}
+                                            {/* WhatsApp */}
                                             <div className="flex-1 group w-full">
-                                                <Link
-                                                    href="https://wa.me/441234567890"
+                                                <a
+                                                    href="https://wa.me/447454796398"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="
@@ -615,11 +679,11 @@ export default function Stepper({
                                                         {/* Content */}
                                                         <div className="flex-1 relative z-10">
                                                             <span className="block text-[16px] font-bold text-gray-800">
-                                                                Live Chat
+                                                                WhatsApp
                                                             </span>
                                                             <span className="block text-xs text-gray-500">
-                                                                Instant
-                                                                connection
+                                                                Chat with an
+                                                                engineer
                                                             </span>
                                                         </div>
                                                     </div>
@@ -628,16 +692,16 @@ export default function Stepper({
                                                     <div className="relative z-10 w-full sm:w-auto">
                                                         {/* 🔴 CHANGE: w-full sm:w-auto */}
                                                         <div className="w-full text-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300 sm:group-hover:translate-x-1">
-                                                            Start now
+                                                            Start chat
                                                         </div>
                                                     </div>
-                                                </Link>
+                                                </a>
                                             </div>
 
-                                            {/* Phone Call */}
+                                            {/* Engineer callback */}
                                             <div className="flex-1 group w-full">
-                                                <a
-                                                    href="tel:03301131333"
+                                                <Link
+                                                    href="/#contact"
                                                     className="
                     relative flex flex-col sm:flex-row sm:items-center gap-4
                     p-4 sm:p-5
@@ -672,10 +736,10 @@ export default function Stepper({
                                                         {/* Content */}
                                                         <div className="flex-1 relative z-10">
                                                             <span className="block text-[14px] font-bold text-gray-800">
-                                                                Phone Call
+                                                                Engineer callback
                                                             </span>
                                                             <span className="block text-xs text-gray-500">
-                                                                conversation
+                                                                No phone queues
                                                             </span>
                                                         </div>
                                                     </div>
@@ -683,20 +747,10 @@ export default function Stepper({
                                                     <div className="relative z-10 w-full sm:w-auto">
                                                         {/* 🔴 CHANGE */}
                                                         <div className="w-full text-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300 sm:group-hover:-translate-x-1">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                <span>
-                                                                    0330
-                                                                </span>
-                                                                <span className="h-1 w-1 rounded-full bg-white/50"></span>
-                                                                <span>113</span>
-                                                                <span className="h-1 w-1 rounded-full bg-white/50"></span>
-                                                                <span>
-                                                                    1333
-                                                                </span>
-                                                            </div>
+                                                            Request callback
                                                         </div>
                                                     </div>
-                                                </a>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
