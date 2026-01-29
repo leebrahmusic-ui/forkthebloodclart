@@ -204,7 +204,9 @@ function resolveBoilerTypeFromAnswers(answers, { combiOk, combiKw }) {
 =========================== */
 
 function resolveFlueType(answers) {
-    return (answers?.flue_wall?.label || "").toLowerCase() === "no"
+    const label = (answers?.flue_wall?.label || "").toLowerCase();
+    const isVertical = label.startsWith("no") || label.includes("roof");
+    return isVertical
         ? "vertical"
         : "horizontal";
 }
