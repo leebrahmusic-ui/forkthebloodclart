@@ -20,10 +20,10 @@ export function HeroSection() {
                                 <img
                                     src="/images/yorkshire%20rose.png"
                                     alt="Yorkshire rose"
-                                    className="inline-block h-16 w-16 align-text-bottom"
+                                    className="inline-block h-10 w-10 sm:h-16 sm:w-16 align-middle"
                                 />
                                 <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
-                                    Bookings available all-days of the week. Depending on demand.
+                                    Booking slots are available seven days a week, subject to demand.
                                 </span>
                             </h2>
 
