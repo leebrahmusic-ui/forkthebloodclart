@@ -1,108 +1,95 @@
-import { FcGoogle } from "react-icons/fc";
-import { usePage } from "@inertiajs/react";
+import { useEffect, useRef, useState } from "react";
 
 export function GoogleReview() {
-    const { googleBusiness } = usePage().props || {};
+    const containerRef = useRef(null);
+    const [brandingRemoved, setBrandingRemoved] = useState(false);
 
-    const fallbackUrl =
-        "https://www.google.com/search?q=MD+Gas+Leeds&stick=H4sIAAAAAAAA_-NgU1I1qDBKTTRJMTAxTjFMMU21NDS3MqgwT7GwMEu0TElNSTY1MEgxWcTK4-ui4J5YrOCTmppSDAANgsr0OAAAAA&hl=en&mat=CTqTWGe_fFeMElYBTVDHnuqbxBwblP2-pewRSIB9v7Fc6NCQG6UfLVSP74OfKisuAjMmgaJcWLuFK7U2ex7ZhbotIUBPgoph_nxGgcDyJ_DVWmnBoVgMPu1HC_P4dtCQFQ&authuser=0#cobssid=s&mpd=~10112688649798193978/customers/reviews";
+    useEffect(() => {
+        let cancelled = false;
 
-    const profileUrl = isSafeHttpsUrl(googleBusiness?.profileUrl)
-        ? googleBusiness.profileUrl
-        : fallbackUrl;
+        const mountWidget = () => {
+            if (cancelled) return;
 
-    const hasRating =
-        typeof googleBusiness?.rating === "number" &&
-        typeof googleBusiness?.reviewCount === "number";
+            const container = document.getElementById(
+                "shapo-widget-1569ee68f38a1e8430cb"
+            );
+            if (!container) return;
 
-    const formattedReviewCount = hasRating
-        ? googleBusiness.reviewCount.toLocaleString()
-        : null;
+            // Clear any existing iframes inside the widget container
+            container.querySelectorAll("iframe").forEach((node) => node.remove());
+
+            // Remove existing embed script so it can re-run after mount
+            const existingScript = document.getElementById("shapo-embed-js");
+            if (existingScript) existingScript.remove();
+
+            // Reset Shapo loader flags (set by their script)
+            if (window._shapoLoaded) delete window._shapoLoaded;
+            if (window._shapoLoadedPopups) delete window._shapoLoadedPopups;
+
+            const script = document.createElement("script");
+            script.id = "shapo-embed-js";
+            script.src = `https://cdn.shapo.io/js/embed.js?cb=${Date.now()}`;
+            script.defer = true;
+            document.head.appendChild(script);
+        };
+
+        const timer = setTimeout(mountWidget, 0);
+
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
+    }, []);
+
+    useEffect(() => {
+        const target = containerRef.current;
+        if (!target) return;
+
+        const removeBranding = () => {
+            const candidates = Array.from(
+                target.querySelectorAll("a, div, span")
+            );
+
+            const brandingNode = candidates.find((el) =>
+                /powered by\s*shapo/i.test(el.textContent || "")
+            );
+
+            if (brandingNode) {
+                brandingNode.remove();
+                setBrandingRemoved(true);
+            }
+        };
+
+        removeBranding();
+
+        const observer = new MutationObserver(() => removeBranding());
+        observer.observe(target, { childList: true, subtree: true });
+
+        return () => observer.disconnect();
+    }, []);
 
     return (
-        <div className="mt-20 flex justify-center">
-            <a
-                href={profileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Read MD Gas reviews on Google"
-                className="
-                    group relative
-                    flex items-center
-                    rounded-2xl
-                    px-6 py-4
-                    bg-white
-                    ring-1 ring-slate-200
-                    shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)]
-                    transition-all duration-300 ease-out
-                    hover:shadow-[0_20px_40px_-18px_rgba(0,0,0,0.45)]
-                    hover:ring-primary/40
-                    hover:-translate-y-0.5
-                    active:scale-[0.98]
-                    cursor-pointer
-                "
-            >
-                <div
-                    className="
-                        pointer-events-none
-                        absolute -inset-6 -z-10 rounded-full
-                        bg-gradient-to-r from-blue-400/5 to-amber-400/5
-                        opacity-0 blur-2xl transition-opacity duration-500
-                        group-hover:opacity-100
-                    "
-                />
-
-                <div className="relative flex items-center gap-5">
-                    <div className="flex items-center gap-4">
-                        <div
-                            className="
-                                flex h-10 w-10 items-center justify-center
-                                rounded-lg bg-white
-                                ring-1 ring-slate-200
-                                shadow-[0_8px_24px_-14px_rgba(0,0,0,0.25)]
-                                transition-transform duration-300
-                                group-hover:scale-[1.06]
-                            "
-                        >
-                            <FcGoogle className="h-6 w-6" />
-                        </div>
-
-                        <div className="flex flex-col leading-tight">
-                            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary">
-                                Reviews on
-                            </span>
-                            <span className="text-[15px] font-semibold text-dark">
-                                Google
-                            </span>
-                            {hasRating && (
-                                <span className="text-xs text-slate-500 mt-1">
-                                    Rated {googleBusiness.rating}/5 from {formattedReviewCount} reviews
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
+        <section className="bg-slate-50 py-16">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+                <div className="flex justify-center">
                     <div
-                        className="
-                            rounded-full
-                            bg-foreground
-                            px-4 py-2
-                            ring-1 ring-primary/20
-                            transition-all duration-300
-                            group-hover:ring-primary/40
-                        "
+                        ref={containerRef}
+                        className={`w-full max-w-4xl rounded-3xl bg-white p-4 ring-1 ring-slate-200 shadow-sm transition-all duration-300 ${
+                            brandingRemoved ? "pb-4" : "pb-8"
+                        }`}
                     >
-                        <span className="text-sm font-semibold text-slate-900">
-                            Read our reviews
-                        </span>
+                        <style>{`
+                            #shapo-widget-1569ee68f38a1e8430cb {
+                                background: #ffffff !important;
+                            }
+                            #shapo-widget-1569ee68f38a1e8430cb iframe {
+                                background: #ffffff !important;
+                            }
+                        `}</style>
+                        <div id="shapo-widget-1569ee68f38a1e8430cb" />
                     </div>
                 </div>
-            </a>
-        </div>
+            </div>
+        </section>
     );
-}
-
-function isSafeHttpsUrl(url) {
-    if (typeof url !== "string") return false;
-    return url.startsWith("https://");
 }

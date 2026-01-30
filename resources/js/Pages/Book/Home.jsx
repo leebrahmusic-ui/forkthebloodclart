@@ -4,6 +4,7 @@ import { Footer } from "@/Components/boiler/footer";
 import WhyChooseUs from "@/Components/boiler/WhyChooseUs";
 import { ServiceCards } from "@/Components/boiler/service-cards";
 import Faq from "@/Components/boiler/Faq";
+import { GoogleReview } from "@/Components/GoogleReview";
 import { router, Head, usePage } from "@inertiajs/react";
 
 /**
@@ -177,6 +178,9 @@ export default function Home() {
                 </div>
             </section>
 
+            <div className="-mt-6">
+                <GoogleReview />
+            </div>
             <WhyChooseUs />
             <ServiceCards />
             <Faq />
