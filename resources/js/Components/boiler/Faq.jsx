@@ -83,7 +83,7 @@ export default function Faq() {
                                         className={`
                                             group relative w-full cursor-pointer
                                             border
-                                            px-8 py-6
+                                            px-8 pt-9 pb-6
                                             flex flex-col items-center gap-3
                                             text-center
                                             transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]
@@ -97,7 +97,7 @@ export default function Faq() {
                                         {/* Rail dot */}
                                         <span
                                             className={`
-                                                absolute left-1/2 top-4 -translate-x-1/2
+                                                absolute left-1/2 top-3 -translate-x-1/2
                                                 h-3 w-3 rounded-full
                                                 transition-all duration-300
                                                 ${
