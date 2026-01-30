@@ -93,7 +93,18 @@ export default function Home() {
 
     return (
         <>
-            <Head title={title} />
+            <Head title={title}>
+                <script
+                    id="shapo-embed-js"
+                    type="text/javascript"
+                    src="https://cdn.shapo.io/js/embed.js"
+                    defer
+                ></script>
+                <script
+                    type="application/ld+json"
+                    id="shapo-ratingschema-0206b0f6a8"
+                ></script>
+            </Head>
             <Header />
 
             {/* ================= HERO ================= */}
