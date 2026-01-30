@@ -15,10 +15,10 @@ export default function Home() {
                 {/* <Header/> */}
                 <GuestLayout>
                     <HeroSection />
+                    <InstagramFeed />
                     <HomeTypesStrip />
                     <ServiceCards />
                     <WhyChooseUs />
-                    <InstagramFeed />
                     <Faq />
                 </GuestLayout>
                 {/* <Footer /> */}
