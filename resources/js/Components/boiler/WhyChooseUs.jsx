@@ -84,7 +84,7 @@ export default function WhyChooseUs() {
                             <article
                                 key={item.title}
                                 className="
-                                    relative flex h-full items-center gap-4 
+                                    relative flex h-full flex-col items-center gap-4 text-center
                                     rounded-2xl border border-slate-200 
                                     bg-white
                                     p-5 sm:p-6 
@@ -115,7 +115,7 @@ export default function WhyChooseUs() {
                                 </div>
 
                                 {/* Text area */}
-                                <div className="flex flex-col flex-1">
+                                <div className="flex flex-col flex-1 items-center">
                                     <h3 className="text-sm sm:text-[15px] font-semibold text-slate-900">
                                         {item.title}
                                     </h3>

@@ -14,16 +14,22 @@ export function HeroSection() {
                     <div className="absolute -top-8 left-0 h-32 w-32 rounded-full bg-gradient-to-br from-emerald-200 via-emerald-100/40 to-transparent blur-2xl" />
 
                     <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
-                        <div className="space-y-6">
+                        <div className="space-y-6 text-center flex flex-col items-center">
                             <h2 className="text-4xl sm:text-[40px] lg:text-[52px] font-semibold tracking-tight text-slate-900">
-                                New boiler installs in Leeds & Surrounding — fixed price, no sales visit.
+                                <span className="uppercase">New boiler installation in Leeds & Surrounding</span>{" "}
+                                <img
+                                    src="/images/yorkshire%20rose.png"
+                                    alt="Yorkshire rose"
+                                    className="inline-block h-16 w-16 align-text-bottom"
+                                />
+                                .
                                 <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
-                                    Book this week. Next‑day installs available when ordered before 3pm.
+                                    Booking's available all-days of the week. Depending on demand.
                                 </span>
                             </h2>
 
 
-                            <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex flex-wrap items-center justify-center gap-3">
                                 <a
                                     href="/book"
                                     className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
@@ -35,7 +41,7 @@ export function HeroSection() {
                                 </span>
                             </div>
 
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-slate-500 mx-auto">
                                 Big blue prices? Not here. Local engineers, fixed quotes.
                             </p>
 
@@ -65,7 +71,7 @@ export function HeroSection() {
                                     <span className="text-xs font-semibold text-emerald-700">Next‑day installs available</span>
                                 </div>
                                 <div className="mt-2 text-xs text-slate-600">
-                                    Confirmation sent the same day with a tidy, punctual install.
+                                    We will contact you with confirmation.
                                 </div>
                             </div>
 

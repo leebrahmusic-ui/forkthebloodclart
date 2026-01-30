@@ -14,7 +14,7 @@ export function InstagramFeed() {
     return (
         <section className="bg-white py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div className="flex flex-col items-center text-center gap-6">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600">
                             Recent work

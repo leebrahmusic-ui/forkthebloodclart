@@ -51,7 +51,7 @@ export function ServiceCards() {
                             <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 leading-10">
                                 A clear online quote, without a sales visit.
                                 <br className="hidden sm:block" />
-                                <span className="text-emerald-600">
+                                <span className="block mt-2 text-emerald-600">
                                     Local engineers, tidy installs, clear pricing.
                                 </span>
                             </h2>

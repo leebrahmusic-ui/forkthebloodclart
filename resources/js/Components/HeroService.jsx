@@ -87,20 +87,20 @@ export function HeroServices() {
     return (
         <div className="space-y-6">
             {featuredService && (
-                <Card className="group relative flex flex-col overflow-hidden rounded-[28px] border border-emerald-200 bg-white p-7 shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
+                <Card className="group relative flex flex-col overflow-hidden rounded-[28px] border border-emerald-200 bg-white p-7 text-center shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
                     {/* label pill */}
-                        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
-                            {featuredService.highlight}
-                        </div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 mx-auto">
+                        {featuredService.highlight}
+                    </div>
 
                     <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-                        <div className="space-y-3">
-                            <CardHeader className="p-0">
-                                <CardTitle className="text-[22px] font-semibold text-slate-900">
+                        <div className="space-y-3 flex flex-col items-center">
+                            <CardHeader className="p-0 w-full">
+                                <CardTitle className="w-full text-[22px] font-semibold text-slate-900">
                                     {featuredService.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-0">
+                            <CardContent className="p-0 w-full">
                                 <CardDescription className="text-[14px] leading-relaxed text-slate-600">
                                     {featuredService.description}
                                 </CardDescription>
@@ -112,8 +112,8 @@ export function HeroServices() {
                                 {featuredService.specs?.length > 0 && (
                                     <ul className="mt-3 space-y-1 text-sm text-slate-600">
                                         {featuredService.specs.map((spec) => (
-                                            <li key={spec} className="flex items-start gap-2">
-                                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                            <li key={spec} className="flex items-center justify-center gap-2">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                                                 <span>{spec}</span>
                                             </li>
                                         ))}
@@ -149,7 +149,7 @@ export function HeroServices() {
                 {otherServices.map((service) => (
                     <Card
                         key={service.id}
-                        className="group relative flex flex-col overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
+                        className="group relative flex flex-col items-center text-center overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
                     >
                         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                             {service.highlight}

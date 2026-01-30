@@ -98,24 +98,24 @@ export function HomeTypesStrip() {
             {/* FLEX ROW ON DESKTOP — BOTH SIDES EXACT 50% */}
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0 lg:flex lg:items-center lg:gap-16">
                 {/* LEFT = 50% WIDTH */}
-                <div className="w-full lg:w-[40%] flex flex-col justify-between gap-10 mb-12 lg:mb-0">
+                <div className="w-full lg:w-[40%] flex flex-col items-center text-center justify-between gap-10 mb-12 lg:mb-0">
                     <div>
                         <p className="mb-4 text-sm font-semibold tracking-wide text-emerald-600">
                             Tailored for Leeds & Surrounding homes
                         </p>
 
                         <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                            The right boiler for every Leeds & Surrounding home.
+                            The right boiler for every home in Leeds & Surrounding.
                         </h2>
 
-                        <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-600">
+                        <p className="mt-5 max-w-xl mx-auto text-sm leading-relaxed text-slate-600">
                             We match your home size, usage and budget with a
                             fixed‑price quote and a clean install.
                         </p>
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center gap-4">
                         <button
                             onClick={handlePrev}
                             className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white"
@@ -161,25 +161,25 @@ export function HomeTypesStrip() {
                                         xl:basis-[45%]
                                     "
                                 >
-                                    <div className="flex h-full relative flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                                    <div className="flex h-full relative flex-col items-center text-center justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                                         <div>
                                             {/* Top-right badge */}
                                             <div className="absolute top-4 right-4 z-50 w-12 text-center h-12 inline-flex items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[8px] font-medium text-emerald-700 leading-2.5">
                                                 {type.tag}
                                             </div>
 
-                                            <div className="mb-5 flex items-center gap-4">
+                                            <div className="mb-5 flex flex-col items-center gap-3 text-center">
                                                 {/* Icon wrapper – don't let it stretch */}
                                                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 shrink-0">
                                                     <type.icon className="h-6 w-6 text-emerald-700" />
                                                 </div>
 
-                                                <h3 className="text-2xl font-bold leading-7 max-w-32 text-slate-900 sm:text-3xl">
+                                                <h3 className="text-2xl font-bold leading-7 max-w-xs text-slate-900 sm:text-3xl">
                                                     {type.name} homes
                                                 </h3>
                                             </div>
 
-                                            <p className="max-w-md text-sm leading-relaxed text-slate-600">
+                                            <p className="max-w-md mx-auto text-sm leading-relaxed text-slate-600">
                                                 {type.description}
                                             </p>
                                         </div>

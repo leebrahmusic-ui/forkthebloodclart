@@ -43,7 +43,7 @@ export default function Faq() {
         <section className="bg-slate-50 py-20 rounded-b-[45px]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
                 {/* Header */}
-                <div className="mb-16 max-w-3xl">
+                <div className="mb-16 max-w-3xl mx-auto text-center">
                     <span className="text-xs uppercase tracking-[0.3em] text-emerald-600">
                         Leeds & Surrounding support
                     </span>
@@ -83,13 +83,13 @@ export default function Faq() {
                                         className={`
                                             group relative w-full cursor-pointer
                                             border
-                                            px-8 py-6 pl-14
-                                            flex items-center justify-between
-                                            text-left
+                                            px-8 py-6
+                                            flex flex-col items-center gap-3
+                                            text-center
                                             transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]
                                             ${
                                                 isOpen
-                                                    ? "bg-white border-emerald-200 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)] translate-x-1"
+                                                    ? "bg-white border-emerald-200 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)]"
                                                     : "bg-white border-slate-200 hover:border-emerald-200 hover:shadow-md"
                                             }
                                         `}
@@ -97,7 +97,7 @@ export default function Faq() {
                                         {/* Rail dot */}
                                         <span
                                             className={`
-                                                absolute left-4 top-1/2 -translate-y-1/2
+                                                absolute left-1/2 top-4 -translate-x-1/2
                                                 h-3 w-3 rounded-full
                                                 transition-all duration-300
                                                 ${
@@ -150,7 +150,7 @@ export default function Faq() {
                                             }
                                         `}
                                     >
-                                        <div className="ml-14 mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 border border-slate-200 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]">
+                                        <div className="mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 text-center border border-slate-200 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]">
                                             {item.a}
                                         </div>
                                     </div>
