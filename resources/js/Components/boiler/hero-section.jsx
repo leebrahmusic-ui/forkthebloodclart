@@ -22,9 +22,8 @@ export function HeroSection() {
                                     alt="Yorkshire rose"
                                     className="inline-block h-16 w-16 align-text-bottom"
                                 />
-                                .
                                 <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
-                                    Booking's available all-days of the week. Depending on demand.
+                                    Bookings available all-days of the week. Depending on demand.
                                 </span>
                             </h2>
 
