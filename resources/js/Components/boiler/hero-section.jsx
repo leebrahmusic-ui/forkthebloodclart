@@ -1,5 +1,6 @@
 import { GoogleReview } from "../GoogleReview";
 import { HeroServices } from "../HeroService";
+import { BadgeCheck, ShieldCheck, Clock4, PhoneCall } from "lucide-react";
 
 export function HeroSection() {
     return (
@@ -40,58 +41,73 @@ export function HeroSection() {
 
                         </div>
 
-                        <div className="rounded-[24px] border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src="/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png"
-                                        alt="Gas Safe Register"
-                                        className="h-9 w-9"
-                                    />
-                                    <div>
-                                        <div className="text-sm font-semibold text-slate-900">
-                                            Gas Safe Register 636354
-                                        </div>
-                                        <div className="text-xs text-slate-500">
-                                            Certified engineers
-                                        </div>
+                        <div className="relative overflow-hidden rounded-[24px] border border-slate-200/70 bg-white p-4 sm:p-5 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
+                            <div className="pointer-events-none absolute -right-16 -top-16 h-32 w-32 rounded-full bg-emerald-200/40 blur-2xl" />
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <img
+                                    src="/images/gas%20safe%20logo%20mega.png"
+                                    alt="Gas Safe Register"
+                                    className="h-10 w-10"
+                                />
+                                <div>
+                                    <div className="text-xs uppercase tracking-[0.25em] text-slate-500">
+                                        Gas Safe Register 636354
+                                    </div>
+                                    <div className="text-lg font-semibold text-slate-900">
+                                        Certified local engineers
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2">
+                            <div className="mt-3 rounded-2xl border border-emerald-200/70 bg-emerald-50/70 px-3 py-2">
+                                <div className="flex flex-col items-center gap-1">
                                     <span className="text-sm font-semibold text-slate-900">Order before 3pm</span>
-                                    <span className="text-xs font-semibold text-emerald-600">Next‑day installs</span>
+                                    <span className="text-xs font-semibold text-emerald-700">Next‑day installs available</span>
                                 </div>
+                                <div className="mt-2 text-xs text-slate-600">
+                                    Confirmation sent the same day with a tidy, punctual install.
+                                </div>
+                            </div>
 
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2">
-                                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                            Fully insured
-                                        </div>
-                                        <div className="text-sm font-semibold text-slate-900">
-                                            Work protected
-                                        </div>
-                                        <div className="mt-1 text-xs text-slate-500">
-                                            Insurance details available on request
+                            <div className="mt-3 grid gap-2">
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-2.5">
+                                        <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                                        <div>
+                                            <div className="text-sm font-semibold text-slate-900">Fully insured workmanship</div>
+                                            <div className="text-xs text-slate-500">Public liability & workmanship protection on every job.</div>
                                         </div>
                                     </div>
-                                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2">
-                                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                            Trusted brand installer
-                                        </div>
-                                        <div className="mt-1 flex items-center gap-2">
-                                            <img
-                                                src="/images/idealheating.png"
-                                                alt="Ideal Heating"
-                                                className="h-6 w-16 object-contain"
-                                            />
-                                            <span className="text-xs text-slate-500">Ideal Heating</span>
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-2.5">
+                                        <BadgeCheck className="h-5 w-5 text-emerald-600" />
+                                        <div>
+                                            <div className="text-sm font-semibold text-slate-900">Approved brand installer</div>
+                                            <div className="mt-1 flex items-center justify-center gap-2">
+                                                <img
+                                                    src="/images/idealheating.png"
+                                                    alt="Ideal Heating"
+                                                    className="h-6 w-16 object-contain"
+                                                />
+                                                <span className="text-xs text-slate-500">Ideal Heating</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
-                                    WhatsApp chat 24/7 or request a callback from an engineer.
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-2.5">
+                                        <Clock4 className="h-5 w-5 text-emerald-600" />
+                                        <div>
+                                            <div className="text-sm font-semibold text-slate-900">Fast booking</div>
+                                            <div className="text-xs text-slate-500">Slots for this week with real‑time availability.</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-2.5">
+                                        <PhoneCall className="h-5 w-5 text-emerald-600" />
+                                        <div>
+                                            <div className="text-sm font-semibold text-slate-900">Engineer support</div>
+                                            <div className="text-xs text-slate-500">WhatsApp 24/7 or request a callback.</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
