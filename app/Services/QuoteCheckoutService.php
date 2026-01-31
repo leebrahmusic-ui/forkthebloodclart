@@ -74,11 +74,25 @@ class QuoteCheckoutService
                 }
             }
 
-            // 3) Create Appointment
+            // 3) Guard against exact slot already taken
+            $startsAtUtc = $startsAtLocal->copy()->timezone('UTC');
+            $slotTaken = Appointment::query()
+                ->where('appointment_date', $appointmentDate)
+                ->where('starts_at', $startsAtUtc)
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->exists();
+
+            if ($slotTaken) {
+                throw ValidationException::withMessages([
+                    'visit_time' => ['Selected time is no longer available. Please choose another slot.'],
+                ]);
+            }
+
+            // 4) Create Appointment
             $appointment = Appointment::create([
                 'customer_id' => $customer->id, // if you want null until paid, set null here
                 'type' => $serviceType,
-                'starts_at' => $startsAtLocal->copy()->timezone('UTC'),
+                'starts_at' => $startsAtUtc,
                 'appointment_date' => $appointmentDate,
                 'status' => 'pending',
             ]);
