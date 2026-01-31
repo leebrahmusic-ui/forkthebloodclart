@@ -52,7 +52,7 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
         const principal = Number(totalPrice);
         const annualRate = 0.099;
         const monthlyRate = annualRate / 12;
-        const months = 48;
+        const months = 120;
         const monthly =
             (principal * monthlyRate) /
             (1 - Math.pow(1 + monthlyRate, -months));
