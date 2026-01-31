@@ -281,7 +281,7 @@ class QuoteCheckoutService
                     'currency' => strtolower($booking->currency),
                     'unit_amount' => (int) round(((float) $booking->total) * 100),
                     'product_data' => [
-                        'name' => 'Service booking',
+                        'name' => 'MD Gas Booking',
                     ],
                 ],
             ]],
