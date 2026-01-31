@@ -12,7 +12,7 @@ class BookingNotificationService
 {
     public function sendConfirmed(Booking $booking): void
     {
-        $booking->loadMissing(['customer', 'appointment', 'details', 'transactions']);
+        $booking->loadMissing(['customer', 'appointment', 'details', 'transactions', 'products.addOns', 'productAddOns']);
 
         $customerEmail = $booking->customer?->email ?: null;
         $adminEmails = array_values(array_filter(array_map('trim', explode(',', (string) config('mail.admin_emails')))));
