@@ -43,9 +43,29 @@ class AppointmentBlockService
             ];
         }
 
-        // No gap → nothing to block
+        // No gap → still block exact appointment start times (any type)
         if ($gap <= 0) {
-            return ['date' => $day->toDateString(), 'type' => $type, 'blocked' => []];
+            if ($appointments->isEmpty()) {
+                return ['date' => $day->toDateString(), 'type' => $type, 'blocked' => []];
+            }
+
+            $blocked = [];
+            foreach ($appointments as $a) {
+                $start = Carbon::parse($a->starts_at)->timezone($tz);
+                if ($start->toDateString() !== $day->toDateString()) continue;
+
+                $blocked[] = [
+                    'from' => $start->toDateTimeString(),
+                    'to' => $start->copy()->addMinute()->toDateTimeString(),
+                    'reason' => 'Slot already booked',
+                ];
+            }
+
+            return [
+                'date' => $day->toDateString(),
+                'type' => $type,
+                'blocked' => $this->mergeRanges($blocked),
+            ];
         }
 
         // Gap applies against ALL appointments (operationally safest)
