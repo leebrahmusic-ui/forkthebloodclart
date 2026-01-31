@@ -23,10 +23,12 @@ class AppointmentBlockService
         $workStart = $day->copy()->setTime(config('appointment.start_hour'), 0);
         $workEnd   = $day->copy()->setTime(config('appointment.end_hour'), 0);
 
-        $appointments = Appointment::query()
+        $appointmentsAll = Appointment::query()
             ->whereDate('appointment_date', $day->toDateString())
-            ->whereIn('status', ['pending','confirmed'])
-            ->get(['type','starts_at']);
+            ->get(['type','starts_at','status']);
+
+        $appointments = $appointmentsAll
+            ->whereIn('status', ['pending','confirmed']);
         // dd($date);
 
         // Rule: max per day (type-specific)
@@ -45,12 +47,12 @@ class AppointmentBlockService
 
         // No gap → still block exact appointment start times (any type)
         if ($gap <= 0) {
-            if ($appointments->isEmpty()) {
+            if ($appointmentsAll->isEmpty()) {
                 return ['date' => $day->toDateString(), 'type' => $type, 'blocked' => []];
             }
 
             $blocked = [];
-            foreach ($appointments as $a) {
+            foreach ($appointmentsAll as $a) {
                 $start = Carbon::parse($a->starts_at)->timezone($tz);
                 if ($start->toDateString() !== $day->toDateString()) continue;
 
