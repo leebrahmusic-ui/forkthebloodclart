@@ -79,6 +79,7 @@ class QuoteCheckoutService
             $slotTaken = Appointment::query()
                 ->where('appointment_date', $appointmentDate)
                 ->where('starts_at', $startsAtUtc)
+                ->whereIn('status', ['pending', 'confirmed', 'completed'])
                 ->exists();
 
             if ($slotTaken) {
