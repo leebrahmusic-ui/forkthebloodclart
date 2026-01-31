@@ -271,6 +271,9 @@ export default function QuoteResultsPage({ answers }) {
                                                     <div className="text-lg font-semibold">
                                                         from £{monthlyFrom}/mo
                                                     </div>
+                                                    <div className="text-[11px] text-white/60">
+                                                        @ 9.9% APR
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

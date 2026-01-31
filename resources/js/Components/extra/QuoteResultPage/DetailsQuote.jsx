@@ -171,6 +171,9 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                                             {monthlyFrom && (
                                                 <div className="mt-2 text-sm text-slate-700">
                                                     Finance from £{monthlyFrom}/mo
+                                                    <span className="ml-2 text-xs text-slate-500">
+                                                        @ 9.9% APR
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
