@@ -21,7 +21,7 @@ class AppointmentAvailabilityService
             $endHour   = 10;
         }
 
-        $start = Carbon::createFromFormat('Y-m', $month, $tz)->startOfMonth()->startOfDay();
+        $start = Carbon::createFromFormat('Y-m-d', $month . '-01', $tz)->startOfMonth()->startOfDay();
         $end   = $start->copy()->endOfMonth()->startOfDay();
 
         $out = [];
