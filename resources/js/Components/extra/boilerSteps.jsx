@@ -144,18 +144,22 @@ export const SERVICE_QUESTIONS = {
                 {
                     label: "In the airing cupboard",
                     image: "/images/stepper/location-cupboard.svg",
+                    priceNote: "+£800",
                 },
                 {
                     label: "New place within the same room",
                     image: "/images/stepper/location-same-room.svg",
+                    priceNote: "+£800",
                 },
                 {
                     label: "Another room on the same floor",
                     image: "/images/stepper/location-other-room.svg",
+                    priceNote: "+£800",
                 },
                 {
                     label: "Another floor or loft",
                     image: "/images/stepper/location-loft.svg",
+                    priceNote: "+£800",
                 },
             ],
             showIf: (a) =>

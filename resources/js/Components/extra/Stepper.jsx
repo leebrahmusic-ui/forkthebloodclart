@@ -1049,7 +1049,13 @@ export default function Stepper({
                                                             )}
 
                                                             {opt.image && (
-                                                                <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
+                                                                <div
+                                                                    className={`${
+                                                                        current?.id === "flue_wall"
+                                                                            ? "w-32 h-32 sm:w-36 sm:h-36"
+                                                                            : "w-24 h-24 sm:w-28 sm:h-28"
+                                                                    } flex items-center justify-center`}
+                                                                >
                                                                     <img
                                                                         src={
                                                                             opt.image

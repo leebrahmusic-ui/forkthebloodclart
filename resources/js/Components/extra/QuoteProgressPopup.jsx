@@ -157,8 +157,6 @@ export default function QuoteProcessingModal({
         };
     }, [open]);
 
-    if (!open) return null;
-
     const completed = activeStep >= steps.length;
     const currentStep = steps[Math.min(activeStep, steps.length - 1)];
     const progressPercent = Math.min(
@@ -169,6 +167,20 @@ export default function QuoteProcessingModal({
     const ringCircumference = 2 * Math.PI * ringRadius;
     const ringDashOffset =
         ringCircumference - (progressPercent / 100) * ringCircumference;
+
+    useEffect(() => {
+        if (!open || !completed || !quote) return;
+
+        const timer = setTimeout(() => {
+            router.post(`/book/quote/new/results`, quote, {
+                preserveScroll: true,
+            });
+        }, 1800);
+
+        return () => clearTimeout(timer);
+    }, [open, completed, quote]);
+
+    if (!open) return null;
 
     return (
         <div
@@ -300,6 +312,11 @@ export default function QuoteProcessingModal({
                                                 <p className="mt-2 text-[12px] text-muted-foreground">
                                                     Fast, accurate, and tailored to your answers.
                                                 </p>
+                                                {completed && (
+                                                    <p className="mt-2 text-[12px] font-semibold text-primary">
+                                                        Redirecting to your results…
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -418,47 +435,11 @@ export default function QuoteProcessingModal({
                                         </div>
                                     </div>
 
-                                    {/* Desktop button (kept here for desktop layout) */}
-                                    {completed && (
-                                        <button
-                                            onClick={() => {
-                                                if (!quote) return;
-                                                router.post(
-                                                    `/book/quote/new/results`,
-                                                    quote,
-                                                    { preserveScroll: true }
-                                                );
-                                            }}
-                                            className="hidden sm:flex w-full rounded-2xl bg-gradient-to-r from-primary to-secondary px-6 py-4 text-white font-semibold items-center justify-between hover:opacity-90 transition cursor-pointer"
-                                        >
-                                            <span>View your quote</span>
-                                            <FiChevronRight />
-                                        </button>
-                                    )}
+                                    {/* Desktop button removed: auto-redirects */}
                                 </div>
                             </div>
 
-                            {/* Sticky footer button on mobile: always visible, no scroll needed */}
-                            {completed && (
-                                <div className="sm:hidden fixed bottom-0 left-0 right-0 z-[60] p-4 bg-black/70 backdrop-blur-xl border-t border-white/10">
-                                    <button
-                                        onClick={() => {
-                                            if (!quote) return;
-                                            router.post(
-                                                `/book/quote/new/results`,
-                                                quote,
-                                                { preserveScroll: true }
-                                            );
-                                        }}
-                                        className="w-full rounded-2xl bg-gradient-to-r from-primary to-secondary px-6 py-4 text-white font-semibold flex items-center justify-between hover:opacity-90 transition cursor-pointer"
-                                    >
-                                        <span className="truncate">
-                                            View your quote
-                                        </span>
-                                        <FiChevronRight />
-                                    </button>
-                                </div>
-                            )}
+                            {/* Mobile button removed: auto-redirects */}
 
                             {/* Desktop close (optional) */}
                             <button
