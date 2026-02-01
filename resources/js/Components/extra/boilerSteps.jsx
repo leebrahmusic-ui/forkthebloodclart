@@ -51,7 +51,7 @@ export const SERVICE_QUESTIONS = {
             infoBox: {
                 badge: "Tip",
                 text:
-                    "Select Yes if you know. If you’re not sure, choose No and we’ll guide you through it in the next step — or you can speak with an engineer.",
+                    "Common types: Combi boiler • System boiler • Regular/Standard boiler\n\nSelect Yes if you know. If you’re not sure, choose No and we’ll guide you through it in the next step — or you can speak with an engineer.",
                 // helperLabel: "Not sure?",
                 // phone: "0330 113 1333",
                 // phoneLabel: "Speak to an expert",
@@ -291,7 +291,7 @@ export const SERVICE_QUESTIONS = {
 
 If you’re happy to keep your existing thermostat, please select Basic.
 • Standard wireless thermostat (included)
-• Smart thermostat +£100`,
+`,
             },
             options: [
                 {
@@ -301,6 +301,7 @@ If you’re happy to keep your existing thermostat, please select Basic.
                 },
                 {
                     label: "Smart",
+                    priceNote: "+£100",
                     image: "/images/stepper/SMART_room_thermostat-removebg-preview.png",
                 }
             ],
@@ -319,13 +320,11 @@ If you’re happy to keep your existing thermostat, please select Basic.
 
                 Any missing or faulty TRVs will need to be replaced to ensure compliance with current standards.
 
-£35 per radiator
-
                 `
             },
             options: [
                 { label: "No", image: "/images/stepper/option-no.svg" },
-                { label: "Yes", image: "/images/stepper/TRV-removebg-preview.png" },
+                { label: "Yes", priceNote: "+£35 each", image: "/images/stepper/TRV-removebg-preview.png" },
             ],
             preset: { label: "No" },
             showIf: (a) => !!a.thermostat_type,

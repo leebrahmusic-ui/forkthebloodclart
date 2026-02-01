@@ -341,6 +341,13 @@ export default function Stepper({
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [canProceed, index, visibleSteps.length, serviceKey]);
 
+    const optionGridColumns =
+        displayOptions.length === 1
+            ? "grid-cols-1"
+            : displayOptions.length === 2
+                ? "grid-cols-2 md:grid-cols-2"
+                : "grid-cols-2 md:grid-cols-3";
+
     return (
         <>
             <div className="fixed inset-0 bg-light-grey -z-10"></div>
@@ -395,110 +402,56 @@ export default function Stepper({
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-                        {/* ================= LEFT ================= */}
-                        <aside className="order-2 md:order-none md:col-span-4 glass-dark p-8 rounded-3xl overflow-hidden h-full flex flex-col relative">
-                            <div className="sheen absolute inset-0 pointer-events-none rounded-3xl" />
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-2xl font-bold text-primary">
-                                    Why choose us
-                                </h3>
-
-                                {/* <button
-                                    onClick={restart}
-                                    className="inline-flex items-center gap-2 text-xs bg-foreground text-dark px-3 py-1.5 rounded-full cursor-pointer"
-                                >
-                                    <FiRefreshCcw /> Reset
-                                </button> */}
-                            </div>
-
-                            <ul className="space-y-5 text-sm text-foreground/90">
-                                <li>✓ Certified & trusted engineers</li>
-                                <li>✓ Transparent pricing</li>
-                                <li>✓ Warranty included</li>
-                            </ul>
-
-                            {/* PRICE */}
-                            {pricing.total > 0 && (
-                                <div className="mt-8 rounded-2xl bg-foreground p-4">
-                                    <p className="text-xs uppercase text-muted-foreground">
-                                        Your price
-                                    </p>
-
-                                    <p className="mt-1 text-3xl font-extrabold text-dark">
-                                        {currency}
-                                        {formatPrice(pricing.total)}
-                                    </p>
-
-                                    {/* <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                                        <p>Base price: {currency}{formatPrice(pricing.base)}</p>
-                                        {pricing.radiator > 0 && (
-                                            <p>Radiators: {currency}{formatPrice(pricing.radiator)}</p>
-                                        )}
-                                    </div> */}
-
-                                    <p className="mt-2 text-xs text-muted-foreground">
-                                        Fixed price · No hidden extras
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* PROGRESS */}
-                            {/* <div className="mt-auto pt-8">
-                                <div className="text-xs text-foreground/70 mb-2">
-                                    Progress
-                                </div>
-                                <div className="progress-track w-full rounded-full">
-                                    <div
-                                        className="progress-fill"
-                                        style={{ width: `${progress}%` }}
-                                    />
-                                </div>
-                                <div className="mt-2 text-xs text-foreground/60">
-                                    {answeredCount}/{steps.length} answered •{" "}
-                                    {progress}%
-                                </div>
-                            </div> */}
-
-                            {/* RESET BUTTON — bottom aligned */}
-                            <div className="mt-auto pt-10">
-                                <button
-                                    onClick={restart}
-                                    className="
-                                            inline-flex items-center gap-3
-                                            text-sm font-medium
-                                            bg-foreground text-dark
-                                            px-6 py-3
-                                            rounded-full
-                                            cursor-pointer
-                                            shadow-sm
-                                            hover:bg-white hover:shadow-[0_8px_20px_rgba(255,255,255,0.25)]
-
-                                            transition-all"
-                                >
-                                    <FiRefreshCcw className="text-base" />
-                                    Reset
-                                </button>
-                            </div>
-                        </aside>
-
                         {/* ================= RIGHT ================= */}
-                        <section className="order-1 md:order-none md:col-span-8 h-full flex">
-                            <div className="glass-root p-8 rounded-3xl w-full flex flex-col relative">
+                        <section className="md:col-span-12 h-full flex">
+                            <div className="glass-root p-8 rounded-3xl w-full flex flex-col relative min-h-[75vh] sm:min-h-[640px]">
                                 <div className="radial-highlight absolute inset-0 pointer-events-none" />
 
                                 <div className="mb-4 flex items-center justify-between">
                                     <p className="text-sm text-muted-foreground">
                                         Question
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        Step {index + 1} of{" "}
-                                        {visibleSteps.length}
-                                    </p>
+                                    <div className="flex items-center gap-3">
+                                        <p className="text-xs text-muted-foreground">
+                                            Step {index + 1} of{" "}
+                                            {visibleSteps.length}
+                                        </p>
+                                        <button
+                                            onClick={restart}
+                                            className="inline-flex items-center gap-2 text-xs bg-foreground text-dark px-3 py-1.5 rounded-full cursor-pointer shadow-sm hover:bg-white transition-colors"
+                                        >
+                                            <FiRefreshCcw className="text-sm" />
+                                            Reset
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <h2 className="text-2xl font-extrabold text-center text-dark mb-8">
+                                <h2 className="text-2xl font-extrabold text-center text-dark mb-4">
                                     {current?.question}
                                 </h2>
+
+                                {current?.infoBox && (
+                                    <div className="mb-8 max-w-3xl mx-auto text-center">
+                                        <p className="text-sm sm:text-base leading-relaxed text-slate-600 whitespace-pre-line">
+                                            <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary mr-2 align-middle">
+                                                {current.infoBox.badge ?? "Tip"}
+                                            </span>
+                                            {current.infoBox.text}
+                                        </p>
+
+                                        {current.infoBox.phone && current.infoBox.phoneLabel && (
+                                            <div className="mt-3 text-sm text-slate-500">
+                                                {current.infoBox.helperLabel ?? "Not sure?"}{" "}
+                                                <a
+                                                    href={`tel:${current.infoBox.phone.replace(/\s/g, "")}`}
+                                                    className="font-semibold text-slate-900 hover:underline"
+                                                >
+                                                    {current.infoBox.phoneLabel}
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* ========= TRV CHECKBOX + QUANTITY ========= */}
                                 {current?.type === "checkbox_quantity" && (
@@ -1070,68 +1023,63 @@ export default function Stepper({
                                 {/* ========= SELECT OPTIONS ========= */}
                                 {current?.type === "select" && (
                                     <>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
-                                            {displayOptions.map((opt, i) => {
+                                        <div
+                                            className={`grid ${optionGridColumns} gap-5 max-w-5xl mx-auto w-full justify-items-stretch`}
+                                        >
+                                            {displayOptions.map((opt) => {
                                                 const active =
                                                     answers[current?.id]
                                                         ?.label === opt.label;
-                                                // const Icon =
-                                                //     ICONS[i % ICONS.length];
 
                                                 return (
                                                     <div
                                                         key={opt.label}
-                                                        className={`option-card ${active
+                                                        className={`option-card relative overflow-hidden ${active
                                                             ? "option-active sheen"
                                                             : "option-inactive"
                                                             }`}
                                                     >
                                                         <button
                                                             type="button"
-                                                            className="p-4 rounded-2xl w-full cursor-pointer"
+                                                            className="w-full aspect-square p-5 sm:p-6 rounded-2xl cursor-pointer flex flex-col items-center justify-center text-center gap-4"
                                                             onClick={() =>
                                                                 choose(opt)
                                                             }
                                                         >
-                                                            <div className="flex items-center gap-5">
-                                                                <div
-                                                                    className={`radial-dot ${active
-                                                                        ? "radial-dot-active"
-                                                                        : "radial-dot-inactive"
-                                                                        }`}
-                                                                >
-                                                                    <span className="radial-dot-core" />
-                                                                </div>
-                                                                {opt.image && (
-                                                                    <img
-                                                                        src={
-                                                                            opt.image
-                                                                        }
-                                                                        alt={
-                                                                            opt.label
-                                                                        }
-                                                                        className="w-14 h-14 object-contain rounded-lg"
-                                                                    />
-                                                                )}
+                                                            {active && (
+                                                                <span className="absolute top-3 right-3 inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white shadow">
+                                                                    <FiCheck className="text-sm" />
+                                                                </span>
+                                                            )}
 
-                                                                <div className="flex-1 text-left flex gap-4">
-                                                                    <div>
-                                                                        <p className="font-semibold text-dark">
-                                                                            {
-                                                                                opt.label
-                                                                            }
-                                                                        </p>
-                                                                        <p className="text-xs text-muted-foreground mt-0.5">
-                                                                            {active
-                                                                                ? "Selected"
-                                                                                : "Tap to select"}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
+                                                            {opt.image && (
+                                                                <img
+                                                                    src={
+                                                                        opt.image
+                                                                    }
+                                                                    alt={
+                                                                        opt.label
+                                                                    }
+                                                                    className="w-24 h-24 sm:w-[104px] sm:h-[104px] object-contain"
+                                                                />
+                                                            )}
 
-                                                                {active && (
-                                                                    <FiCheck className="text-primary text-lg" />
+                                                            <div>
+                                                                <p className="font-semibold text-dark">
+                                                                    {
+                                                                        opt.label
+                                                                    }
+                                                                </p>
+                                                                {opt.priceNote && (
+                                                                    <p className="text-xs font-semibold text-primary mt-1">
+                                                                        {opt.priceNote}
+                                                                    </p>
                                                                 )}
+                                                                <p className="text-xs text-muted-foreground mt-1">
+                                                                    {active
+                                                                        ? "Selected"
+                                                                        : "Tap to choose"}
+                                                                </p>
                                                             </div>
                                                         </button>
                                                     </div>
@@ -1160,63 +1108,6 @@ export default function Stepper({
                                     </>
                                 )}
 
-                                {current?.infoBox && (
-                                    <div className="mt-14 max-w-4xl mx-auto">
-                                        <div className="flex items-start gap-6">
-                                            {/* Soft expert badge */}
-                                            <div className="shrink-0">
-                                                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/10 to-dark/10 flex items-center justify-center">
-                                                    <span className="text-dark text-sm font-semibold">
-                                                        {current.infoBox
-                                                            .badge ?? "Tip"}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Editorial content */}
-                                            <div className="space-y-4">
-                                                {/* Main text */}
-                                                <p className="text-[16px] leading-relaxed text-slate-700 max-w-2xl whitespace-pre-line">
-                                                    {current.infoBox.text}
-                                                </p>
-
-                                                {/* Optional phone CTA */}
-                                                {current.infoBox.phone &&
-                                                    current.infoBox
-                                                        .phoneLabel && (
-                                                        <div className="flex items-center gap-3 text-sm">
-                                                            <span className="text-slate-400">
-                                                                {current.infoBox
-                                                                    .helperLabel ??
-                                                                    "Not sure?"}
-                                                            </span>
-
-                                                            <a
-                                                                href={`tel:${current.infoBox.phone.replace(
-                                                                    /\s/g,
-                                                                    ""
-                                                                )}`}
-                                                                className="
-                                relative font-semibold text-slate-900
-                                after:absolute after:left-0 after:-bottom-1
-                                after:h-[2px] after:w-full
-                                after:bg-gradient-to-r after:from-dark/20 after:to-dark/10
-                                after:scale-x-0 hover:after:scale-x-100
-                                after:origin-left after:transition-transform
-                            "
-                                                            >
-                                                                {
-                                                                    current
-                                                                        .infoBox
-                                                                        .phoneLabel
-                                                                }
-                                                            </a>
-                                                        </div>
-                                                    )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
 
                                 {/* CONTROLS */}
                                 <div className="mt-auto pt-6 md:pt-10 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 md:justify-between">
