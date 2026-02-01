@@ -412,10 +412,6 @@ export default function Stepper({
                                         Question
                                     </p>
                                     <div className="flex items-center gap-3">
-                                        <p className="text-xs text-muted-foreground">
-                                            Step {index + 1} of{" "}
-                                            {visibleSteps.length}
-                                        </p>
                                         <button
                                             onClick={restart}
                                             className="inline-flex items-center gap-2 text-xs bg-foreground text-dark px-3 py-1.5 rounded-full cursor-pointer shadow-sm hover:bg-white transition-colors"
@@ -1053,15 +1049,17 @@ export default function Stepper({
                                                             )}
 
                                                             {opt.image && (
-                                                                <img
-                                                                    src={
-                                                                        opt.image
-                                                                    }
-                                                                    alt={
-                                                                        opt.label
-                                                                    }
-                                                                    className="w-24 h-24 sm:w-[104px] sm:h-[104px] object-contain"
-                                                                />
+                                                                <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
+                                                                    <img
+                                                                        src={
+                                                                            opt.image
+                                                                        }
+                                                                        alt={
+                                                                            opt.label
+                                                                        }
+                                                                        className="w-full h-full object-contain"
+                                                                    />
+                                                                </div>
                                                             )}
 
                                                             <div>
