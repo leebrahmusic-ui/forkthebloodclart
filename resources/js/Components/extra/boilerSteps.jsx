@@ -226,7 +226,7 @@ export const SERVICE_QUESTIONS = {
                     a.property_type?.label === "Bungalow" ||
                     a.flat_upper_floor?.label === "No" ||
                     a.flue_reachable?.label === "Yes") &&
-                a.pressure_gauge?.label !== "No",
+                (a.move_to_combi?.label === "Yes" || a.pressure_gauge?.label !== "No"),
         },
 
         {
