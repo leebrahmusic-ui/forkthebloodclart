@@ -98,40 +98,31 @@ function parseBaths(lab) {
     return null;
 }
 
+function bathsScore(baths) {
+    if (baths == null) return null;
+    if (baths <= 1.5) return 1;
+    if (baths === 2) return 2;
+    return 3;
+}
+
 /* ===========================
   2) Eligibility + sizing
 =========================== */
 
-function combiAllowed(radsBucket, baths) {
-    if (!radsBucket || baths == null) return false;
-    const radsOk = radsBucket !== "R21_PLUS";
-    const bathsOk = baths <= 2;
-    return radsOk && bathsOk;
+function combiAllowed(baths) {
+    const score = bathsScore(baths);
+    if (score == null) return false;
+    return score <= 3;
 }
 
-function combiTargetKw(radsBucket, baths) {
+function combiTargetKw(baths) {
     const DEFAULT_KW = 35;
-    if (!radsBucket || baths == null) return DEFAULT_KW;
+    const score = bathsScore(baths);
+    if (score == null) return DEFAULT_KW;
 
-    if (radsBucket === "UP_TO_6") {
-        if (baths === 1) return 24;
-        if (baths === 1.5) return 30;
-        return DEFAULT_KW;
-    }
-
-    if (radsBucket === "R7_12") {
-        if (baths === 1) return 30;
-        if (baths === 1.5) return 30;
-        if (baths === 2) return 30;   // << keep 30 kW for 7-12 rads + 2 baths
-        return DEFAULT_KW;
-    }
-
-    if (radsBucket === "R13_20") {
-        if (baths <= 1.5) return 35;
-        return DEFAULT_KW;
-    }
-
-    return DEFAULT_KW;
+    if (score === 1) return 24;
+    if (score === 2) return 30;
+    return 35;
 }
 
 function sysHeatBand(radsBucket) {
@@ -306,8 +297,8 @@ export function buildBoilerQuote({ answers, questions = [] }) {
     const radsBucket = parseRadsBucket(label(answers?.radiators));
     const baths = parseBaths(label(answers?.bathrooms));
 
-    const combiOk = combiAllowed(radsBucket, baths);
-    const combiKw = combiTargetKw(radsBucket, baths);
+    const combiOk = combiAllowed(baths);
+    const combiKw = combiTargetKw(baths);
 
     const allowedBoilerTypes = {
         combi: combiOk && combiKw != null,
