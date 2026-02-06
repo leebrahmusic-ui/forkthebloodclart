@@ -167,39 +167,27 @@ export default function QuotePage() {
                         {/* LEFT */}
                         <div className="md:col-span-7">
                             {content.slug === SERVICE_KEYS.SERVICE ? (
-                                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-4 py-2 text-sm font-semibold text-emerald-800 border border-emerald-200">
-                                    <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-800 border border-slate-200 shadow-sm">
+                                    <span className="h-2 w-2 rounded-full bg-slate-500" />
                                     Boiler service • {content.sampleJobLabel.replace("Boiler Service • ", "")}
                                 </div>
                             ) : (
-                                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
-                                    <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse"></div>
-                                    <span className="text-sm font-medium text-emerald-700">
+                                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-white border border-slate-200 shadow-sm">
+                                    <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                                    <span className="text-sm font-medium text-slate-800">
                                         {content.badge}
                                     </span>
                                 </div>
                             )}
 
                             {/* Hero Title with modern typography */}
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.1]">
-                                <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
-                                    {content.heroTitle
-                                        .split(" ")
-                                        .slice(0, 2)
-                                        .join(" ")}
-                                </span>{" "}
-                                <span className="text-slate-900">
-                                    {content.heroTitle
-                                        .split(" ")
-                                        .slice(2)
-                                        .join(" ")}
-                                </span>
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.1] text-slate-900">
+                                {content.heroTitle}
                             </h1>
 
                             {/* Description with modern styling */}
                             <div className="relative mt-6">
-                                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-200 to-emerald-100 rounded-full"></div>
-                                <p className="pl-6 text-lg text-slate-600 max-w-xl leading-relaxed">
+                                <p className="text-lg text-slate-700 max-w-xl leading-relaxed">
                                     {content.heroDesc}
                                 </p>
                             </div>
