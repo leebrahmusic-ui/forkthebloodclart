@@ -159,11 +159,11 @@ export default function QuotePage() {
             <Head title={title} />
 
             {/* ✅ FIXED: no black bottom gap */}
-            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-emerald-50/50 to-white overflow-x-hidden">
+            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-emerald-50/40 to-white overflow-x-hidden">
                 <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                    <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-emerald-200/60 blur-3xl opacity-60" />
-                    <div className="absolute right-[-10%] top-[-40px] h-80 w-80 rounded-full bg-emerald-300/50 blur-3xl opacity-60" />
-                    <div className="absolute left-1/3 bottom-[-120px] h-96 w-96 rounded-full bg-emerald-100/70 blur-3xl opacity-70" />
+                    <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-emerald-200/35 blur-3xl" />
+                    <div className="absolute right-[-10%] top-[-40px] h-80 w-80 rounded-full bg-emerald-300/30 blur-3xl" />
+                    <div className="absolute left-1/3 bottom-[-120px] h-96 w-96 rounded-full bg-emerald-100/30 blur-3xl" />
                 </div>
                 <PageHeader title={pageTitle} />
 
