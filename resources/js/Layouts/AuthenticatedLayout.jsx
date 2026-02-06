@@ -99,6 +99,13 @@ export default function AuthenticatedLayout({ header, children }) {
                     },
                 ],
             },
+            {
+                key: "scheduling",
+                type: "link",
+                label: "Scheduling",
+                href: route("admin.scheduling.index"),
+                isActive: () => route().current("admin.scheduling.index"),
+            },
         ],
         []
     );

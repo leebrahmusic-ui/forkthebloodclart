@@ -172,7 +172,12 @@ export default function QuoteProcessingModal({
         if (!open || !completed || !quote) return;
 
         const timer = setTimeout(() => {
-            router.post(`/book/quote/new/results`, quote, {
+            const csrfToken = document.head.querySelector(
+                'meta[name="csrf-token"]'
+            )?.content;
+            const payload = csrfToken ? { ...quote, _token: csrfToken } : quote;
+
+            router.post(`/book/quote/new/results`, payload, {
                 preserveScroll: true,
             });
         }, 1800);

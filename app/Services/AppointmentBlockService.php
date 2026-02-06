@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Appointment;
+use App\Models\AppointmentSetting;
+use App\Models\AppointmentBlackout;
 use Carbon\Carbon;
 
 class AppointmentBlockService
@@ -11,17 +13,19 @@ class AppointmentBlockService
     {
         $tz = $timezone ?: config('app.timezone');
 
-        $rules = config('appointment.rules');
-        if (!isset($rules[$type])) {
-            return ['date' => $date, 'type' => $type, 'blocked' => []];
-        }
+        $configRules = config('appointment.rules');
+        $rule = $configRules[$type] ?? null;
 
-        $gap = (int) $rules[$type]['gap_minutes'];
-        $max = (int) $rules[$type]['max_per_day'];
+        $dbRule = AppointmentSetting::where('service_key', $type)->first();
+
+        $gap = (int) ($dbRule?->gap_minutes ?? $rule['gap_minutes'] ?? 0);
+        $max = (int) ($dbRule?->max_per_day ?? $rule['max_per_day'] ?? 5);
 
         $day = Carbon::parse($date, $tz)->startOfDay();
-        $workStart = $day->copy()->setTime(config('appointment.start_hour'), 0);
-        $workEnd   = $day->copy()->setTime(config('appointment.end_hour'), 0);
+        $startHour = (int) ($dbRule?->start_hour ?? config('appointment.start_hour'));
+        $endHour   = (int) ($dbRule?->end_hour ?? config('appointment.end_hour'));
+        $workStart = $day->copy()->setTime($startHour, 0);
+        $workEnd   = $day->copy()->setTime($endHour, 0);
 
         $activeStatuses = ['pending', 'confirmed', 'completed'];
 
@@ -29,7 +33,19 @@ class AppointmentBlockService
             ->whereDate('appointment_date', $day->toDateString())
             ->whereIn('status', $activeStatuses)
             ->get(['type','starts_at','status']);
-        // dd($date);
+
+        // Single-resource mode: any active appointment blocks the entire day for all types
+        if ($appointments->isNotEmpty()) {
+            return [
+                'date' => $day->toDateString(),
+                'type' => $type,
+                'blocked' => [[
+                    'from' => $workStart->toDateTimeString(),
+                    'to'   => $workEnd->toDateTimeString(),
+                    'reason' => 'Day already booked',
+                ]],
+            ];
+        }
 
         // Rule: max per day (type-specific)
         $countType = $appointments->where('type', $type)->count();
@@ -72,6 +88,28 @@ class AppointmentBlockService
 
         // Gap applies against ALL appointments (operationally safest)
         $blocked = [];
+
+        // Add manual blackouts (admin-marked)
+        $blackouts = AppointmentBlackout::query()
+            ->where(function ($q) use ($type) {
+                $q->whereNull('service_key')->orWhere('service_key', $type);
+            })
+            ->whereDate('starts_at', '<=', $day->toDateString())
+            ->whereDate('ends_at', '>=', $day->toDateString())
+            ->get();
+
+        foreach ($blackouts as $b) {
+            $from = Carbon::parse($b->starts_at, $tz);
+            $to   = Carbon::parse($b->ends_at, $tz);
+
+            if ($to->lte($workStart) || $from->gte($workEnd)) continue;
+
+            $blocked[] = [
+                'from' => max($from, $workStart)->toDateTimeString(),
+                'to'   => min($to, $workEnd)->toDateTimeString(),
+                'reason' => $b->reason ?? 'Blackout',
+            ];
+        }
 
         foreach ($appointments as $a) {
             $start = Carbon::parse($a->starts_at)->timezone($tz);

@@ -58,8 +58,8 @@ return [
         'symbol' => env('PAYMENT_CURRENCY_SYMBOL', '£'),
     ],
     'stripe' => [
-        'secret' => env('STRIPE_SECRET','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'),
-        'api'   => 'pk_test_51SiexA9FMtDui4Wvp6m5YMxU9kysY6fFlOALbAFYIr1TQUUMesY5wLLx0erHqEdfuDyMTXfUAaacUxub2z6quHCi00FMVxoBK1'
+        'secret' => env('STRIPE_SECRET'),
+        'api'   => env('STRIPE_KEY')
     ]
 
 

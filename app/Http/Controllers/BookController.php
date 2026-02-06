@@ -18,6 +18,13 @@ class BookController extends Controller
     //For storing new quote key
     private function quoteCacheKey(Request $request): string
     {
+        $qid = $request->query('qid') ?? $request->input('qid');
+
+        if ($qid) {
+            $request->session()->put('quote_session_id', $qid);
+            return 'quote:new:results:' . $qid;
+        }
+
         if (!$request->session()->has('quote_session_id')) {
             $request->session()->put('quote_session_id', (string) Str::uuid());
         }
@@ -106,7 +113,11 @@ class BookController extends Controller
             Cache::put($key, $quote, now()->addMinutes(60));
 
             // Option A (recommended with Inertia): force a GET visit (best refresh behavior)
-            return Inertia::location(route('book.quote.new.results'));
+            return Inertia::location(
+                route('book.quote.new.results', [
+                    'qid' => $request->session()->get('quote_session_id'),
+                ])
+            );
 
             // Option B (also works): normal redirect
             // return redirect()->route('book.quote.new.results');
@@ -124,6 +135,40 @@ class BookController extends Controller
         return Inertia::render('Book/ServiceResults', [
             'answers' => $quote,
             'title' => 'Installation Results',
+        ]);
+    }
+
+    public function serviceCheckout(Request $request)
+    {
+        $key = $this->quoteCacheKey($request);
+        $basePrice = BasePrice::boilerService()->value('price');
+        $symbol = config('services.currency.symbol');
+
+        if ($request->isMethod('post')) {
+            $answers = $request->all();
+
+            if (empty($answers)) {
+                return back()->withErrors(['quote' => 'Quote payload missing.']);
+            }
+
+            Cache::put($key, $answers, now()->addMinutes(60));
+
+            return Inertia::location(route('book.quote.service.checkout'));
+        }
+
+        $answers = Cache::get($key);
+
+        if (!$answers) {
+            return redirect()
+                ->route('book.quote.service')
+                ->with('message', 'Your session expired. Please start again.');
+        }
+
+        return Inertia::render('Book/ServiceCheckout', [
+            'answers' => $answers,
+            'basePrice' => $basePrice,
+            'symbol' => $symbol,
+            'title' => 'Boiler Service Checkout',
         ]);
     }
 

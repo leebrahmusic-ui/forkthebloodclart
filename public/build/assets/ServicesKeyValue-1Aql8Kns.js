@@ -1,0 +1,1 @@
+const e={BOILER_REPAIR:{key:"boiler_repair",value:"Boiler Repair"},BOILER_SERVICE:{key:"boiler_service",value:"Boiler Service"},NEW_BOILER_QUOTE:{key:"new_boiler_quote",value:"New Boiler Quote"},POWER_FLUSH:{key:"power_flush",value:"Power Flush"}};export{e as S};

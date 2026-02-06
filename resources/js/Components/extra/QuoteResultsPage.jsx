@@ -12,6 +12,16 @@ import { router } from "@inertiajs/react";
 import DetailsQuoteSidebar from "./QuoteResultPage/DetailsQuote";
 
 export default function QuoteResultsPage({ answers }) {
+    const getCsrfToken = () => {
+        if (typeof document === "undefined") return null;
+        return document.head.querySelector('meta[name="csrf-token"]')?.content;
+    };
+
+    const withCsrf = (payload) => {
+        const token = getCsrfToken();
+        return token ? { ...payload, _token: token } : payload;
+    };
+
     // 1. Extract products safely from the Inertia props
     const products = answers?.products || [];
     const recommendedProductId = answers?.recommendedProductId;
@@ -326,7 +336,7 @@ export default function QuoteResultsPage({ answers }) {
                                         onClick={() =>
                                             router.post(
                                                 "/book/quote/new/install",
-                                                {
+                                                withCsrf({
                                                     boiler_id: product.id,
                                                     brand: product.brand,
                                                     model: product.model,
@@ -340,7 +350,7 @@ export default function QuoteResultsPage({ answers }) {
                                                     price: finalPrice,
                                                     power: selectedPower,
                                                     answers: answers,
-                                                }
+                                                })
                                             )
                                         }
                                         className="w-full rounded-xl cursor-pointer bg-gradient-to-r from-primary/90 to-secondary/80 hover:from-primary hover:to-secondary text-white py-3.5 font-semibold shadow-lg hover:shadow-dark/20 hover:shadow-lg transition-colors duration-300"

@@ -1,0 +1,1 @@
+import{r as t,j as e}from"./app-BsNM9hXS.js";import"./button-ZK28pXwu.js";import{H as r,F as o}from"./footer-CcJYjjxF.js";function x({children:s}){const[a,n]=t.useState(!1);return e.jsxs("div",{className:"flex min-h-screen flex-col relative",children:[e.jsx(r,{}),s,e.jsx(o,{})]})}export{x as G};

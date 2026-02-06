@@ -72,13 +72,13 @@ const SERVICE_CONTENT = {
 
     [SERVICE_KEYS.SERVICE]: {
         slug: SERVICE_KEYS.SERVICE,
-        heroTitle: "Annual boiler service — safety checks & reliability.",
+        heroTitle: "Boiler service — parts included, no extras.",
         heroDesc:
-            "A full annual check to keep your boiler safe, efficient, and compliant.",
+            "Annual service with full clean, safety checks, and combustion analysis. Gaskets and electrodes included so you’re covered on the day.",
         badge: "Boiler Service",
-        sampleJobLabel: "Boiler Service • £89 inc VAT",
+        sampleJobLabel: "Boiler Service • £115 inc VAT",
         estimateLabel: "Annual check",
-        labour: "£89",
+        labour: "£115",
         parts: "—",
         gaugeLabel: "Pass rate",
         gaugeValueText: "99%",
@@ -134,13 +134,19 @@ export default function QuotePage() {
                     <section className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
                         {/* LEFT */}
                         <div className="md:col-span-7">
-                            {/* Modern Badge with icon and animation */}
-                            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
-                                <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse"></div>
-                                <span className="text-sm font-medium text-emerald-700">
-                                    {content.badge}
-                                </span>
-                            </div>
+                            {content.slug === SERVICE_KEYS.SERVICE ? (
+                                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-4 py-2 text-sm font-semibold text-emerald-800 border border-emerald-200">
+                                    <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                                    Boiler service • £115 all in
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
+                                    <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse"></div>
+                                    <span className="text-sm font-medium text-emerald-700">
+                                        {content.badge}
+                                    </span>
+                                </div>
+                            )}
 
                             {/* Hero Title with modern typography */}
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.1]">
@@ -184,35 +190,51 @@ export default function QuotePage() {
                                 <TechnicianButton />
                             </div>
 
-                            {/* Trust indicators matching right side design */}
-                            <div className="mt-12 flex flex-wrap items-center gap-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-                                        <span className="text-emerald-600">✓</span>
+                            {/* Trust indicators */}
+                            {content.slug === SERVICE_KEYS.SERVICE ? (
+                                <div className="mt-12 grid gap-4 sm:grid-cols-2">
+                                    {["Full clean and combustion safety checks", "Gaskets & electrodes included", "Expansion vessel set and leak-checked", "Gas Safe engineers, tidy work"].map((item) => (
+                                        <div
+                                            key={item}
+                                            className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-sm"
+                                        >
+                                            <span className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500" />
+                                            <p className="text-sm font-semibold text-slate-900 leading-snug">
+                                                {item}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="mt-12 flex flex-wrap items-center gap-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                                            <span className="text-emerald-600">✓</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-900">
+                                                Same-day service
+                                            </p>
+                                            <p className="text-xs text-slate-500">
+                                                Emergency response
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-slate-900">
-                                            Same-day service
-                                        </p>
-                                        <p className="text-xs text-slate-500">
-                                            Emergency response
-                                        </p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                                            <span className="text-emerald-600">💷</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-900">
+                                                Fixed pricing
+                                            </p>
+                                            <p className="text-xs text-slate-500">
+                                                No hidden fees
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-                                        <span className="text-emerald-600">💷</span>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-slate-900">
-                                            Fixed pricing
-                                        </p>
-                                        <p className="text-xs text-slate-500">
-                                            No hidden fees
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* RIGHT */}
@@ -319,6 +341,16 @@ export default function QuotePage() {
                                             <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
                                                 <span className="text-emerald-600 animate-[spin_8s_linear_infinite]">🧰</span>
                                             </div>
+
+                                            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+                                                <p className="font-semibold text-emerald-800">What we actually do on the strip-down:</p>
+                                                <ul className="mt-2 list-disc space-y-1 pl-5">
+                                                    <li>Pump and set the expansion vessel, checking the Schrader valve</li>
+                                                    <li>Clean the combustion chamber and burner area</li>
+                                                    <li>Clean and flush the condensate trap</li>
+                                                    <li>Swap gaskets and electrodes where needed</li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -327,18 +359,18 @@ export default function QuotePage() {
                                             {[
                                                 {
                                                     step: "STEP 01",
-                                                    title: "Book your service",
-                                                    text: "£89 inc VAT for a full annual boiler service.",
+                                                    title: "Book online in minutes",
+                                                    text: "Answer the short questions and lock in your £115 strip-down service instantly—no calls or back-and-forth.",
                                                 },
                                                 {
                                                     step: "STEP 02",
-                                                    title: "Full safety checks",
-                                                    text: "We inspect, test, and service your boiler for safe, efficient running.",
+                                                    title: "We confirm your slot",
+                                                    text: "You get the appointment time and a reminder. If anything needs tweaking, we’ll message you straight away.",
                                                 },
                                                 {
                                                     step: "STEP 03",
-                                                    title: "If a kit is needed",
-                                                    text: "Manufacturer service kits are a fixed £25 extra, only if required.",
+                                                    title: "Service + sign-off",
+                                                    text: "We arrive, carry out the strip-down service, and log the checks—gaskets/electrodes included in the price.",
                                                 },
                                             ].map((item) => (
                                                 <div
@@ -366,7 +398,7 @@ export default function QuotePage() {
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                             <div className="space-y-1">
                                                 <p className="text-sm text-slate-600">
-                                                    Fixed £89 service fee. Parts kits only if required.
+                                                    Fixed £115 strip-down service. Gaskets and electrodes included.
                                                 </p>
                                                 <p className="text-sm text-slate-600">
                                                     Book instantly online after the questions — no waiting, no calling, no callbacks unless you want one.

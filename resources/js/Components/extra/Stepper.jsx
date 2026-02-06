@@ -13,7 +13,7 @@ import { PageHeader } from "../ui/page-header";
 import AppointmentDateTimePicker from "./AppointmentDateTimePicker";
 import { useEffect, useRef, useState, useMemo } from "react";
 import QuoteProcessingModal from "./QuoteProgressPopup";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import InstantQuoteModal from "./InstantQuoteModal";
 
 const formatPrice = (value) => {
@@ -102,7 +102,12 @@ export default function Stepper({
     const displayOptions = useMemo(() => {
         if (!current?.options) return [];
 
-        return current.options.map((opt) =>
+        const rawOptions =
+            typeof current.options === "function"
+                ? current.options(answers)
+                : current.options;
+
+        return (rawOptions || []).map((opt) =>
             typeof opt === "string"
                 ? { label: opt, price: 0 }
                 : {
@@ -110,7 +115,7 @@ export default function Stepper({
                     requiresText: opt.requiresText || false,
                 }
         );
-    }, [current]);
+    }, [current, answers]);
 
     const answeredCount = Object.keys(answers).length;
     // const progress = Math.round(
@@ -166,17 +171,7 @@ export default function Stepper({
 
                 if (currentIndex >= 0) {
                     if (currentIndex >= nextVisibleSteps.length - 1) {
-                        if (
-                            SERVICES_WITH_INSTANT_QUOTE.includes(
-                                serviceKey?.key
-                            )
-                        ) {
-                            setShowInstantQuote(true);
-                            setShowProcessing(false);
-                        } else {
-                            setShowProcessing(true);
-                            setShowInstantQuote(false);
-                        }
+                        handleCompletion();
                     } else {
                         setIndex(currentIndex + 1);
                     }
@@ -200,12 +195,26 @@ export default function Stepper({
         const ans = answers[current.id];
         if (!ans || ans.requiresText) return;
 
+        if (current.type === "make_model") {
+            if (!ans.brand || !ans.model) return;
+        }
+
         const key = `${current.id}:${ans.label ?? ans.value ?? JSON.stringify(ans)}`;
         if (lastAutoAdvanceRef.current === key) return;
         lastAutoAdvanceRef.current = key;
 
         setIndex((i) => Math.min(i + 1, visibleSteps.length - 1));
     }, [autoAdvance, current, answers, visibleSteps.length]);
+
+    function updateMakeModel(next) {
+        setAnswers((s) => ({
+            ...s,
+            [current.id]: {
+                ...(s[current.id] || {}),
+                ...next,
+            },
+        }));
+    }
 
 
     function updateText(value) {
@@ -228,6 +237,23 @@ export default function Stepper({
             },
         }));
     }
+
+    const handleCompletion = () => {
+        if (serviceKey?.key === "boiler_service") {
+            router.post(route("book.quote.service.checkout"), answers, {
+                preserveScroll: true,
+            });
+            return;
+        }
+
+        if (SERVICES_WITH_INSTANT_QUOTE.includes(serviceKey?.key)) {
+            setShowInstantQuote(true);
+            setShowProcessing(false);
+        } else {
+            setShowProcessing(true);
+            setShowInstantQuote(false);
+        }
+    };
 
     function next() {
         if (!canProceed) return;
@@ -294,6 +320,12 @@ export default function Stepper({
             return !!ans?.label;
         }
 
+        if (current.type === "make_model") {
+            if (!ans?.brand || !ans?.model) return false;
+            if (ans.requiresText) return !!ans.extraText?.trim();
+            return true;
+        }
+
         if (current.type === "checkbox_quantity") {
             return true;
         }
@@ -325,13 +357,7 @@ export default function Stepper({
 
             // Same behavior as Next button
             if (index === visibleSteps.length - 1) {
-                if (SERVICES_WITH_INSTANT_QUOTE.includes(serviceKey?.key)) {
-                    setShowInstantQuote(true);
-                    setShowProcessing(false);
-                } else {
-                    setShowProcessing(true);
-                    setShowInstantQuote(false);
-                }
+                handleCompletion();
             } else {
                 setIndex((i) => i + 1);
             }
@@ -339,7 +365,7 @@ export default function Stepper({
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [canProceed, index, visibleSteps.length, serviceKey]);
+    }, [canProceed, index, visibleSteps.length, serviceKey, answers]);
 
     const optionGridColumns =
         displayOptions.length === 1
@@ -795,6 +821,118 @@ export default function Stepper({
                                         </div>
                                     )}
 
+                                {/* make + model */}
+                                {current?.type === "make_model" && (
+                                    <div className="max-w-2xl mx-auto w-full space-y-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-dark mb-2">
+                                                    Brand
+                                                </label>
+                                                <select
+                                                    className="w-full rounded-xl border border-dark/20 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+                                                    value={
+                                                        answers[current.id]?.brand ||
+                                                        ""
+                                                    }
+                                                    onChange={(e) => {
+                                                        const brand = e.target.value;
+                                                        updateMakeModel({
+                                                            brand,
+                                                            brandLabel: brand,
+                                                            model: "",
+                                                            modelLabel: "",
+                                                            requiresText: false,
+                                                            extraText: "",
+                                                            label: brand || "",
+                                                        });
+                                                    }}
+                                                >
+                                                    <option value="">Select brand</option>
+                                                    {(current.brands || []).map((label) => (
+                                                        <option key={label} value={label}>
+                                                            {label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-dark mb-2">
+                                                    Model
+                                                </label>
+                                                <select
+                                                    className="w-full rounded-xl border border-dark/20 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+                                                    value={
+                                                        answers[current.id]?.model ||
+                                                        ""
+                                                    }
+                                                    onChange={(e) => {
+                                                        const selected = e.target.value;
+                                                        const modelOptions =
+                                                            current.getModels?.(
+                                                                answers[current.id]?.brand
+                                                            ) || [];
+                                                        const opt = modelOptions.find(
+                                                            (o) => o.label === selected
+                                                        );
+                                                        const requiresText =
+                                                            !!opt?.requiresText;
+
+                                                        updateMakeModel({
+                                                            model: selected,
+                                                            modelLabel: selected,
+                                                            requiresText,
+                                                            extraText: "",
+                                                            label: `${
+                                                                answers[current.id]?.brand ||
+                                                                ""
+                                                            }${selected ? ` — ${selected}` : ""}`,
+                                                        });
+                                                    }}
+                                                    disabled={!answers[current.id]?.brand}
+                                                >
+                                                    <option value="">
+                                                        {answers[current.id]?.brand
+                                                            ? "Select model"
+                                                            : "Select brand first"}
+                                                    </option>
+                                                    {(current.getModels?.(
+                                                        answers[current.id]?.brand
+                                                    ) || []).map((opt) => (
+                                                        <option key={opt.label} value={opt.label}>
+                                                            {opt.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {answers[current.id]?.requiresText && (
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter model"
+                                                    value={
+                                                        answers[current.id]?.extraText ||
+                                                        ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        updateMakeModel({
+                                                            extraText: e.target.value,
+                                                            label: `${
+                                                                answers[current.id]?.brand ||
+                                                                ""
+                                                            } — ${e.target.value}`,
+                                                        })
+                                                    }
+                                                    className="w-full rounded-xl border border-dark/20 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* dropdown */}
                                 {current?.type === "dropdown" && (
                                     <div className="max-w-2xl mx-auto w-full overflow-x-clip">
@@ -858,23 +996,16 @@ export default function Stepper({
                                                 >
                                                     <div className="bg-white border-2 border-dark/20 rounded-xl overflow-hidden">
                                                         <div className="max-h-80 overflow-y-auto">
-                                                            {current.options.map(
+                                                            {displayOptions.map(
                                                                 (opt) => (
                                                                     <button
                                                                         key={
-                                                                            opt.value
+                                                                            opt.value ||
+                                                                            opt.label
                                                                         }
                                                                         type="button"
                                                                         onClick={() => {
-                                                                            setAnswers(
-                                                                                (
-                                                                                    s
-                                                                                ) => ({
-                                                                                    ...s,
-                                                                                    [current.id]:
-                                                                                        opt,
-                                                                                })
-                                                                            );
+                                                                            choose(opt);
                                                                             setIsDropdownOpen(
                                                                                 false
                                                                             );
@@ -1139,23 +1270,7 @@ export default function Stepper({
                                                     index ===
                                                     visibleSteps.length - 1
                                                 ) {
-                                                    if (
-                                                        SERVICES_WITH_INSTANT_QUOTE.includes(
-                                                            serviceKey?.key
-                                                        )
-                                                    ) {
-                                                        setShowInstantQuote(
-                                                            true
-                                                        );
-                                                        setShowProcessing(
-                                                            false
-                                                        ); // safety
-                                                    } else {
-                                                        setShowProcessing(true);
-                                                        setShowInstantQuote(
-                                                            false
-                                                        ); // safety
-                                                    }
+                                                    handleCompletion();
                                                 } else {
                                                     next();
                                                 }

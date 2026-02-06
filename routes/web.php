@@ -13,6 +13,7 @@ use App\Http\Controllers\QuoteCheckoutController;
 use App\Http\Controllers\Admin\OrderManagementController;
 use App\Http\Controllers\Admin\RadiatorPriceController;
 use App\Http\Controllers\Admin\PricingOverridesController;
+use App\Http\Controllers\Admin\SchedulingController;
 
 
 Route::get('/health', function () {
@@ -88,6 +89,8 @@ Route::prefix('book')->name('book.')->group(function () {
     Route::get('/quote/new', [BookController::class, 'newStepper'])->name('quote.new');
     Route::get('/quote/powerflush', [BookController::class, 'powerflushStepper'])->name('quote.powerflush');
     Route::get('/quote/service', [BookController::class, 'serviceStepper'])->name('quote.service');
+    Route::match(['get', 'post'], '/quote/service/checkout', [BookController::class, 'serviceCheckout'])
+        ->name('quote.service.checkout');
 
 
     Route::match(['get', 'post'],'/quote/new/results', [BookController::class, 'serviceResults'])
@@ -176,6 +179,12 @@ Route::middleware(['auth']) // add your admin middleware if you have one
         Route::get('/pricing', [PricingOverridesController::class, 'index'])->name('pricing.index');
         Route::post('/pricing/save', [PricingOverridesController::class, 'save'])->name('pricing.save');
         Route::post('/pricing/reset', [PricingOverridesController::class, 'reset'])->name('pricing.reset');
+
+        // Scheduling controls
+        Route::get('/scheduling', [SchedulingController::class, 'index'])->name('scheduling.index');
+        Route::post('/scheduling/settings', [SchedulingController::class, 'saveSettings'])->name('scheduling.settings');
+        Route::post('/scheduling/blackouts', [SchedulingController::class, 'addBlackout'])->name('scheduling.blackouts.add');
+        Route::delete('/scheduling/blackouts/{blackout}', [SchedulingController::class, 'deleteBlackout'])->name('scheduling.blackouts.delete');
 });
 
 

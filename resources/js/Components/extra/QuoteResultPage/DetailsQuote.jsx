@@ -9,12 +9,15 @@ import ProductTabs from "./Tabs";
 import { useRef, useState } from "react";
 import { router } from "@inertiajs/react";
 
-
-
-export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, product, selectedPower }) {
+export default function DetailsQuoteSidebar({
+    detailsQuote,
+    onClose,
+    answers,
+    product,
+    selectedPower,
+}) {
     if (!detailsQuote) return null;
 
-    // 1. We create the reference here
     const scrollContainerRef = useRef(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -30,18 +33,24 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
         productImages = [],
     } = detailsQuote;
 
-    console.log("details page include", detailsQuote);
-
     const safePrice = Number(price) || 0;
 
-    // Calculate Price: Handle nulls from your screenshot (base + margin + addons)
-    const calculatePrice = (product) => {
-        console.log("Calculating price for product:", product);
-        if (product.pricing?.total) return product.pricing.total;
+    const getCsrfToken = () => {
+        if (typeof document === "undefined") return null;
+        return document.head.querySelector('meta[name="csrf-token"]')?.content;
+    };
 
-        const base = parseFloat(product.pricing?.base || 0);
-        const margin = parseFloat(product.pricing?.marginApplied || 0);
-        const addons = parseFloat(product.pricing?.addOnsTotal || 0);
+    const withCsrf = (payload) => {
+        const token = getCsrfToken();
+        return token ? { ...payload, _token: token } : payload;
+    };
+
+    const calculatePrice = (productToPrice) => {
+        if (productToPrice?.pricing?.total) return productToPrice.pricing.total;
+
+        const base = parseFloat(productToPrice?.pricing?.base || 0);
+        const margin = parseFloat(productToPrice?.pricing?.marginApplied || 0);
+        const addons = parseFloat(productToPrice?.pricing?.addOnsTotal || 0);
         return base + margin + addons;
     };
 
@@ -67,23 +76,6 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
         ? [productImages]
         : ["/images/ideal-20logic.png"];
 
-
-    console.log("Detailed Quote", {
-                                                    boiler_id: product.id,
-                                                    brand: product.brand,
-                                                    model: product.model,
-                                                    includes:
-                                                        product.includes ?? [],
-                                                    images:
-                                                        product.images ?? [],
-                                                    kw: product.kw,
-                                                    warrantyYears:
-                                                        product.warrantyYears,
-                                                    price: finalPrice,
-                                                    power: selectedPower,
-                                                    answers: answers,
-                                                })
-
     return (
         <>
             <div
@@ -93,7 +85,6 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
 
             <aside className="fixed right-0 top-0 h-full w-full overflow-y-auto lg:w-[1000px] bg-white z-50 border-l border-slate-200 shadow-2xl animate-slideFromRight">
                 <div className="h-full flex flex-col">
-                    {/* HEADER */}
                     <div className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
                         <div className="px-8 py-6 flex justify-between items-center">
                             <div className="flex items-center gap-3">
@@ -116,9 +107,7 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                         </div>
                     </div>
 
-                    {/* BODY */}
                     <div className="flex-1 flex overflow-hidden">
-                        {/* LEFT: CAROUSEL */}
                         <div className="hidden lg:block w-[400px] p-6">
                             <div className="rounded-2xl bg-slate-50 border border-slate-200">
                                 <div className="px-6 py-4 border-b border-slate-200 flex justify-between">
@@ -143,13 +132,10 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                             </div>
                         </div>
 
-                        {/* RIGHT CONTENT */}
-                        {/* 2. CHANGE: Added 'ref' here and 'scroll-smooth'. This is the main scroll area. */}
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 overflow-y-auto p-6 scroll-smooth relative thin-scroll"
                         >
-                            {/* STACKED CARD LAYOUT */}
                             <div className="space-y-4 mb-8">
                                 <div className="bg-white rounded-2xl border border-slate-200 p-6">
                                     <div className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] lg:items-center gap-6 lg:gap-8">
@@ -183,25 +169,23 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                                 <button
                                     type="button"
                                     onClick={() =>
-                                            router.post(
-                                                "/book/quote/new/install",
-                                                {
-                                                    boiler_id: product.id,
-                                                    brand: product.brand,
-                                                    model: product.model,
-                                                    includes:
-                                                        product.includes ?? [],
-                                                    images:
-                                                        product.images ?? [],
-                                                    kw: product.kw,
-                                                    warrantyYears:
-                                                        product.warrantyYears,
-                                                    price: finalPrice,
-                                                    power: selectedPower,
-                                                    answers: answers,
-                                                }
-                                            )
-                                        }
+                                        router.post(
+                                            "/book/quote/new/install",
+                                            withCsrf({
+                                                boiler_id: product.id,
+                                                brand: product.brand,
+                                                model: product.model,
+                                                includes: product.includes ?? [],
+                                                images: product.images ?? [],
+                                                kw: product.kw,
+                                                warrantyYears:
+                                                    product.warrantyYears,
+                                                price: finalPrice,
+                                                power: selectedPower,
+                                                answers: answers,
+                                            })
+                                        )
+                                    }
                                     className="group relative cursor-pointer w-full flex items-center gap-4 p-5 rounded-2xl bg-slate-900 border border-slate-900 hover:bg-slate-800 transition-all duration-300"
                                 >
                                     <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-white text-slate-900 shadow-sm shrink-0">
@@ -219,8 +203,6 @@ export default function DetailsQuoteSidebar({ detailsQuote, onClose, answers, pr
                                 </button>
                             </div>
 
-                            {/* TABS */}
-                            {/* 3. CHANGE: Removed the extra wrapper <div> that was causing the scroll issue. Passed ref directly. */}
                             <ProductTabs
                                 containerRef={scrollContainerRef}
                                 notes={detailsQuote.notes}

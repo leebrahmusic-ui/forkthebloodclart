@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use App\Models\AppointmentSetting;
+use App\Models\AppointmentBlackout;
 
 class AppointmentAvailabilityService
 {
@@ -12,9 +14,12 @@ class AppointmentAvailabilityService
     {
         $tz = $timezone ?: config('app.timezone');
 
-        $slotMinutes = (int) config('appointment.slot_minutes', 60);
-        $startHour   = (int) config('appointment.start_hour', 8);
-        $endHour     = (int) config('appointment.end_hour', 18);
+        $settings = $this->settingsFor($type);
+
+        $slotMinutes = (int) ($settings['slot_minutes'] ?? config('appointment.slot_minutes', 60));
+        $startHour   = (int) ($settings['start_hour'] ?? config('appointment.start_hour', 8));
+        $endHour     = (int) ($settings['end_hour'] ?? config('appointment.end_hour', 18));
+        $lastSlot    = $settings['last_slot_time'] ?? null;
 
         if (in_array($type, ['power_flush', 'new_boiler_quote'], true)) {
             $startHour = 9;
@@ -35,13 +40,26 @@ class AppointmentAvailabilityService
             $workStart = $d->copy()->setTime($startHour, 0);
             $workEnd   = $d->copy()->setTime($endHour, 0);
 
+            // Apply last-slot cutoff if provided
+            if ($lastSlot) {
+                [$h, $m] = explode(':', $lastSlot);
+                $cutoff = $d->copy()->setTime((int) $h, (int) $m);
+                if ($cutoff->lt($workEnd)) {
+                    $workEnd = $cutoff;
+                }
+            }
+
             $times = [];
+
+            $blackouts = $this->blackoutsForDay($date, $type, $tz);
 
             for ($t = $workStart->copy(); $t->lt($workEnd); $t->addMinutes($slotMinutes)) {
                 // no past time
                 if ($t->lt(Carbon::now($tz))) continue;
 
                 if ($this->isBlocked($t, $blocked, $tz)) continue;
+
+                if ($this->isBlocked($t, $blackouts, $tz)) continue;
 
                 $times[] = $t->format('H:i A');
             }
@@ -65,5 +83,39 @@ class AppointmentAvailabilityService
             }
         }
         return false;
+    }
+
+    private function settingsFor(string $type): array
+    {
+        $row = AppointmentSetting::where('service_key', $type)->first();
+        if (!$row) return [];
+
+        return [
+            'slot_minutes'   => $row->slot_minutes,
+            'start_hour'     => $row->start_hour,
+            'end_hour'       => $row->end_hour,
+            'max_per_day'    => $row->max_per_day,
+            'gap_minutes'    => $row->gap_minutes,
+            'last_slot_time' => $row->last_slot_time,
+        ];
+    }
+
+    private function blackoutsForDay(string $date, string $type, string $tz): array
+    {
+        return AppointmentBlackout::query()
+            ->whereDate('starts_at', '<=', $date)
+            ->whereDate('ends_at', '>=', $date)
+            ->where(function ($q) use ($type) {
+                $q->whereNull('service_key')->orWhere('service_key', $type);
+            })
+            ->get()
+            ->map(function ($b) use ($tz) {
+                return [
+                    'from' => $b->starts_at->timezone($tz)->toDateTimeString(),
+                    'to'   => $b->ends_at->timezone($tz)->toDateTimeString(),
+                    'reason' => $b->reason ?? 'Blackout',
+                ];
+            })
+            ->all();
     }
 }

@@ -156,39 +156,35 @@ class QuoteCheckoutService
                 ->get()
                 ->keyBy('frontend_key');
 
-            if ($questions->isEmpty()) {
-                throw ValidationException::withMessages([
-                    'service' => ['No questions configured for this service.'],
-                ]);
-            }
+            $hasQuestions = $questions->isNotEmpty();
 
             // dd($answers);
-            // reject unknown answer keys (optional but recommended)
-            foreach ($answers as $k => $_) {
-                if (!$questions->has($k)) {
-                    // allow *_extraText if master exists for that key too
+            if ($hasQuestions) {
+                // reject unknown answer keys (optional but recommended)
+                foreach ($answers as $k => $_) {
                     if (!$questions->has($k)) {
-                        // if your questions table includes access_extraText etc then it will pass.
-                        throw ValidationException::withMessages(["answers.$k" => ["Invalid question key."]]);
+                        // allow *_extraText if master exists for that key too
+                        if (!$questions->has($k)) {
+                            throw ValidationException::withMessages(["answers.$k" => ["Invalid question key."]]);
+                        }
                     }
                 }
             }
 
             foreach ($answers as $k => $v) {
                 $q = $questions->get($k);
-                if (!$q) continue; // ignore keys not defined (if you prefer strict, throw above)
 
                 [$answerText, $answerJson, $media] = $this->normalize($k, $v);
 
                 BookingDetail::create([
                     'booking_id' => $booking->id,
-                    'question_id' => $q->id,
+                    'question_id' => $q?->id,
                     'frontend_key' => $k,
-                    'question_snapshot' => $q->question,
+                    'question_snapshot' => $q?->question ?? $k,
                     'answer_text' => $answerText,
                     'answer_json' => $answerJson,
                     'media' => $media,
-                    'amount' => $q->price_adjustment,
+                    'amount' => $q?->price_adjustment,
                 ]);
             }
 
