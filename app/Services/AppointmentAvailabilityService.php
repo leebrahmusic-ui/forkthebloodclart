@@ -21,11 +21,6 @@ class AppointmentAvailabilityService
         $endHour     = (int) ($settings['end_hour'] ?? config('appointment.end_hour', 18));
         $lastSlot    = $settings['last_slot_time'] ?? null;
 
-        if (in_array($type, ['power_flush', 'new_boiler_quote'], true)) {
-            $startHour = 9;
-            $endHour   = 10;
-        }
-
         $start = Carbon::createFromFormat('Y-m-d', $month . '-01', $tz)->startOfMonth()->startOfDay();
         $end   = $start->copy()->endOfMonth()->startOfDay();
 
