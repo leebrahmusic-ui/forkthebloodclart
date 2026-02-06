@@ -210,6 +210,21 @@ export default function QuotePage() {
                                 <TechnicianButton />
                             </div>
 
+                            {/* Klarna banner */}
+                            <div className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5 flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-400 to-pink-500 text-white font-black text-xl flex items-center justify-center">
+                                    K
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-sm font-semibold text-slate-900">Spread the cost with Klarna</p>
+                                    <p className="text-sm text-slate-600">Pay in 3 instalments, interest free. Subject to status. Choose Klarna at checkout.</p>
+                                </div>
+                                <div className="hidden sm:flex items-center gap-2 text-sm font-semibold text-pink-600">
+                                    Learn more
+                                    <span aria-hidden>→</span>
+                                </div>
+                            </div>
+
                             {/* Trust indicators */}
                             {content.slug === SERVICE_KEYS.SERVICE ? (
                                 <div className="mt-12 grid gap-4 sm:grid-cols-2">
