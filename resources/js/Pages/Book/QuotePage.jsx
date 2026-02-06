@@ -72,9 +72,9 @@ const SERVICE_CONTENT = {
 
     [SERVICE_KEYS.SERVICE]: {
         slug: SERVICE_KEYS.SERVICE,
-        heroTitle: "Boiler service — parts included, no extras.",
+        heroTitle: "Boiler Servicing in Leeds & Surrounding",
         heroDesc:
-            "Annual service with full clean, safety checks, and combustion analysis. Gaskets and electrodes included so you’re covered on the day.",
+            "Full strip-down service with safety checks, combustion analysis, and clean. If strip-down shows worn seals, gaskets, or electrodes, we’ll show you and price the required service parts for your boiler model before fitting.",
         badge: "Boiler Service",
         sampleJobLabel: "Boiler Service • £115 inc VAT",
         estimateLabel: "Annual check",
@@ -87,7 +87,7 @@ const SERVICE_CONTENT = {
 
         // ✅ CORRECT PLACE
         serviceNote:
-            "If a manufacturer service kit (gaskets, seals, electrodes, etc.) is required during the service, it will be supplied and fitted at an additional fixed cost of £25, chargeable by card.",
+            "A strip-down can reveal failed seals, gaskets, or electrodes. These are routine service parts that occasionally need replacing; we’ll confirm the requirement and cost based on your boiler model before fitting. If your boiler isn’t working or showing faults, please book a repair/diagnosis instead of a service.",
     },
 };
 
@@ -103,7 +103,39 @@ function getServiceFromUrl() {
 export default function QuotePage() {
     const radius = 14;
     const [serviceKey, setServiceKey] = useState(getServiceFromUrl());
-    const { title } = usePage().props;
+    const { title, basePrices = {}, symbol = "£" } = usePage().props;
+
+    const mergedContent = useMemo(() => {
+        const servicePrice = basePrices.boiler_service;
+        const repairPrice = basePrices.boiler_repair;
+        const powerFlushPrice = basePrices.power_flush;
+
+        return {
+            ...SERVICE_CONTENT,
+            [SERVICE_KEYS.SERVICE]: {
+                ...SERVICE_CONTENT[SERVICE_KEYS.SERVICE],
+                labour: servicePrice ? `${symbol}${servicePrice}` : SERVICE_CONTENT[SERVICE_KEYS.SERVICE].labour,
+                sampleJobLabel: servicePrice
+                    ? `Boiler Service • ${symbol}${servicePrice} inc VAT`
+                    : SERVICE_CONTENT[SERVICE_KEYS.SERVICE].sampleJobLabel,
+            },
+            [SERVICE_KEYS.REPAIR]: {
+                ...SERVICE_CONTENT[SERVICE_KEYS.REPAIR],
+                pricingTable: SERVICE_CONTENT[SERVICE_KEYS.REPAIR].pricingTable.map((row) =>
+                    row.item === "Sensor"
+                        ? { ...row, price: repairPrice ? `${symbol}${repairPrice}` : row.price }
+                        : row
+                ),
+            },
+            [SERVICE_KEYS.POWERFLUSH]: {
+                ...SERVICE_CONTENT[SERVICE_KEYS.POWERFLUSH],
+                labour: powerFlushPrice ? `${symbol}${powerFlushPrice}` : SERVICE_CONTENT[SERVICE_KEYS.POWERFLUSH].labour,
+                sampleJobLabel: powerFlushPrice
+                    ? `Magnacleanse • From ${symbol}${powerFlushPrice} inc VAT`
+                    : SERVICE_CONTENT[SERVICE_KEYS.POWERFLUSH].sampleJobLabel,
+            },
+        };
+    }, [basePrices, symbol]);
 
     useEffect(() => {
         const onChange = () => setServiceKey(getServiceFromUrl());
@@ -113,8 +145,8 @@ export default function QuotePage() {
 
     const content = useMemo(
         () =>
-            SERVICE_CONTENT[serviceKey] || SERVICE_CONTENT[SERVICE_KEYS.REPAIR],
-        [serviceKey]
+            mergedContent[serviceKey] || mergedContent[SERVICE_KEYS.REPAIR],
+        [serviceKey, mergedContent]
     );
 
     const gaugePercent = parseInt(content.gaugeValueText || "75") / 100;
@@ -127,7 +159,12 @@ export default function QuotePage() {
             <Head title={title} />
 
             {/* ✅ FIXED: no black bottom gap */}
-            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white overflow-x-hidden">
+            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-emerald-50/50 to-white overflow-x-hidden">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-emerald-200/60 blur-3xl opacity-60" />
+                    <div className="absolute right-[-10%] top-[-40px] h-80 w-80 rounded-full bg-emerald-300/50 blur-3xl opacity-60" />
+                    <div className="absolute left-1/3 bottom-[-120px] h-96 w-96 rounded-full bg-emerald-100/70 blur-3xl opacity-70" />
+                </div>
                 <PageHeader title={pageTitle} />
 
                 <main className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
@@ -137,7 +174,7 @@ export default function QuotePage() {
                             {content.slug === SERVICE_KEYS.SERVICE ? (
                                 <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-4 py-2 text-sm font-semibold text-emerald-800 border border-emerald-200">
                                     <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-                                    Boiler service • £115 all in
+                                    Boiler service • {content.sampleJobLabel.replace("Boiler Service • ", "")}
                                 </div>
                             ) : (
                                 <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
@@ -193,7 +230,7 @@ export default function QuotePage() {
                             {/* Trust indicators */}
                             {content.slug === SERVICE_KEYS.SERVICE ? (
                                 <div className="mt-12 grid gap-4 sm:grid-cols-2">
-                                    {["Full clean and combustion safety checks", "Gaskets & electrodes included", "Expansion vessel set and leak-checked", "Gas Safe engineers, tidy work"].map((item) => (
+                                    {["Full clean and combustion safety checks", "Strip-down inspection; service parts priced if worn", "Expansion vessel set and leak-checked", "Gas Safe engineers, tidy work"].map((item) => (
                                         <div
                                             key={item}
                                             className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-sm"
@@ -335,7 +372,7 @@ export default function QuotePage() {
                                                     How boiler servicing works
                                                 </h3>
                                                 <p className="text-slate-600 text-sm mt-1">
-                                                    Straight‑forward annual care, no fluff.
+                                                    Strip-down service; if service parts are needed, we price them clearly before fitting.
                                                 </p>
                                             </div>
                                             <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
@@ -348,7 +385,7 @@ export default function QuotePage() {
                                                     <li>Pump and set the expansion vessel, checking the Schrader valve</li>
                                                     <li>Clean the combustion chamber and burner area</li>
                                                     <li>Clean and flush the condensate trap</li>
-                                                    <li>Swap gaskets and electrodes where needed</li>
+                                                    <li>Check and replace worn service parts (gaskets/electrodes) if needed</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -360,7 +397,7 @@ export default function QuotePage() {
                                                 {
                                                     step: "STEP 01",
                                                     title: "Book online in minutes",
-                                                    text: "Answer the short questions and lock in your £115 strip-down service instantly—no calls or back-and-forth.",
+                                                    text: "Answer the short questions and lock in your strip-down service instantly — no calls or back-and-forth.",
                                                 },
                                                 {
                                                     step: "STEP 02",
@@ -370,7 +407,7 @@ export default function QuotePage() {
                                                 {
                                                     step: "STEP 03",
                                                     title: "Service + sign-off",
-                                                    text: "We arrive, carry out the strip-down service, and log the checks—gaskets/electrodes included in the price.",
+                                                    text: "We carry out the strip-down. If service parts are required, we’ll show you and price them before fitting; if your boiler has faults, we’ll recommend a repair visit instead.",
                                                 },
                                             ].map((item) => (
                                                 <div
@@ -398,10 +435,10 @@ export default function QuotePage() {
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                             <div className="space-y-1">
                                                 <p className="text-sm text-slate-600">
-                                                    Fixed £115 strip-down service. Gaskets and electrodes included.
+                                                    Fixed-price strip-down service. If worn service parts are needed, we price them clearly by boiler model before fitting.
                                                 </p>
                                                 <p className="text-sm text-slate-600">
-                                                    Book instantly online after the questions — no waiting, no calling, no callbacks unless you want one.
+                                                    Service is for healthy or routine maintenance. If your boiler is showing faults or not working, please book a repair/diagnosis instead.
                                                 </p>
                                             </div>
                                             <Link

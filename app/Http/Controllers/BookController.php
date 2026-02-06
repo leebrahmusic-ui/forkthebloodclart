@@ -40,8 +40,13 @@ class BookController extends Controller
     }
 
     public function quote(){
+        $basePrices = BasePrice::all()
+            ->mapWithKeys(fn ($p) => [$p->service_key => $p->price]);
+
         return Inertia::render('Book/QuotePage', [
             'title' => 'Get a Quote',
+            'basePrices' => $basePrices,
+            'symbol' => config('services.currency.symbol'),
         ]);
     }
 
