@@ -34,19 +34,6 @@ class AppointmentBlockService
             ->whereIn('status', $activeStatuses)
             ->get(['type','starts_at','status']);
 
-        // Single-resource mode: any active appointment blocks the entire day for all types
-        if ($appointments->isNotEmpty()) {
-            return [
-                'date' => $day->toDateString(),
-                'type' => $type,
-                'blocked' => [[
-                    'from' => $workStart->toDateTimeString(),
-                    'to'   => $workEnd->toDateTimeString(),
-                    'reason' => 'Day already booked',
-                ]],
-            ];
-        }
-
         // Rule: max per day (type-specific)
         $countType = $appointments->where('type', $type)->count();
         if ($countType >= $max) {
