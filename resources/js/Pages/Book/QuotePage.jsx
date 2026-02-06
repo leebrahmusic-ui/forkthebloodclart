@@ -219,10 +219,6 @@ export default function QuotePage() {
                                     <p className="text-sm font-semibold text-slate-900">Spread the cost with Klarna</p>
                                     <p className="text-sm text-slate-600">Pay in 3 instalments, interest free. Subject to status. Choose Klarna at checkout.</p>
                                 </div>
-                                <div className="hidden sm:flex items-center gap-2 text-sm font-semibold text-pink-600">
-                                    Learn more
-                                    <span aria-hidden>→</span>
-                                </div>
                             </div>
 
                             {/* Trust indicators */}
