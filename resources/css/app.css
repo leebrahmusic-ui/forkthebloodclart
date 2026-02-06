@@ -10,9 +10,8 @@
 /* @custom-variant dark (&:is(.dark *)); */
 
 :root {
-    color-scheme: light;
-    --background: #ffffff;
-    --foreground: #0f172a;
+    --background: #000000;
+    --foreground: #ffffff;
 
     --primary: #0067ff;
     --dark: #172a44;
@@ -52,7 +51,7 @@
     }
 
     body {
-        @apply bg-background font-sans antialiased text-foreground;
+        @apply bg-background font-sans antialiased;
     }
 
     @import url("https://fonts.googleapis.com/css2?family=Marcellus&display=swap");
