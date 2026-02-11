@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import { FiCreditCard, FiLoader, FiCheck, FiShield, FiCalendar, FiMapPin } from "react-icons/fi";
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 
-export default function ServiceCheckout() {
+export default function RepairCheckout() {
     const { answers, basePrice, symbol, title } = usePage().props;
 
     const [selectedDate, setSelectedDate] = useState("");
@@ -27,6 +27,7 @@ export default function ServiceCheckout() {
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
     const mounted = useRef(true);
+    const prefilled = useRef(false);
 
     useEffect(() => {
         mounted.current = true;
@@ -34,6 +35,34 @@ export default function ServiceCheckout() {
             mounted.current = false;
         };
     }, []);
+
+    useEffect(() => {
+        if (prefilled.current) return;
+        prefilled.current = true;
+
+        const customer = answers?.customer_details || {};
+        const nameParts = (customer.name || "").trim().split(/\s+/);
+        const firstFromName = nameParts[0] || "";
+        const lastFromName = nameParts.slice(1).join(" ");
+        const visit = answers?.visit_time?.datetime || {};
+        const extraNotes = [answers?.fault_type?.extraText, answers?.previous_work?.extraText]
+            .filter(Boolean)
+            .join(" | ");
+
+        setFormData((prev) => ({
+            ...prev,
+            firstName: prev.firstName || firstFromName,
+            lastName: prev.lastName || lastFromName,
+            email: prev.email || customer.email || "",
+            phone: prev.phone || customer.phone || "",
+            postcode: prev.postcode || customer.postcode || "",
+            address: prev.address || customer.address || "",
+            notes: prev.notes || extraNotes || "",
+        }));
+
+        if (visit.date) setSelectedDate(visit.date);
+        if (visit.time) setSelectedTime(visit.time);
+    }, [answers]);
 
     const dateRef = useRef(null);
     const titleRef = useRef(null);
@@ -173,7 +202,7 @@ export default function ServiceCheckout() {
             const res = await axios.post(
                 "/quote/checkout",
                 {
-                    service: SERVICES_KEY_VALUE.BOILER_SERVICE,
+                    service: SERVICES_KEY_VALUE.BOILER_REPAIR,
                     form: payload,
                     amount: basePrice,
                 },
@@ -211,15 +240,18 @@ export default function ServiceCheckout() {
         }
     };
 
+    const withNote = (item) => {
+        if (!item?.label) return "—";
+        return item.extraText ? `${item.label} (${item.extraText})` : item.label;
+    };
+
     const summaryItems = [
         { label: "Boiler type", value: answers?.boiler_type?.label || "—" },
         { label: "Make & model", value: answers?.boiler_model?.label || "—" },
-        { label: "Boiler age", value: answers?.boiler_age?.label || "—" },
+        { label: "Issue", value: withNote(answers?.fault_type) },
+        { label: "When it started", value: answers?.issue_start?.label || "—" },
+        { label: "Previous work", value: withNote(answers?.previous_work) },
         { label: "Access", value: answers?.access?.label || "—" },
-        {
-            label: "Known issues",
-            value: answers?.any_issue?.label || "—",
-        },
     ];
 
     return (
@@ -237,7 +269,7 @@ export default function ServiceCheckout() {
                         </div>
                         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">{title}</h1>
                         <p className="text-base text-slate-600 max-w-2xl">
-                            Confirm your visit time and details. Your service is fixed price—no surprises when the engineer arrives.
+                            Confirm your visit time and details. Repairs include diagnosis and the first hour on site; we agree any parts and extra labour with you before fitting.
                         </p>
                     </div>
 
@@ -247,11 +279,11 @@ export default function ServiceCheckout() {
                             <div className="relative p-6 space-y-6">
                                 <div className="flex items-start justify-between gap-4">
                                     <div>
-                                        <p className="text-sm text-emerald-700 font-semibold">Fixed, all-in price</p>
+                                        <p className="text-sm text-emerald-700 font-semibold">Diagnostic visit</p>
                                         <p className="text-4xl font-black text-slate-900">
                                             {symbol}{basePrice}
                                         </p>
-                                        <p className="text-xs text-slate-500 mt-1">If inspection finds worn seals, gaskets, or electrodes, we’ll quote before fitting—often not needed.</p>
+                                        <p className="text-xs text-slate-500 mt-1">Diagnostic and first hour included. Parts and extra labour are quoted first; no work proceeds without your approval.</p>
                                     </div>
                                     <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800">
                                         <FiCheck className="h-4 w-4" />
@@ -270,13 +302,13 @@ export default function ServiceCheckout() {
 
                                 <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-4 text-sm text-slate-900">
                                     <p className="font-semibold text-emerald-900 flex items-center gap-2">
-                                        <FiShield className="h-4 w-4" /> What’s included
+                                        <FiShield className="h-4 w-4" /> What's included
                                     </p>
                                     <ul className="mt-2 space-y-1 text-slate-700">
-                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Safety, combustion, and flue checks</li>
-                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Full clean of burner, condense trap, and seals</li>
-                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Expansion vessel set & leak-checked</li>
-                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Digital service record for compliance</li>
+                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Fault diagnosis and safety checks</li>
+                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />First hour of labour on site</li>
+                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Transparent parts pricing before fitting</li>
+                                        <li className="flex items-start gap-2"><FiCheck className="mt-0.5 h-4 w-4 text-emerald-600" />Gas Safe engineer attendance</li>
                                     </ul>
                                 </div>
                             </div>
@@ -302,7 +334,7 @@ export default function ServiceCheckout() {
                                                 ? { date: selectedDate, time: selectedTime }
                                                 : null
                                         }
-                                        type={SERVICES_KEY_VALUE.BOILER_SERVICE}
+                                        type={SERVICES_KEY_VALUE.BOILER_REPAIR}
                                         onChange={handleAppointmentChange}
                                     />
                                     {errors.appointment && (
@@ -440,17 +472,17 @@ export default function ServiceCheckout() {
                                     {processing ? (
                                         <>
                                             <FiLoader className="animate-spin" />
-                                            Processing…
+                                            Processing...
                                         </>
                                     ) : (
                                         <>
                                             <FiCreditCard />
-                                            Pay & Book Service
+                                            Pay & Book Repair
                                         </>
                                     )}
                                 </button>
                                 <p className="text-xs text-emerald-50/90 text-center mt-3">
-                                    Your details are encrypted and processed by Stripe.
+                                    Card payments are encrypted via Stripe. Approved parts or extra labour are billed separately per our Terms & Conditions.
                                 </p>
                             </div>
                         </div>

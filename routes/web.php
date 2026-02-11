@@ -83,6 +83,8 @@ Route::prefix('book')->name('book.')->group(function () {
 
     Route::get('/quote', [BookController::class, 'quote'])->name('quote');
     Route::get('/quote/repair', [BookController::class, 'repairStepper'])->name('quote.repair');
+    Route::match(['get', 'post'], '/quote/repair/checkout', [BookController::class, 'repairCheckout'])
+        ->name('quote.repair.checkout');
 
 
 

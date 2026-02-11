@@ -177,6 +177,40 @@ class BookController extends Controller
         ]);
     }
 
+    public function repairCheckout(Request $request)
+    {
+        $key = $this->quoteCacheKey($request);
+        $basePrice = BasePrice::boilerRepair()->value('price');
+        $symbol = config('services.currency.symbol');
+
+        if ($request->isMethod('post')) {
+            $answers = $request->all();
+
+            if (empty($answers)) {
+                return back()->withErrors(['quote' => 'Quote payload missing.']);
+            }
+
+            Cache::put($key, $answers, now()->addMinutes(60));
+
+            return Inertia::location(route('book.quote.repair.checkout'));
+        }
+
+        $answers = Cache::get($key);
+
+        if (!$answers) {
+            return redirect()
+                ->route('book.quote.repair')
+                ->with('message', 'Your session expired. Please start again.');
+        }
+
+        return Inertia::render('Book/RepairCheckout', [
+            'answers' => $answers,
+            'basePrice' => $basePrice,
+            'symbol' => $symbol,
+            'title' => 'Boiler Repair Checkout',
+        ]);
+    }
+
     public function install(Request $request)
     {
         $symbol = config('services.currency.symbol');

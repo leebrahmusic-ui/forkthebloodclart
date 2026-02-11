@@ -4,17 +4,7 @@ import { Head, usePage } from "@inertiajs/react";
 import React from "react";
 
 const STEPS = [
-    // {
-    //     id: "fixed_price",
-    //     question: "Typical Fixed Part Prices?",
-    //     type: "select",
-    //     options: [
-    //         { label: "Sensor" },
-    //         { label: "Electrodes" },
-    //         {
-    //             label: "Plate heat exchanger",
-    //         },
-    //         { label: "Fan" },
+    // Checkout collects details and visit time, so no pre-checkout duplicate steps here.
     //         {
     //             label: "Room thermostat",
     //         },
@@ -231,25 +221,6 @@ const STEPS = [
     },
 
     {
-        id: "previous_work",
-        question: "Has anyone worked on it recently?",
-        type: "select",
-        options: [
-            {
-                label: "No",
-                image:
-                    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'><circle cx='32' cy='32' r='24' fill='%23ecfdf3' stroke='%2322c55e' stroke-width='3'/><path d='M24 32l6 6 10-14' stroke='%2322c55e' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>",
-            },
-            {
-                label: "Yes",
-                requiresText: true,
-                image:
-                    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'><rect x='10' y='12' width='44' height='40' rx='10' fill='%23fff7ed' stroke='%23f97316' stroke-width='3'/><path d='M24 40h16' stroke='%23f97316' stroke-width='3' stroke-linecap='round'/><circle cx='32' cy='26' r='8' fill='%23ffedd5' stroke='%23f97316' stroke-width='3'/><path d='M28 46c0-2.2 1.8-4 4-4s4 1.8 4 4' stroke='%23f97316' stroke-width='3' stroke-linecap='round'/><path d='M36 22l4-3m-12 3l-4-3' stroke='%23fb923c' stroke-width='3' stroke-linecap='round'/></svg>",
-            },
-        ],
-    },
-
-    {
         id: "access",
         question: "Where is your boiler located?",
         type: "select",
@@ -274,17 +245,7 @@ const STEPS = [
         ],
     },
 
-    {
-        id: "customer_details",
-        question: "Your details",
-        type: "details",
-    },
-
-    {
-        id: "visit_time",
-        question: "Preferred visit date & time",
-        type: "datetime",
-    },
+    // Checkout collects details and visit time, so no pre-checkout duplicate steps here.
 ];
 
 export default function RepairQuote() {

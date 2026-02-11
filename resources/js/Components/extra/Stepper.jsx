@@ -141,7 +141,7 @@ export default function Stepper({
 
         const shouldAutoAdvance =
             autoAdvance &&
-            ["select", "dropdown"].includes(current.type) &&
+            ["select", "dropdown", "make_model"].includes(current.type) &&
             !option.requiresText;
 
         setAnswers((s) => {
@@ -190,7 +190,7 @@ export default function Stepper({
             return;
         }
 
-        if (!["select", "dropdown"].includes(current.type)) return;
+        if (!["select", "dropdown", "make_model"].includes(current.type)) return;
 
         const ans = answers[current.id];
         if (!ans || ans.requiresText) return;
@@ -241,6 +241,13 @@ export default function Stepper({
     const handleCompletion = () => {
         if (serviceKey?.key === "boiler_service") {
             router.post(route("book.quote.service.checkout"), answers, {
+                preserveScroll: true,
+            });
+            return;
+        }
+
+        if (serviceKey?.key === "boiler_repair") {
+            router.post(route("book.quote.repair.checkout"), answers, {
                 preserveScroll: true,
             });
             return;
