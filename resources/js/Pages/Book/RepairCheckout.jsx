@@ -1,6 +1,7 @@
 import AppointmentDateTimePicker from "@/Components/extra/AppointmentDateTimePicker";
 import { PageHeader } from "@/Components/ui/page-header";
 import { Head, usePage } from "@inertiajs/react";
+import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -488,6 +489,7 @@ export default function RepairCheckout() {
                         </div>
                     </div>
                 </div>
+                <GoogleReview />
             </div>
         </>
     );
