@@ -58,13 +58,23 @@ class SchedulingController extends Controller
         $defaults = config('appointment');
         $rules = $defaults['rules'];
 
+        // Normalize optional fields so empty strings validate as null
+        $normalizedSettings = collect($request->input('settings', []))->map(function ($row) {
+            if (array_key_exists('last_slot_time', $row) && $row['last_slot_time'] === '') {
+                $row['last_slot_time'] = null;
+            }
+            return $row;
+        })->all();
+
+        $request->merge(['settings' => $normalizedSettings]);
+
         $data = $request->validate([
             'settings' => 'required|array',
             'settings.*.service_key' => ['required', Rule::in($serviceKeys)],
             'settings.*.slot_minutes' => 'nullable|integer|min:15|max:240',
             'settings.*.start_hour' => 'nullable|integer|min:0|max:23',
             'settings.*.end_hour' => 'nullable|integer|min:1|max:24',
-            'settings.*.max_per_day' => 'nullable|integer|min:1|max:50',
+            'settings.*.max_per_day' => 'nullable|integer|min:0|max:50',
             'settings.*.gap_minutes' => 'nullable|integer|min:0|max:480',
             'settings.*.last_slot_time' => 'nullable|date_format:H:i',
         ]);
@@ -125,3 +135,4 @@ class SchedulingController extends Controller
         return back()->with('success', 'Blackout removed.');
     }
 }
+
