@@ -456,7 +456,7 @@ export default function RepairCheckout() {
                                     <div className="flex items-center gap-2 text-sm font-semibold">
                                         <FiShield className="h-4 w-4" /> Secure Stripe checkout
                                     </div>
-                                    <div className="text-xs bg-white/15 px-3 py-1 rounded-full">Card payments only</div>
+                                    <div className="text-xs bg-white/15 px-3 py-1 rounded-full">Card or Klarna payments</div>
                                 </div>
                                 <button
                                     type="button"

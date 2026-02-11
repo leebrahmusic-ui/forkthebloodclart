@@ -1,6 +1,7 @@
 import AppointmentDateTimePicker from "@/Components/extra/AppointmentDateTimePicker";
 import { PageHeader } from "@/Components/ui/page-header";
 import { Head, usePage } from "@inertiajs/react";
+import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -424,7 +425,7 @@ export default function ServiceCheckout() {
                                     <div className="flex items-center gap-2 text-sm font-semibold">
                                         <FiShield className="h-4 w-4" /> Secure Stripe checkout
                                     </div>
-                                    <div className="text-xs bg-white/15 px-3 py-1 rounded-full">Card payments only</div>
+                                    <div className="text-xs bg-white/15 px-3 py-1 rounded-full">Card or Klarna payments</div>
                                 </div>
                                 <button
                                     type="button"
@@ -456,6 +457,8 @@ export default function ServiceCheckout() {
                         </div>
                     </div>
                 </div>
+
+                <GoogleReview />
             </div>
         </>
     );
