@@ -18,13 +18,19 @@ class AppointmentBlockService
 
         $dbRule = AppointmentSetting::where('service_key', $type)->first();
 
+        $defaultSlot = config('appointment.slot_minutes', 60);
         $gap = (int) ($dbRule?->gap_minutes ?? $rule['gap_minutes'] ?? 0);
         $max = (int) ($dbRule?->max_per_day ?? $rule['max_per_day'] ?? 5);
-        $slotMinutes = (int) ($dbRule?->slot_minutes ?? config('appointment.slot_minutes', 60));
+        $slotMinutes = (int) ($dbRule?->slot_minutes ?? $defaultSlot);
+
+        // Cache per-service slot lengths so cross-type blocks respect each booking's duration
+        $slotMinutesByType = AppointmentSetting::all()
+            ->keyBy('service_key')
+            ->map(fn($s) => (int) ($s->slot_minutes ?? $defaultSlot));
 
         $day = Carbon::parse($date, $tz)->startOfDay();
         $startHour = (int) ($dbRule?->start_hour ?? config('appointment.start_hour'));
-        $endHour   = (int) ($dbRule?->end_hour ?? config('appointment.end_hour'));
+        $endHour   = (int) ($dbRule?->end_hour   ?? config('appointment.end_hour'));
         $workStart = $day->copy()->setTime($startHour, 0);
         $workEnd   = $day->copy()->setTime($endHour, 0);
 
@@ -60,9 +66,11 @@ class AppointmentBlockService
                 $start = Carbon::parse($a->starts_at)->timezone($tz);
                 if ($start->toDateString() !== $day->toDateString()) continue;
 
+                $appointmentSlot = $slotMinutesByType[$a->type] ?? $defaultSlot;
+
                 $blocked[] = [
                     'from' => $start->toDateTimeString(),
-                    'to' => $start->copy()->addMinutes($slotMinutes)->toDateTimeString(),
+                    'to' => $start->copy()->addMinutes($appointmentSlot)->toDateTimeString(),
                     'reason' => 'Slot already booked',
                 ];
             }
@@ -74,7 +82,7 @@ class AppointmentBlockService
             ];
         }
 
-        // Gap applies against same-type appointments; other types only block their exact slot.
+        // Gap applies against all appointments; block duration plus configured gap buffer.
         $blocked = [];
 
         // Add manual blackouts (admin-marked)
@@ -104,16 +112,11 @@ class AppointmentBlockService
 
             if ($start->toDateString() !== $day->toDateString()) continue;
 
-            $isSameType = $a->type === $type;
+            $appointmentSlot = $slotMinutesByType[$a->type] ?? $defaultSlot;
 
-            if ($isSameType) {
-                $from = $start->copy()->subMinutes($gap);
-                $to   = $start->copy()->addMinutes($gap);
-            } else {
-                // Allow other services to coexist on the day, but not at the exact slot time.
-                $from = $start->copy();
-                $to   = $start->copy()->addMinutes($slotMinutes);
-            }
+            // Block appointment duration plus gap buffer
+            $from = $start->copy()->subMinutes($gap);
+            $to   = $start->copy()->addMinutes($appointmentSlot + $gap);
 
             // clamp to working hours
             if ($to->lte($workStart) || $from->gte($workEnd)) continue;
@@ -152,3 +155,4 @@ class AppointmentBlockService
         return $out;
     }
 }
+
