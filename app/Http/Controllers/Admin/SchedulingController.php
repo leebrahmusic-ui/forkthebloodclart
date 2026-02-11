@@ -58,10 +58,12 @@ class SchedulingController extends Controller
         $defaults = config('appointment');
         $rules = $defaults['rules'];
 
-        // Normalize optional fields so empty strings validate as null
+        // Normalize optional fields so empty strings validate as null and trim seconds if provided
         $normalizedSettings = collect($request->input('settings', []))->map(function ($row) {
             if (array_key_exists('last_slot_time', $row) && $row['last_slot_time'] === '') {
                 $row['last_slot_time'] = null;
+            } elseif (array_key_exists('last_slot_time', $row) && $row['last_slot_time'] !== null) {
+                $row['last_slot_time'] = substr($row['last_slot_time'], 0, 5);
             }
             return $row;
         })->all();
@@ -76,7 +78,7 @@ class SchedulingController extends Controller
             'settings.*.end_hour' => 'nullable|integer|min:1|max:24',
             'settings.*.max_per_day' => 'nullable|integer|min:0|max:50',
             'settings.*.gap_minutes' => 'nullable|integer|min:0|max:480',
-            'settings.*.last_slot_time' => 'nullable|date_format:H:i',
+            'settings.*.last_slot_time' => ['nullable', 'regex:/^\d{2}:\d{2}$/'],
         ]);
 
         foreach ($data['settings'] as $row) {
