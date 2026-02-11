@@ -59,23 +59,31 @@ class SchedulingController extends Controller
         $data = $request->validate([
             'settings' => 'required|array',
             'settings.*.service_key' => ['required', Rule::in($serviceKeys)],
-            'settings.*.slot_minutes' => 'required|integer|min:15|max:240',
-            'settings.*.start_hour' => 'required|integer|min:0|max:23',
-            'settings.*.end_hour' => 'required|integer|min:1|max:24',
-            'settings.*.max_per_day' => 'required|integer|min:1|max:50',
-            'settings.*.gap_minutes' => 'required|integer|min:0|max:480',
+            'settings.*.slot_minutes' => 'nullable|integer|min:15|max:240',
+            'settings.*.start_hour' => 'nullable|integer|min:0|max:23',
+            'settings.*.end_hour' => 'nullable|integer|min:1|max:24',
+            'settings.*.max_per_day' => 'nullable|integer|min:1|max:50',
+            'settings.*.gap_minutes' => 'nullable|integer|min:0|max:480',
             'settings.*.last_slot_time' => 'nullable|date_format:H:i',
         ]);
 
         foreach ($data['settings'] as $row) {
+            $rule = $rules[$row['service_key']] ?? ['max_per_day' => 5, 'gap_minutes' => 0];
+
+            $slotMinutes = $row['slot_minutes'] ?? $defaults['slot_minutes'];
+            $startHour   = $row['start_hour']   ?? $defaults['start_hour'];
+            $endHour     = $row['end_hour']     ?? $defaults['end_hour'];
+            $maxPerDay   = $row['max_per_day']  ?? $rule['max_per_day'];
+            $gapMinutes  = $row['gap_minutes']  ?? $rule['gap_minutes'] ?? 0;
+
             AppointmentSetting::updateOrCreate(
                 ['service_key' => $row['service_key']],
                 [
-                    'slot_minutes' => $row['slot_minutes'],
-                    'start_hour' => $row['start_hour'],
-                    'end_hour' => $row['end_hour'],
-                    'max_per_day' => $row['max_per_day'],
-                    'gap_minutes' => $row['gap_minutes'],
+                    'slot_minutes' => $slotMinutes,
+                    'start_hour' => $startHour,
+                    'end_hour' => $endHour,
+                    'max_per_day' => $maxPerDay,
+                    'gap_minutes' => $gapMinutes,
                     'last_slot_time' => $row['last_slot_time'] ?? null,
                 ]
             );
