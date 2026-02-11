@@ -20,6 +20,7 @@ class AppointmentBlockService
 
         $gap = (int) ($dbRule?->gap_minutes ?? $rule['gap_minutes'] ?? 0);
         $max = (int) ($dbRule?->max_per_day ?? $rule['max_per_day'] ?? 5);
+        $slotMinutes = (int) ($dbRule?->slot_minutes ?? config('appointment.slot_minutes', 60));
 
         $day = Carbon::parse($date, $tz)->startOfDay();
         $startHour = (int) ($dbRule?->start_hour ?? config('appointment.start_hour'));
@@ -48,7 +49,7 @@ class AppointmentBlockService
             ];
         }
 
-        // No gap → still block exact appointment start times (any type)
+        // No gap → block the booked slot window (any type)
         if ($gap <= 0) {
             if ($appointments->isEmpty()) {
                 return ['date' => $day->toDateString(), 'type' => $type, 'blocked' => []];
@@ -61,7 +62,7 @@ class AppointmentBlockService
 
                 $blocked[] = [
                     'from' => $start->toDateTimeString(),
-                    'to' => $start->copy()->addMinute()->toDateTimeString(),
+                    'to' => $start->copy()->addMinutes($slotMinutes)->toDateTimeString(),
                     'reason' => 'Slot already booked',
                 ];
             }
@@ -73,7 +74,7 @@ class AppointmentBlockService
             ];
         }
 
-        // Gap applies against ALL appointments (operationally safest)
+        // Gap applies against same-type appointments; other types only block their exact slot.
         $blocked = [];
 
         // Add manual blackouts (admin-marked)
@@ -103,8 +104,16 @@ class AppointmentBlockService
 
             if ($start->toDateString() !== $day->toDateString()) continue;
 
-            $from = $start->copy()->subMinutes($gap);
-            $to   = $start->copy()->addMinutes($gap);
+            $isSameType = $a->type === $type;
+
+            if ($isSameType) {
+                $from = $start->copy()->subMinutes($gap);
+                $to   = $start->copy()->addMinutes($gap);
+            } else {
+                // Allow other services to coexist on the day, but not at the exact slot time.
+                $from = $start->copy();
+                $to   = $start->copy()->addMinutes($slotMinutes);
+            }
 
             // clamp to working hours
             if ($to->lte($workStart) || $from->gte($workEnd)) continue;

@@ -42,7 +42,7 @@ export default function Scheduling({ settings = [], blackouts = [], services = {
 
             <div className="py-12">
                 <div className="mx-auto max-w-6xl sm:px-6 lg:px-8">
-                    <div className="mb-4">
+                    <div className="mb-4 space-y-3">
                         <div className="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
                             {['rules', 'blackouts'].map((key) => (
                                 <button
@@ -55,7 +55,17 @@ export default function Scheduling({ settings = [], blackouts = [], services = {
                             ))}
                         </div>
                         {flash?.success && (
-                            <p className="mt-3 text-sm text-emerald-700">{flash.success}</p>
+                            <p className="text-sm text-emerald-700">{flash.success}</p>
+                        )}
+                        {tab === 'rules' && (
+                            <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 shadow-sm">
+                                <p className="font-semibold">How to set availability</p>
+                                <ul className="mt-2 list-disc space-y-1 pl-4 text-emerald-900">
+                                    <li>Set slot length and your working hours; that creates the day’s slots.</li>
+                                    <li>Installs automatically block the whole day. Other services only block their chosen slot.</li>
+                                    <li>Use “Max per day” to cap how many of that service you take.</li>
+                                </ul>
+                            </div>
                         )}
                     </div>
 
@@ -63,40 +73,51 @@ export default function Scheduling({ settings = [], blackouts = [], services = {
                         <div className="space-y-4">
                             {data.settings.map((item, idx) => (
                                 <div key={item.service_key} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                                    <div className="flex items-center justify-between gap-3">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
                                         <div>
                                             <p className="text-sm font-semibold text-gray-900">{item.service_label}</p>
                                             <p className="text-xs text-gray-500">Service key: {item.service_key}</p>
                                         </div>
-                                        <div className="text-xs bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">All-in price remains unchanged</div>
+                                        <div className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">Simple: set slot length & hours</div>
                                     </div>
 
-                                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
-                                        <Field label="Slot length (mins)">
-                                            <input
-                                                type="number"
+                                    <div className="mt-3 text-xs text-gray-600">
+                                        Slots every <strong>{item.slot_minutes || 60} mins</strong> between <strong>{item.start_hour}:00</strong> and <strong>{item.end_hour}:00</strong>. Max <strong>{item.max_per_day || 0}</strong> per day.
+                                    </div>
+
+                                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                        <Field label="Slot length">
+                                            <select
                                                 value={item.slot_minutes}
                                                 onChange={(e) => updateSetting(idx, 'slot_minutes', e.target.value)}
                                                 className="w-full rounded-lg border border-gray-200 px-3 py-2"
-                                            />
+                                            >
+                                                {[30,45,60,75,90,120].map((m) => (
+                                                    <option key={m} value={m}>{m} minutes</option>
+                                                ))}
+                                            </select>
                                         </Field>
-                                        <Field label="Start hour (0-23)">
+                                        <Field label="Day starts">
                                             <input
                                                 type="number"
+                                                min="0"
+                                                max="23"
                                                 value={item.start_hour}
                                                 onChange={(e) => updateSetting(idx, 'start_hour', e.target.value)}
                                                 className="w-full rounded-lg border border-gray-200 px-3 py-2"
                                             />
                                         </Field>
-                                        <Field label="End hour (1-24)">
+                                        <Field label="Day ends">
                                             <input
                                                 type="number"
+                                                min="1"
+                                                max="24"
                                                 value={item.end_hour}
                                                 onChange={(e) => updateSetting(idx, 'end_hour', e.target.value)}
                                                 className="w-full rounded-lg border border-gray-200 px-3 py-2"
                                             />
                                         </Field>
-                                        <Field label="Last slot starts at (HH:MM)">
+                                        <Field label="Last slot starts (optional)">
                                             <input
                                                 type="time"
                                                 value={item.last_slot_time || ''}
@@ -107,18 +128,21 @@ export default function Scheduling({ settings = [], blackouts = [], services = {
                                         <Field label="Max per day">
                                             <input
                                                 type="number"
+                                                min="0"
                                                 value={item.max_per_day}
                                                 onChange={(e) => updateSetting(idx, 'max_per_day', e.target.value)}
                                                 className="w-full rounded-lg border border-gray-200 px-3 py-2"
                                             />
                                         </Field>
-                                        <Field label="Gap minutes (buffer)">
+                                        <Field label="Buffer (advanced)">
                                             <input
                                                 type="number"
+                                                min="0"
                                                 value={item.gap_minutes}
                                                 onChange={(e) => updateSetting(idx, 'gap_minutes', e.target.value)}
                                                 className="w-full rounded-lg border border-gray-200 px-3 py-2"
                                             />
+                                            <p className="mt-1 text-[11px] text-gray-500">Leave at 0 unless you need extra prep/cleanup.</p>
                                         </Field>
                                     </div>
                                 </div>
