@@ -23,14 +23,12 @@ export default function PowerflushQuote() {
     const basePriceForStepper = 0;
 
     const radiatorOptions = radiatorRows.length
-        ? radiatorRows.map((item) => {
-              const addOn = Number(item.price) || 0;
-              return {
-                  label: item.label,
-                  price: baseValue + addOn,
-                  image: radiatorIcon,
-              };
-          })
+        ? radiatorRows.map((item) => ({
+              label: item.label,
+              // Use the admin-set per-range price directly; fall back to baseValue if missing
+              price: Number(item.price) || baseValue,
+              image: radiatorIcon,
+          }))
         : [
               { label: "1–5 radiators", price: baseValue, image: radiatorIcon },
               { label: "6–10 radiators", price: baseValue, image: radiatorIcon },
