@@ -55,6 +55,8 @@ class SchedulingController extends Controller
     public function saveSettings(Request $request)
     {
         $serviceKeys = array_keys($this->services);
+        $defaults = config('appointment');
+        $rules = $defaults['rules'];
 
         $data = $request->validate([
             'settings' => 'required|array',
