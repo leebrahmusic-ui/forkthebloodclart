@@ -15,7 +15,8 @@ const SECTIONS = [
     { id: "safety", title: "7. Safety Requirements" },
     { id: "complaints", title: "8. Complaints" },
     { id: "changes", title: "9. Changes to Terms" },
-    { id: "contact", title: "10. Contact Information" },
+    { id: "next-day", title: "10. Next-Day Installation Terms" },
+    { id: "contact", title: "11. Contact Information" },
 ];
 
 const getActiveIdFromHash = () => {
@@ -259,8 +260,43 @@ export default function TermsConditionsPage() {
                             </TermsSection>
 
                             <TermsSection
+                                id="next-day"
+                                title="10. Next-Day Installation Terms"
+                                isActive={activeSectionId === "next-day"}
+                            >
+                                <ul className="list-disc pl-5 space-y-2">
+                                    <li>
+                                        Next-day installation refers to the next
+                                        available appointment window, not a
+                                        guaranteed time slot.
+                                    </li>
+                                    <li>
+                                        Applies to eligible, in-stock products
+                                        ordered and paid before 3:00pm Monday to
+                                        Friday.
+                                    </li>
+                                    <li>
+                                        Subject to final technical review,
+                                        engineer and supplier availability,
+                                        service-area coverage, and safe site
+                                        access.
+                                    </li>
+                                    <li>
+                                        Excludes bank holidays, weekends,
+                                        special-order materials, and complex
+                                        upgrade or remedial works.
+                                    </li>
+                                    <li>
+                                        We may reschedule where required for
+                                        safety, compliance, access, weather, or
+                                        third-party delays.
+                                    </li>
+                                </ul>
+                            </TermsSection>
+
+                            <TermsSection
                                 id="contact"
-                                title="10. Contact Information"
+                                title="11. Contact Information"
                                 isActive={activeSectionId === "contact"}
                                 isContact
                             >

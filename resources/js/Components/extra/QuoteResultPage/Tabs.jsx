@@ -6,13 +6,14 @@ import {
     FiCheck,
     FiCalendar,
     FiPackage,
+    FiTool,
 } from "react-icons/fi";
 
 const tabs = [
     {
         id: "details",
-        label: "Details",
-        subtitle: "Product info",
+        label: "Performance",
+        subtitle: "Core specifications",
         icon: FiInfo,
         color: "from-blue-500/20 to-cyan-500/20",
         borderColor: "border-blue-500/30",
@@ -20,12 +21,21 @@ const tabs = [
     },
     {
         id: "whats-included",
-        label: "What's Included",
-        subtitle: "Package contents",
+        label: "Scope",
+        subtitle: "Included works",
         icon: FiCheckSquare,
         color: "from-emerald-500/20 to-green-500/20",
         borderColor: "border-emerald-500/30",
         iconColor: "text-emerald-400",
+    },
+    {
+        id: "your-selections",
+        label: "Selections",
+        subtitle: "Survey choices",
+        icon: FiTool,
+        color: "from-violet-500/20 to-purple-500/20",
+        borderColor: "border-violet-500/30",
+        iconColor: "text-violet-400",
     },
 ];
 
@@ -35,8 +45,20 @@ export default function ProductTabs({
     kw = "25",
     warranty = "10",
     brand = "Boiler",
+    selectedExtras = [],
+    addOnsTotal = 0,
     containerRef,
 }) {
+    const isCompatibilityDependentItem = (label = "") => {
+        const normalized = String(label).toLowerCase();
+        return ["shock arrestor", "scale reducer", "magnetic filter"].some(
+            (term) => normalized.includes(term)
+        );
+    };
+
+    const compatibilityTooltipText =
+        "Installed subject to site suitability and compatibility with your existing system configuration.";
+
     const [activeTab, setActiveTab] = useState("details");
     const [isSticky, setIsSticky] = useState(false);
 
@@ -144,7 +166,7 @@ export default function ProductTabs({
                                         onClick={() => scrollToSection(tab.id)}
                                         className={`relative group min-w-[160px] px-5 py-3 rounded-xl border transition-all duration-300 flex-shrink-0 ${
                                             isActive
-                                                ? "border-slate-900 bg-slate-900 text-white shadow-md scale-[1.02]"
+                                                ? "border-primary/30 bg-primary/10 text-primary shadow-md scale-[1.02]"
                                                 : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 hover:scale-[1.01]"
                                         }`}
                                     >
@@ -152,14 +174,14 @@ export default function ProductTabs({
                                             <div
                                                 className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
                                                     isActive
-                                                        ? "bg-white/10"
+                                                        ? "bg-white"
                                                         : "bg-slate-100"
                                                 }`}
                                             >
                                                 <tab.icon
                                                     className={`text-lg transition-all duration-300 ${
                                                         isActive
-                                                            ? "text-white"
+                                                            ? "text-primary"
                                                             : "text-slate-600 group-hover:text-slate-800"
                                                     }`}
                                                 />
@@ -169,7 +191,7 @@ export default function ProductTabs({
                                                 <div
                                                     className={`font-bold transition-all duration-300 ${
                                                         isActive
-                                                            ? "text-white"
+                                                            ? "text-primary"
                                                             : "text-slate-800 group-hover:text-slate-900"
                                                     }`}
                                                 >
@@ -189,7 +211,7 @@ export default function ProductTabs({
             </div>
 
             {/* Tab Content Sections */}
-            <div className="relative max-w-4xl mx-auto mt-8 space-y-12 pb-20">
+            <div className="relative max-w-none mt-6 space-y-8 pb-16">
                 {/* Details Section */}
                 <section
                     id="details"
@@ -204,11 +226,11 @@ export default function ProductTabs({
                             </div>
                             <div>
                                 <h3 className="text-2xl font-bold text-slate-900">
-                                    Built for everyday comfort
+                                    Designed for reliable day-to-day comfort
                                 </h3>
                                 <div className="text-slate-600">
-                                    A dependable {brand} boiler designed around
-                                    real homes and real usage.
+                                    A {brand} package matched to your property profile,
+                                    balancing output, efficiency, and long-term usability.
                                 </div>
                             </div>
                         </div>
@@ -229,9 +251,8 @@ export default function ProductTabs({
                                     </div>
                                 </div>
                                 <div className="text-slate-700 text-sm">
-                                    Optimized power output ensuring consistent
-                                    heating and hot water performance for your
-                                    specific property needs.
+                                    Sized to support stable heating performance and
+                                    dependable hot water delivery for your household demand.
                                 </div>
                             </div>
 
@@ -250,9 +271,8 @@ export default function ProductTabs({
                                     </div>
                                 </div>
                                 <div className="text-slate-700 text-sm">
-                                    Long-term peace of mind with extensive cover
-                                    on parts and labour when maintained in line
-                                    with guidance.
+                                    Clear warranty coverage to protect your installation,
+                                    with support expectations set out from day one.
                                 </div>
                             </div>
                         </div>
@@ -260,12 +280,11 @@ export default function ProductTabs({
                         {notes && notes.length > 0 && (
                             <div className="space-y-4">
                                 <h4 className="text-lg font-bold text-slate-900 mb-4">
-                                    Key Highlights
+                                    Why this model is a strong fit
                                 </h4>
                                 <p className="text-slate-700 text-sm leading-relaxed mb-4">
-                                    This model focuses on simplicity,
-                                    efficiency, and proven performance — making
-                                    it a solid choice for homeowners.
+                                    Key notes from your quote engine analysis,
+                                    focused on practical performance and installation suitability.
                                 </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     {notes.map((note, index) => (
@@ -298,37 +317,108 @@ export default function ProductTabs({
                             </div>
                             <div>
                                 <h3 className="text-[20px] font-bold text-slate-900">
-                                    What’s included in your installation
+                                    Included in your installation scope
                                 </h3>
                                 <div className="text-slate-600 text-[14px]">
-                                    Everything required for a safe, complete,
-                                    and compliant boiler replacement.
+                                    Core works and components provided to complete
+                                    a compliant, handover-ready installation.
                                 </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {includes.map((item, index) => (
-                                <div key={index} className="group">
-                                    <div className="h-full bg-slate-50 rounded-xl border border-slate-200 p-6 transition-all duration-300 hover:border-slate-300 hover:scale-[1.02]">
-                                        <div className="flex items-start gap-4">
-                                            <div className="mt-1">
-                                                <FiPackage className="text-emerald-700 text-lg" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-slate-900 mb-1">
-                                                    {item}
-                                                </h4>
-                                                <p className="text-sm text-slate-600">
-                                                    Premium component included
-                                                    in your package.
-                                                </p>
+                        {includes.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {includes.map((item, index) => (
+                                    <div key={index} className="group">
+                                        <div className="h-full bg-slate-50 rounded-xl border border-slate-200 p-6 transition-all duration-300 hover:border-slate-300 hover:scale-[1.02]">
+                                            <div className="flex items-start gap-4">
+                                                <div className="mt-1">
+                                                    <FiPackage className="text-emerald-700 text-lg" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+                                                        <span>{item}</span>
+                                                        {isCompatibilityDependentItem(
+                                                            item
+                                                        ) && (
+                                                            <span
+                                                                title={compatibilityTooltipText}
+                                                                aria-label={compatibilityTooltipText}
+                                                                className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500"
+                                                            >
+                                                                <FiInfo className="h-3 w-3" />
+                                                            </span>
+                                                        )}
+                                                    </h4>
+                                                    <p className="text-sm text-slate-600">
+                                                        Included as standard within your selected package.
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                                No line-item inclusions were provided for this product profile.
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                <section
+                    id="your-selections"
+                    ref={(el) => (tabRefs.current["your-selections"] = el)}
+                    className="scroll-mt-32"
+                >
+                    <div className="bg-white rounded-2xl border border-slate-200 p-8 relative overflow-hidden">
+                        <div className="flex items-start gap-4 mb-8 relative">
+                            <div className="w-14 h-14 rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center flex-shrink-0">
+                                <FiTool className="text-2xl text-violet-700" />
+                            </div>
+                            <div>
+                                <h3 className="text-[20px] font-bold text-slate-900">
+                                    Your selected survey options
+                                </h3>
+                                <div className="text-slate-600 text-[14px]">
+                                    These choices carry through to checkout exactly as shown below.
                                 </div>
-                            ))}
+                            </div>
                         </div>
+
+                        {selectedExtras.length > 0 ? (
+                            <>
+                                <div className="space-y-3">
+                                    {selectedExtras.map((extra, index) => (
+                                        <div
+                                            key={`${extra.label}-${index}`}
+                                            className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                                        >
+                                            <div className="text-sm font-semibold text-slate-800">
+                                                {extra.label}
+                                            </div>
+                                            <div className="text-sm text-slate-700 text-right">
+                                                {extra.totalText || extra.value || "Included"}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="mt-5 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-violet-900">
+                                        Add-ons total
+                                    </span>
+                                    <span className="text-base font-bold text-violet-900">
+                                        £{Number(addOnsTotal || 0).toLocaleString()}
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                                No paid extras were selected in your survey journey.
+                            </div>
+                        )}
                     </div>
                 </section>
             </div>

@@ -5,7 +5,12 @@ import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { FiCreditCard, FiLoader } from "react-icons/fi";
+import {
+    FiCreditCard,
+    FiInfo,
+    FiLoader,
+    FiShield,
+} from "react-icons/fi";
 
 export default function InstallPage({ booking }) {
     const { symbol, title } = usePage().props;
@@ -14,6 +19,11 @@ export default function InstallPage({ booking }) {
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState(null);
     const [showAllIncludes, setShowAllIncludes] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [termsError, setTermsError] = useState("");
+    const [showCancellationTooltip, setShowCancellationTooltip] =
+        useState(false);
+    const [showPetTooltip, setShowPetTooltip] = useState(false);
 
     const titleOptions = ["Mr", "Mrs", "Ms", "Miss", "Dr"];
 
@@ -69,14 +79,6 @@ export default function InstallPage({ booking }) {
         };
     }, []);
 
-    useEffect(() => {
-        const postcode = booking?.answers?.inputs?.postcode;
-        setFormData((prev) => {
-            if (prev.address?.trim()) return prev;
-            return { ...prev, address: postcode ? `${postcode} ` : "" };
-        });
-    }, []);
-
     // refs to scroll/focus to invalid section
     const dateRef = useRef(null);
     const titleRef = useRef(null);
@@ -85,6 +87,7 @@ export default function InstallPage({ booking }) {
     const emailRef = useRef(null);
     const phoneRef = useRef(null);
     const addressRef = useRef(null);
+    const termsRef = useRef(null);
 
     const includes = Array.isArray(booking?.includes) ? booking.includes : [];
     const visibleIncludes = showAllIncludes ? includes : includes.slice(0, 3);
@@ -112,6 +115,16 @@ export default function InstallPage({ booking }) {
     const thermostatLabel = hasSmartThermostat
         ? "Smart Thermostat"
         : "Standard Wireless Thermostat";
+
+    const isCompatibilityDependentItem = (label = "") => {
+        const normalized = String(label).toLowerCase();
+        return ["shock arrestor", "scale reducer", "magnetic filter"].some(
+            (term) => normalized.includes(term)
+        );
+    };
+
+    const compatibilityTooltipText =
+        "Installed subject to site suitability and compatibility with your existing system configuration.";
 
     const scrollToRef = (ref) => {
         const el = ref?.current;
@@ -273,6 +286,18 @@ export default function InstallPage({ booking }) {
             return;
         }
 
+        if (!acceptedTerms) {
+            setTermsError(
+                "Please confirm you agree to the Terms & Conditions before continuing."
+            );
+            toast.error("Please agree to the Terms & Conditions to continue.", {
+                duration: 4000,
+                position: "top-center",
+            });
+            scrollToRef(termsRef);
+            return;
+        }
+
         setProcessing(true);
 
         const productDetails = {
@@ -381,13 +406,13 @@ export default function InstallPage({ booking }) {
             <Head title={title} />
             <PageHeader />
 
-            <div className="min-h-screen bg-slate-50">
-                <div className="max-w-7xl mx-auto px-4 py-8">
-                    <div className="flex items-end gap-6 mb-8">
+            <div className="min-h-screen bg-white">
+                <div className="max-w-7xl mx-auto px-4 py-10 md:py-14 pb-28 lg:pb-10">
+                    <div className="flex items-end gap-6 mb-10">
                         <button
                             type="button"
                             onClick={() => window.history.back()}
-                            className="group flex w-fit items-center gap-2 text-[14px] cursor-pointer font-bold uppercase tracking-wide text-slate-400 transition-colors hover:text-slate-900"
+                            className="group flex w-fit items-center gap-2 text-[13px] cursor-pointer font-semibold uppercase tracking-wide text-slate-400 transition-colors hover:text-slate-900"
                         >
                             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 transition-transform duration-300 group-hover:-translate-x-1 group-hover:bg-slate-200">
                                 <svg
@@ -404,28 +429,75 @@ export default function InstallPage({ booking }) {
                                     />
                                 </svg>
                             </span>
-                            Go Back
+                            Back
                         </button>
 
-                        <div className="relative">
-                            <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight whitespace-nowrap">
-                                Finalize Booking
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                Checkout
+                            </p>
+                            <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight whitespace-nowrap">
+                                Finalise booking
                             </h2>
-                            <div className="absolute -bottom-2 right-0 h-1 w-12 rounded-full bg-emerald-500"></div>
+                        </div>
+                    </div>
+
+                    <div className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Selected boiler package
+                                </p>
+                                <h3 className="mt-1 text-lg md:text-xl font-bold text-slate-900">
+                                    {booking?.brand} {booking?.model}
+                                </h3>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                                        {booking?.kw}kW
+                                    </span>
+                                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                                        {booking?.warrantyYears} year warranty
+                                    </span>
+                                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                                        Installation included
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="text-left sm:text-right">
+                                <p className="text-xs uppercase tracking-wider text-slate-500">Total</p>
+                                <div className="text-2xl font-bold text-slate-900">
+                                    {symbol} {booking?.price}
+                                </div>
+                                <p className="text-[11px] text-slate-500">inc VAT</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Google Reviews</p>
+                            <p className="mt-1 text-sm font-semibold text-slate-900">Rated Excellent by local customers</p>
+                        </div>
+                        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                            <p className="text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">Gas Safe</p>
+                            <p className="mt-1 text-sm font-semibold text-emerald-900">Registered business: 636354</p>
+                        </div>
+                        <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
+                            <p className="text-[11px] uppercase tracking-wider text-sky-800 font-semibold">Secure payment</p>
+                            <p className="mt-1 text-sm font-semibold text-sky-900">Card payments accepted online</p>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 space-y-6">
                             {/* STEP 1: Appointment */}
-                            <section className="relative overflow-hidden rounded-2xl bg-white shadow-xl shadow-slate-200/60 ring-1 ring-slate-100">
-                                <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-[100px]" />
-                                <div className="pointer-events-none absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-blue-400/10 blur-[100px]" />
+                            <section className="rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)]">
 
-                                <div className="flex flex-col gap-2 border-b border-slate-100 p-4 md:6 lg:p-8">
+                                <div className="flex flex-col gap-2 border-b border-slate-100 p-5 md:p-7 lg:p-8">
                                     <div className="flex-1 flex gap-2 items-center justify-between">
                                         <div>
-                                            <h2 className="text-[16px] lg:text-xl font-bold text-slate-900">
+                                            <h2 className="text-lg lg:text-2xl font-semibold text-slate-900">
                                                 Select Installation Date
                                             </h2>
                                             <p className="text-sm text-slate-500 line-clamp-1">
@@ -471,14 +543,12 @@ export default function InstallPage({ booking }) {
                             </section>
 
                             {/* STEP 2: Customer Details (unchanged markup except errors) */}
-                            <section className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/60 shadow-2xl backdrop-blur-2xl transition-all duration-500">
-                                <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-[100px]" />
-                                <div className="pointer-events-none absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-blue-400/10 blur-[100px]" />
+                            <section className="rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)] transition-all duration-500">
 
-                                <div className="relative border-b border-slate-200/50 px-8 py-5">
+                                <div className="relative border-b border-slate-200/70 px-6 md:px-8 py-5">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                                            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
                                                 Personal Details
                                             </h2>
                                             <div className="mt-1 flex items-center gap-2">
@@ -489,6 +559,10 @@ export default function InstallPage({ booking }) {
                                                 <p className="text-sm font-medium text-slate-500">
                                                     Secure checkout active
                                                 </p>
+                                            </div>
+                                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-800">
+                                                <FiShield className="h-3.5 w-3.5" />
+                                                Your details are used only to arrange your installation and confirmation.
                                             </div>
                                         </div>
 
@@ -513,10 +587,10 @@ export default function InstallPage({ booking }) {
                                 <div className="relative p-8 pt-6">
                                     <div className="space-y-7">
                                         {/* Name Section */}
-                                        <div className="group relative">
+                                        <div className="group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
                                             <div className="flex gap-6">
                                                 <div className="flex-grow">
-                                                    <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-primary">
+                                                    <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary">
                                                         Who are we installing
                                                         for?
                                                     </h3>
@@ -669,10 +743,10 @@ export default function InstallPage({ booking }) {
                                         </div>
 
                                         {/* Contact Section */}
-                                        <div className="group relative">
+                                        <div className="group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
                                             <div className="flex gap-6">
                                                 <div className="flex-grow pt-1.5">
-                                                    <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-primary">
+                                                    <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary">
                                                         How can we reach you?
                                                     </h3>
 
@@ -783,10 +857,10 @@ export default function InstallPage({ booking }) {
                                         </div>
 
                                         {/* Address Section */}
-                                        <div className="group relative">
+                                        <div className="group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
                                             <div className="flex gap-6">
                                                 <div className="flex-grow pt-1.5">
-                                                    <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400 transition-colors group-focus-within:text-primary">
+                                                    <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary">
                                                         Where are we installing?
                                                     </h3>
 
@@ -795,20 +869,18 @@ export default function InstallPage({ booking }) {
                                                             <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
                                                                 Property Address
                                                             </label>
-
                                                             <div className="relative group/input">
                                                                 <input
-                                                                    ref={
-                                                                        addressRef
-                                                                    }
+                                                                    ref={addressRef}
                                                                     name="address"
-                                                                    placeholder="Start typing postcode or address..."
+                                                                    placeholder="House number/name, street, town and postcode"
                                                                     value={
                                                                         formData.address
                                                                     }
                                                                     onChange={
                                                                         handleInputChange
                                                                     }
+                                                                    autoComplete="street-address"
                                                                     className={`w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
                                     ${errors.address
                                                                             ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10"
@@ -826,17 +898,13 @@ export default function InstallPage({ booking }) {
                                                                         <path
                                                                             strokeLinecap="round"
                                                                             strokeLinejoin="round"
-                                                                            strokeWidth={
-                                                                                1.5
-                                                                            }
+                                                                            strokeWidth={1.5}
                                                                             d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                                                                         />
                                                                         <path
                                                                             strokeLinecap="round"
                                                                             strokeLinejoin="round"
-                                                                            strokeWidth={
-                                                                                1.5
-                                                                            }
+                                                                            strokeWidth={1.5}
                                                                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                                                                         />
                                                                     </svg>
@@ -850,22 +918,66 @@ export default function InstallPage({ booking }) {
                                                                     }
                                                                 </p>
                                                             )}
+                                                            <p className="mt-2 text-xs text-slate-500">
+                                                                Please enter your full installation address manually.
+                                                            </p>
                                                         </div>
 
-                                                        {/* <div className="relative transition-all duration-300 focus-within:-translate-y-1">
+                                                        <div className="relative transition-all duration-300 focus-within:-translate-y-1">
                                                             <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
-                                                                Additional Notes{" "}
+                                                                Access & parking notes{" "}
                                                                 <span className="font-normal text-slate-400 ml-1 opacity-70">(Optional)</span>
                                                             </label>
                                                             <textarea
                                                                 name="notes"
                                                                 rows={3}
-                                                                placeholder="Any parking restrictions, access details, or special requests?"
+                                                                placeholder="Tell us about parking, gate access, alarms, mobility requirements, or anything else we should know."
                                                                 value={formData.notes}
                                                                 onChange={handleInputChange}
                                                                 className="w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-medium text-slate-900 ring-1 ring-slate-200 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10 focus:outline-none resize-none"
                                                             />
-                                                        </div> */}
+                                                        </div>
+
+                                                        <div className="relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                                                            <span className="font-semibold text-slate-800">
+                                                                Pet-friendly visits
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setShowPetTooltip(
+                                                                        (v) => !v
+                                                                    )
+                                                                }
+                                                                onBlur={() =>
+                                                                    setTimeout(
+                                                                        () =>
+                                                                            setShowPetTooltip(
+                                                                                false
+                                                                            ),
+                                                                        120
+                                                                    )
+                                                                }
+                                                                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary"
+                                                                aria-label="Show pet-friendly information"
+                                                            >
+                                                                <FiInfo className="h-3.5 w-3.5" />
+                                                            </button>
+
+                                                            {showPetTooltip && (
+                                                                <div className="absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-white p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl">
+                                                                    <p>
+                                                                        We are dog-friendly and happy for them to be around during the visit.
+                                                                    </p>
+                                                                    <p className="mt-1.5">
+                                                                        If your dog is feeling social, we are always glad to say hello first.
+                                                                    </p>
+                                                                    <p className="mt-1.5">
+                                                                        During active work, we ask that pets are kept clear of tools and working areas for everyone’s safety.
+                                                                    </p>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
 
                                                     {Object.keys(errors)
@@ -889,25 +1001,18 @@ export default function InstallPage({ booking }) {
 
                         {/* RIGHT COLUMN - Sticky Summary */}
                         <div className="lg:col-span-1">
-                            <aside className="sticky top-6 filter drop-shadow-xl">
-                                <div
-                                    className="relative bg-white text-slate-800 rounded-t-2xl"
-                                    style={{
-                                        clipPath:
-                                            "polygon(0 0, 100% 0, 100% calc(100% - 12px), 95% 100%, 90% calc(100% - 12px), 85% 100%, 80% calc(100% - 12px), 75% 100%, 70% calc(100% - 12px), 65% 100%, 60% calc(100% - 12px), 55% 100%, 50% calc(100% - 12px), 45% 100%, 40% calc(100% - 12px), 35% 100%, 30% calc(100% - 12px), 25% 100%, 20% calc(100% - 12px), 15% 100%, 10% calc(100% - 12px), 5% 100%, 0 calc(100% - 12px))",
-                                    }}
-                                >
-                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 h-4 w-4 rounded-full bg-foreground shadow-inner border border-slate-200" />
-
-                                    <div className="bg-slate-50 p-6 pt-10 border-b-2 border-dashed border-dark/40 text-center rounded-t-2xl space-y-0.5">
-                                        <h2 className="text-[12px] font-black font-mono uppercase tracking-widest text-dark/70 mt-2">
+                            <aside className="sticky top-6">
+                                <div className="rounded-3xl border border-slate-200 bg-white text-slate-800 shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
+                                    <div className="bg-slate-50 p-6 border-b border-slate-200 text-center rounded-t-3xl space-y-1">
+                                        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                                             Installation Summary
                                         </h2>
                                         <div>
-                                            <span className="text-5xl font-bold tracking-tighter text-slate-900">
+                                            <span className="text-5xl font-bold tracking-tight text-slate-900">
                                                 {symbol} {booking?.price}
                                             </span>
                                         </div>
+                                        <p className="text-[11px] uppercase tracking-wider text-slate-500">Instant price • inc VAT</p>
                                     </div>
 
                                     <div className="p-6 space-y-4">
@@ -1091,8 +1196,21 @@ export default function InstallPage({ booking }) {
                                                                             }ms`,
                                                                     }}
                                                                 >
-                                                                    <span className="max-w-[90%] text-[15px] line-clamp-1">
-                                                                        {item}
+                                                                    <span className="max-w-[90%] text-[15px] line-clamp-1 inline-flex items-center gap-1.5">
+                                                                        <span>
+                                                                            {item}
+                                                                        </span>
+                                                                        {isCompatibilityDependentItem(
+                                                                            item
+                                                                        ) && (
+                                                                            <span
+                                                                                title={compatibilityTooltipText}
+                                                                                aria-label={compatibilityTooltipText}
+                                                                                className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500"
+                                                                            >
+                                                                                <FiInfo className="h-3 w-3" />
+                                                                            </span>
+                                                                        )}
                                                                     </span>
                                                                     <span className="text-primary text-sm font-semibold">
                                                                         Included
@@ -1122,21 +1240,132 @@ export default function InstallPage({ booking }) {
                                         </div>
 
                                         {/* ✅ Pay Now button functionality applied here */}
-                                        <div className="bg-slate-900 -mx-6 -mb-6 p-6 pb-12 mt-6 text-white">
+                                        <div className="bg-slate-50 -mx-6 -mb-6 p-6 pb-10 mt-6 border-t border-slate-200 text-slate-900">
+                                            <div className="mb-4 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+                                                <div className="relative inline-flex items-center gap-1.5 text-xs text-slate-600">
+                                                    <span className="font-semibold text-slate-800">
+                                                        Cancellation policy
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowCancellationTooltip(
+                                                                (v) => !v
+                                                            )
+                                                        }
+                                                        onBlur={() =>
+                                                            setTimeout(
+                                                                () =>
+                                                                    setShowCancellationTooltip(
+                                                                        false
+                                                                    ),
+                                                                120
+                                                            )
+                                                        }
+                                                        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary"
+                                                        aria-label="Show cancellation policy"
+                                                    >
+                                                        <FiInfo className="h-3.5 w-3.5" />
+                                                    </button>
+
+                                                    {showCancellationTooltip && (
+                                                        <div className="absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-white p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl">
+                                                            <p>
+                                                                You can cancel for a full refund up to 24 hours before your booking.
+                                                            </p>
+                                                            <p className="mt-1.5">
+                                                                Cancellations made with less than 24 hours’ notice may be chargeable, including where materials have already been ordered or engineer time has been allocated.
+                                                            </p>
+                                                            <p className="mt-2 text-slate-500">
+                                                                This does not affect your statutory rights. Full terms:
+                                                                <a
+                                                                    href="/terms-conditions"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="ml-1 font-semibold text-primary underline underline-offset-2"
+                                                                >
+                                                                    view full terms
+                                                                </a>
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                ref={termsRef}
+                                                className={`mb-4 rounded-xl border p-3 ${
+                                                    termsError
+                                                        ? "border-red-300 bg-red-50"
+                                                        : "border-slate-200 bg-white"
+                                                }`}
+                                            >
+                                                <label className="flex items-start gap-3 text-sm leading-relaxed text-slate-700">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={acceptedTerms}
+                                                        onChange={(e) => {
+                                                            setAcceptedTerms(
+                                                                e.target.checked
+                                                            );
+                                                            setTermsError("");
+                                                        }}
+                                                        className="mt-0.5 h-4 w-4 rounded border-slate-300 bg-white text-primary focus:ring-primary"
+                                                    />
+                                                    <span>
+                                                        I confirm that I have read and agree to the{" "}
+                                                        <a
+                                                            href="/terms-conditions"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="font-semibold underline underline-offset-2"
+                                                        >
+                                                            Terms & Conditions
+                                                        </a>{" "}
+                                                        and{" "}
+                                                        <a
+                                                            href="/privacy-policy"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="font-semibold underline underline-offset-2"
+                                                        >
+                                                            Privacy Policy
+                                                        </a>
+                                                        , including any advertised{" "}
+                                                        <a
+                                                            href="/terms-conditions#next-day"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="font-semibold underline underline-offset-2"
+                                                        >
+                                                            next-day installation terms
+                                                        </a>
+                                                        .
+                                                    </span>
+                                                </label>
+                                                {termsError && (
+                                                    <p className="mt-2 text-xs font-semibold text-red-600">
+                                                        {termsError}
+                                                    </p>
+                                                )}
+                                            </div>
+
                                             <button
                                                 type="button"
                                                 onClick={handlePayAndBook}
                                                 disabled={
-                                                    !isFormValid || processing
+                                                    !isFormValid ||
+                                                    processing ||
+                                                    !acceptedTerms
                                                 }
                                                 aria-busy={processing}
                                                 className={[
-                                                    "w-full py-4 text-sm font-bold rounded-sm uppercase tracking-widest border-2 transition-all flex items-center justify-center gap-2",
+                                                    "w-full py-4 text-sm font-bold rounded-xl uppercase tracking-wide border transition-all flex items-center justify-center gap-2",
                                                     processing
                                                         ? "bg-gray-400 border-gray-400 cursor-not-allowed text-white"
                                                         : isFormValid
-                                                            ? "bg-primary border-primary text-foreground hover:text-dark hover:bg-foreground"
-                                                            : "bg-transparent border-slate-700 text-slate-500 cursor-not-allowed",
+                                                            ? "bg-primary border-primary text-white hover:opacity-95"
+                                                            : "bg-slate-200 border-slate-200 text-slate-500 cursor-not-allowed",
                                                 ].join(" ")}
                                             >
                                                 {processing ? (
@@ -1153,13 +1382,13 @@ export default function InstallPage({ booking }) {
                                             </button>
 
                                             <div className="mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
-                                                <span className="rounded-full border border-white/30 bg-white/95 text-slate-900 px-3 py-1 shadow-sm">
+                                                <span className="rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm">
                                                     Visa
                                                 </span>
-                                                <span className="rounded-full border border-white/30 bg-white/95 text-slate-900 px-3 py-1 shadow-sm">
+                                                <span className="rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm">
                                                     Mastercard
                                                 </span>
-                                                <span className="rounded-full border border-white/30 bg-white/95 text-slate-900 px-3 py-1 shadow-sm">
+                                                <span className="rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm">
                                                     Klarna
                                                 </span>
                                             </div>
@@ -1169,6 +1398,47 @@ export default function InstallPage({ booking }) {
                             </aside>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 backdrop-blur lg:hidden">
+                <div className="mx-auto max-w-7xl flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                        <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+                            Total package
+                        </p>
+                        <p className="text-lg font-bold text-slate-900 truncate">
+                            {symbol} {booking?.price}
+                        </p>
+                        <label className="mt-1 inline-flex items-center gap-2 text-[11px] text-slate-600">
+                            <input
+                                type="checkbox"
+                                checked={acceptedTerms}
+                                onChange={(e) => {
+                                    setAcceptedTerms(e.target.checked);
+                                    setTermsError("");
+                                }}
+                                className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary"
+                            />
+                            Agree to terms
+                        </label>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handlePayAndBook}
+                        disabled={!isFormValid || processing || !acceptedTerms}
+                        aria-busy={processing}
+                        className={[
+                            "rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
+                            processing
+                                ? "bg-gray-400 text-white cursor-not-allowed"
+                                : isFormValid
+                                ? "bg-primary text-white"
+                                : "bg-slate-200 text-slate-500 cursor-not-allowed",
+                        ].join(" ")}
+                    >
+                        {processing ? "Processing…" : "Pay & Book"}
+                    </button>
                 </div>
             </div>
             <GoogleReview />

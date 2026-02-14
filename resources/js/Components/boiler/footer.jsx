@@ -74,7 +74,10 @@ export function Footer() {
                 </div>
 
                 <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row">
-                    <p>© {currentYear} MD Gas Leeds. All rights reserved.</p>
+                    <div>
+                        <p>© {currentYear} MD Gas Leeds. All rights reserved.</p>
+                        <p className="mt-1">VAT No: 511 0588 26</p>
+                    </div>
                     <div className="flex gap-6">
                         <Link href="/about" className="hover:text-slate-700">
                             About Us

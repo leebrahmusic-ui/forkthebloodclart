@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     FiInfo,
     FiX,
     FiChevronRight,
     FiShield,
+    FiAward,
+    FiFileText,
+    FiStar,
+    FiClock,
     FiChevronDown,
     FiCheck,
 } from "react-icons/fi";
@@ -12,6 +16,16 @@ import { router } from "@inertiajs/react";
 import DetailsQuoteSidebar from "./QuoteResultPage/DetailsQuote";
 
 export default function QuoteResultsPage({ answers }) {
+    const isCompatibilityDependentItem = (label = "") => {
+        const normalized = String(label).toLowerCase();
+        return ["shock arrestor", "scale reducer", "magnetic filter"].some(
+            (term) => normalized.includes(term)
+        );
+    };
+
+    const compatibilityTooltipText =
+        "Installed subject to site suitability and compatibility with your existing system configuration.";
+
     const getCsrfToken = () => {
         if (typeof document === "undefined") return null;
         return document.head.querySelector('meta[name="csrf-token"]')?.content;
@@ -24,12 +38,28 @@ export default function QuoteResultsPage({ answers }) {
 
     // 1. Extract products safely from the Inertia props
     const products = answers?.products || [];
-    const recommendedProductId = answers?.recommendedProductId;
+    const quoteAddOns = answers?.addOns || {};
+    const quoteAddOnItems = Array.isArray(quoteAddOns?.items)
+        ? quoteAddOns.items
+        : [];
+    const derivedFlueType = quoteAddOns?.derived?.flueType;
+    const bathroomsLabel =
+        answers?.inputs?.bathrooms ||
+        answers?.answers?.raw?.bathrooms?.label ||
+        answers?.bathrooms?.label ||
+        null;
 
     const [activeQuote, setActiveQuote] = useState(null);
     const [detailsQuote, setDetailsQuote] = useState(null);
     const [selectedPower, setSelectedPower] = useState("25");
     const [visibleCount, setVisibleCount] = useState(3);
+    const [showInstallTimeInfo, setShowInstallTimeInfo] = useState(false);
+    const [showGasSafeInfo, setShowGasSafeInfo] = useState(false);
+    const [showNextDayInfo, setShowNextDayInfo] = useState(false);
+    const [showWarrantyInfo, setShowWarrantyInfo] = useState(false);
+    const [activeCardIndex, setActiveCardIndex] = useState(0);
+    const [openIncludesCard, setOpenIncludesCard] = useState(null);
+    const mobileCarouselRef = useRef(null);
 
     const [productDetails, setProductDetails] = useState({});
 
@@ -66,44 +96,321 @@ export default function QuoteResultsPage({ answers }) {
     };
 
     const getTierLabel = (index) => {
-        if (index === 0) return "Budget";
-        if (index === 1) return "Best seller";
+        if (index === 0) return "Essential";
+        if (index === 1) return "Most popular";
         if (index === 2) return "Premium";
         return "";
     };
 
-    const calculateMonthlyFrom = (totalPrice) => {
-        if (!totalPrice || Number.isNaN(Number(totalPrice))) return null;
-        const principal = Number(totalPrice);
-        const annualRate = 0.099;
-        const monthlyRate = annualRate / 12;
-        const months = 120;
-        const monthly =
-            (principal * monthlyRate) /
-            (1 - Math.pow(1 + monthlyRate, -months));
-        return Math.ceil(monthly);
+    const getConfidenceLine = (index) => {
+        if (index === 0) return "Great value with trusted essentials";
+        if (index === 1) return "Balanced performance for most homes";
+        if (index === 2) return "Maximum comfort and longer-term cover";
+        return "Matched to your property answers";
+    };
+
+    const getBestFor = (index) => {
+        if (index === 0) return "Value-first homeowners";
+        if (index === 1) return "Most household setups";
+        if (index === 2) return "Premium features and longer cover";
+        return "Your selected property profile";
+    };
+
+    const getResultsContextLine = () => {
+        const raw = String(bathroomsLabel || "").trim();
+        if (!raw) return "Results for your home";
+
+        const match = raw.match(/(\d+(?:\.\d+)?\+?)/);
+        if (match?.[1]) return `Results for your ${match[1]}-bathroom home`;
+
+        return "Results for your home";
+    };
+
+    const formatCurrency = (value) => {
+        const amount = Number(value);
+        if (Number.isNaN(amount)) return null;
+        return `£${amount.toLocaleString()}`;
+    };
+
+    const selectedExtras = [
+        ...(derivedFlueType
+            ? [
+                  {
+                      label: "Flue type",
+                      value:
+                          String(derivedFlueType).charAt(0).toUpperCase() +
+                          String(derivedFlueType).slice(1),
+                  },
+              ]
+            : []),
+        ...quoteAddOnItems.map((item) => {
+            const qty = Number(item?.qty || 0);
+            const unitPrice = Number(item?.unitPrice ?? item?.unit_price ?? 0);
+            const total = Number(item?.total ?? 0);
+
+            const quantityText =
+                qty > 0 ? `${qty} × ${formatCurrency(unitPrice) || "£0"}` : null;
+
+            return {
+                label: item?.label || item?.key || "Selected extra",
+                value: quantityText || "Included",
+                totalText: total > 0 ? formatCurrency(total) : "Included",
+            };
+        }),
+    ];
+
+    const getBrandLogo = (brandName) => {
+        const b = String(brandName || "").toLowerCase();
+
+        if (b.includes("worcester"))
+            return "/images/brands/worcester-bosch.svg";
+        if (b.includes("ideal")) return "/images/idealheating.png";
+        if (b.includes("vaillant")) return "/images/brands/vaillant.svg";
+        if (b.includes("viessmann")) return "/images/brands/viessmann.svg";
+        if (b.includes("baxi")) return "/images/brands/baxi.svg";
+        if (b.includes("alpha")) return "/images/brands/alpha.svg";
+        if (b.includes("glow")) return "/images/brands/glow-worm.svg";
+        if (b.includes("vokera")) return "/images/brands/vokera.svg";
+        if (b.includes("intergas")) return "/images/brands/intergas.svg";
+        if (b.includes("atag")) return "/images/brands/atag.svg";
+
+        return null;
+    };
+
+    const visibleProducts = products.slice(0, visibleCount);
+
+    useEffect(() => {
+        if (activeCardIndex >= visibleProducts.length) {
+            setActiveCardIndex(Math.max(0, visibleProducts.length - 1));
+        }
+    }, [activeCardIndex, visibleProducts.length]);
+
+    const updateActiveCardFromScroll = () => {
+        const container = mobileCarouselRef.current;
+        if (!container) return;
+
+        const cards = Array.from(
+            container.querySelectorAll("[data-card-index]")
+        );
+        if (!cards.length) return;
+
+        const containerCenter =
+            container.scrollLeft + container.clientWidth / 2;
+
+        let nearestIndex = 0;
+        let smallestDistance = Number.POSITIVE_INFINITY;
+
+        cards.forEach((card, idx) => {
+            const cardCenter = card.offsetLeft + card.clientWidth / 2;
+            const distance = Math.abs(containerCenter - cardCenter);
+            if (distance < smallestDistance) {
+                smallestDistance = distance;
+                nearestIndex = idx;
+            }
+        });
+
+        setActiveCardIndex(nearestIndex);
+    };
+
+    const scrollToProductCard = (index) => {
+        const el = document.getElementById(`quote-product-card-${index}`);
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        setActiveCardIndex(index);
     };
 
     return (
-        <div className="min-h-screen bg-light-background px-4 py-12 md:px-6 md:py-16">
+        <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50/40 px-4 py-8 md:px-6 md:py-10 overflow-hidden">
+            <div className="pointer-events-none absolute -top-24 -left-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-12 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" />
             {/* HEADER */}
-            <div className="max-w-7xl mx-auto mb-14">
-                <div className="relative">
-                    <div className="relative ">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-                            <div>
-                                <div className="text-xs uppercase tracking-wider text-slate-500 mb-1">
-                                    Installation packages
+            <div className="relative max-w-7xl mx-auto mb-8">
+                <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+                    <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-stretch">
+                        <div className="space-y-3">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                                <FiStar className="h-3.5 w-3.5" />
+                                Personalised results
+                            </div>
+
+                            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 leading-tight">
+                                Boiler options matched to your home
+                            </h1>
+
+                            <p className="text-sm md:text-base text-slate-600 max-w-3xl leading-relaxed">
+                                Fixed-price packages based on your survey answers.
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700">
+                                    {getResultsContextLine()}
+                                </span>
+                                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800">
+                                    <FiCheck className="h-3.5 w-3.5" />
+                                    Installation included
+                                </span>
+                            </div>
+
+                            <div className="pt-1 flex flex-wrap items-center gap-2">
+                                <p className="text-sm text-slate-600">
+                                    Stay in touch on WhatsApp throughout the process.
+                                </p>
+                                <a
+                                    href="https://wa.me/447454796398"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
+                                >
+                                    WhatsApp 24/7
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="relative rounded-2xl border border-emerald-200 bg-emerald-50 p-3 group">
+                                <div className="flex items-center gap-2">
+                                <img
+                                    src="/images/gas%20safe%20logo%20mega.png"
+                                    alt="Gas Safe Register"
+                                    className="h-6 w-auto object-contain"
+                                    loading="lazy"
+                                    onError={(e) => {
+                                        e.currentTarget.src =
+                                            "/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png";
+                                    }}
+                                />
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-emerald-800 font-semibold">
+                                        Gas Safe Registered
+                                        <button
+                                            type="button"
+                                            aria-label="Gas Safe verification details"
+                                            onClick={() =>
+                                                setShowGasSafeInfo(
+                                                    (prev) => !prev
+                                                )
+                                            }
+                                            className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-emerald-300 bg-white text-emerald-700 hover:text-emerald-800"
+                                        >
+                                            <FiInfo className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
-                                <h1 className="text-3xl font-bold text-dark">
-                                    Your Personalized Quotes
-                                </h1>
-                                <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
-                                    <span>Gas Safe registered engineers</span>
-                                    <span className="hidden sm:inline">•</span>
-                                    <span>Fixed price, no hidden extras</span>
-                                    <span className="hidden sm:inline">•</span>
-                                    <span>Warranty included</span>
+                                </div>
+
+                                <div
+                                    className={`absolute left-4 right-4 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-emerald-200 bg-white p-3 text-xs leading-relaxed text-slate-600 shadow-lg transition-opacity ${
+                                        showGasSafeInfo
+                                            ? "opacity-100"
+                                            : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+                                    }`}
+                                >
+                                    Verify our registration on the official Gas Safe Register using business registration number <span className="font-semibold text-slate-800">636354</span>.{" "}
+                                    <a
+                                        href="https://www.gassaferegister.co.uk/find-an-engineer-or-check-the-register/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold text-emerald-700 hover:text-emerald-800 underline underline-offset-2"
+                                    >
+                                        Check the register
+                                    </a>
+                                    .
+                                </div>
+                            </div>
+
+                            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group">
+                                <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+                                    Estimated install time
+                                    <button
+                                        type="button"
+                                        aria-label="Estimated install time details"
+                                        onClick={() =>
+                                            setShowInstallTimeInfo(
+                                                (prev) => !prev
+                                            )
+                                        }
+                                        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-500 hover:text-slate-700"
+                                    >
+                                        <FiInfo className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                                <div className="mt-1 text-sm font-semibold text-slate-900 flex items-center gap-2">
+                                    <FiClock className="text-primary" />
+                                    1 day typical
+                                </div>
+
+                                <div
+                                    className={`absolute left-4 right-4 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-600 shadow-lg transition-opacity ${
+                                        showInstallTimeInfo
+                                            ? "opacity-100"
+                                            : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+                                    }`}
+                                >
+                                    A standard boiler replacement is usually completed in one day. More complex installations, system upgrades, or additional heating works may require extra time.
+                                </div>
+                            </div>
+
+                            <div className="relative rounded-2xl border border-emerald-200 bg-gradient-to-r from-white to-emerald-50 p-3 group">
+                                <div className="text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">
+                                    Delivery priority
+                                </div>
+                                <div className="mt-1 text-sm font-semibold text-slate-900 leading-snug">
+                                    Next day installation when ordered before 3pm
+                                </div>
+                                <button
+                                    type="button"
+                                    aria-label="Delivery priority terms"
+                                    onClick={() =>
+                                        setShowNextDayInfo((prev) => !prev)
+                                    }
+                                    className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-900"
+                                >
+                                    <FiInfo className="h-3.5 w-3.5" />
+                                    See terms
+                                </button>
+
+                                <div
+                                    className={`absolute left-4 right-4 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-600 shadow-lg transition-opacity ${
+                                        showNextDayInfo
+                                            ? "opacity-100"
+                                            : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+                                    }`}
+                                >
+                                    Next-day order slots apply to standard, in-stock products confirmed and paid before 3:00pm Monday to Friday. Subject to final survey checks, engineer availability, postcode coverage, and supplier cut-off times. Excludes weekends, bank holidays, special-order items, and complex upgrade works. Installation dates may be adjusted for safety, access, weather, or third-party supply delays.
+                                    <a
+                                        href="/terms-conditions#next-day"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="mt-2 inline-block font-semibold text-emerald-700 underline underline-offset-2"
+                                    >
+                                        See full next-day installation terms
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group">
+                                <div className="flex items-center gap-2 text-sm text-slate-900 font-semibold leading-snug">
+                                    Warranty & workmanship cover
+                                    <button
+                                        type="button"
+                                        aria-label="Warranty cover details"
+                                        onClick={() =>
+                                            setShowWarrantyInfo((prev) => !prev)
+                                        }
+                                        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-500 hover:text-slate-700"
+                                    >
+                                        <FiInfo className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+
+                                <div
+                                    className={`absolute left-4 right-4 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-600 shadow-lg transition-opacity ${
+                                        showWarrantyInfo
+                                            ? "opacity-100"
+                                            : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+                                    }`}
+                                >
+                                    All packages include at least a 5-year manufacturer-backed warranty. We also provide 12 months workmanship cover to support the quality of our installation and give you added peace of mind.
                                 </div>
                             </div>
                         </div>
@@ -112,28 +419,92 @@ export default function QuoteResultsPage({ answers }) {
             </div>
 
             {/* QUOTE CARDS GRID */}
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                {products.slice(0, visibleCount).map((product, index) => {
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-4 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+                    {visibleProducts.map((product, index) => (
+                        <button
+                            key={`switch-${product.id || index}`}
+                            type="button"
+                            onClick={() => scrollToProductCard(index)}
+                            className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                                activeCardIndex === index
+                                    ? "border-primary/30 bg-primary/10 text-primary"
+                                    : "border-slate-200 bg-white text-slate-700"
+                            }`}
+                        >
+                            {getTierLabel(index) || `Option ${index + 1}`}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="mb-4 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/95 px-3 py-2.5 shadow-sm lg:hidden">
+                    <button
+                        type="button"
+                        onClick={() => scrollToProductCard(Math.max(0, activeCardIndex - 1))}
+                        disabled={activeCardIndex <= 0}
+                        className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <span className="-ml-0.5">‹</span>
+                        Prev
+                    </button>
+
+                    <div className="text-center">
+                        <div className="text-sm font-semibold text-slate-900 tracking-wide">
+                            {visibleProducts.length ? `${activeCardIndex + 1} / ${visibleProducts.length}` : "0 / 0"}
+                        </div>
+                        <div className="text-[11px] text-slate-500">Swipe or tap next</div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            scrollToProductCard(
+                                Math.min(visibleProducts.length - 1, activeCardIndex + 1)
+                            )
+                        }
+                        disabled={activeCardIndex >= visibleProducts.length - 1}
+                        className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        Next
+                        <span className="-mr-0.5">›</span>
+                    </button>
+                </div>
+
+                <div
+                    ref={mobileCarouselRef}
+                    onScroll={updateActiveCardFromScroll}
+                    className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible"
+                >
+                {visibleProducts.map((product, index) => {
                     const style = getCardStyle(index);
                     const finalPrice = calculatePrice(product);
                     const tierLabel = getTierLabel(index);
-                    const monthlyFrom = calculateMonthlyFrom(finalPrice);
+                    const confidenceLine = getConfidenceLine(index);
+                    const bestFor = getBestFor(index);
+                    const brandLogo = getBrandLogo(product.brand);
+                    const cardKey = product.id || index;
+                    const remainingIncludes = Array.isArray(product.includes)
+                        ? product.includes.slice(2)
+                        : [];
 
                     return (
                         <div
-                            key={product.id || index}
-                            className={`relative rounded-3xl bg-gradient-to-b ${style.gradient} shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden border border-foreground hover:shadow-[0_30px_80px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300`}
+                            key={cardKey}
+                            id={`quote-product-card-${index}`}
+                            data-card-index={index}
+                            className={`relative min-w-[88%] snap-center rounded-3xl bg-gradient-to-b ${style.gradient} shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden border border-slate-200 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0`}
                         >
+                            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-emerald-300 to-sky-300" />
                             {/* Header Section */}
                             <div
-                                className={`h-40 ${style.accent} relative overflow-hidden`}
+                                className={`h-28 ${style.accent} relative overflow-hidden`}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
                                 <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent" />
 
                                 <div className="relative p-6 flex justify-between items-start">
                                     {tierLabel && (
-                                        <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-slate-800 shadow-sm border border-slate-200">
+                                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-slate-800 shadow-sm border border-slate-200">
                                             <span className="text-[14px] font-semibold tracking-wide">
                                                 {tierLabel}
                                             </span>
@@ -149,14 +520,14 @@ export default function QuoteResultsPage({ answers }) {
                             </div>
 
                             {/* Image Section */}
-                            <div className="flex justify-center -mt-28 relative z-10 px-6">
+                            <div className="flex justify-center -mt-16 relative z-10 px-6">
                                 <div className="relative">
-                                    <div className="absolute inset-10 bg-gradient-to-r from-dark/40 to-transparent blur-2xl" />
+                                    <div className="absolute inset-10 bg-gradient-to-r from-primary/25 to-secondary/20 blur-2xl" />
                                     <img
                                         // Use the first image from API or fallback
                                         src={product.images?.[0]}
                                         alt={`${product.brand} ${product.model}`}
-                                        className="h-60 object-contain drop-shadow-2xl"
+                                        className="h-44 object-contain drop-shadow-2xl"
                                         onError={(e) => {
                                             e.target.src =
                                                 "/images/ideal-20logic.png";
@@ -166,7 +537,7 @@ export default function QuoteResultsPage({ answers }) {
                             </div>
 
                             {/* Divider */}
-                            <div className="relative my-7">
+                            <div className="relative my-4">
                                 <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
                                 <div className="absolute inset-x-0 top-1/2 h-px w-full bg-gradient-to-r from-transparent via-white/60 to-transparent blur-sm" />
                             </div>
@@ -186,8 +557,53 @@ export default function QuoteResultsPage({ answers }) {
                                     </h3>
                                 </div>
 
+                                {brandLogo && (
+                                    <div className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-2 inline-flex items-center">
+                                        <img
+                                            src={brandLogo}
+                                            alt={`${product.brand} logo`}
+                                            className="h-5 w-auto object-contain"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = "none";
+                                                const fallback = e.currentTarget.nextElementSibling;
+                                                if (fallback) fallback.style.display = "inline";
+                                            }}
+                                        />
+                                        <span
+                                            className="hidden text-xs font-semibold text-slate-600"
+                                            style={{ display: "none" }}
+                                        >
+                                            {product.brand}
+                                        </span>
+                                    </div>
+                                )}
+
+                                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                                    {confidenceLine}
+                                </p>
+
+                                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                        <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                                            Best for
+                                        </div>
+                                        <div className="mt-1 text-sm font-semibold text-slate-800">
+                                            {bestFor}
+                                        </div>
+                                    </div>
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                        <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                                            Warranty cover
+                                        </div>
+                                        <div className="mt-1 text-sm font-semibold text-slate-800">
+                                            {product.warrantyYears} years included
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Warranty */}
-                                <div className="mt-5 flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-white rounded-2xl border border-slate-100">
+                                <div className="mt-5 flex items-center gap-3 p-3 bg-gradient-to-r from-emerald-50 to-white rounded-2xl border border-emerald-100">
                                     <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
                                         <FiShield className="text-emerald-600" />
                                     </div>
@@ -201,6 +617,78 @@ export default function QuoteResultsPage({ answers }) {
                                         </div>
                                     </div>
                                 </div>
+
+                                {Array.isArray(product.includes) &&
+                                    product.includes.length > 0 && (
+                                        <div className="relative mt-4 flex flex-wrap items-center gap-2">
+                                            {product.includes
+                                                .slice(0, 2)
+                                                .map((item, i) => (
+                                                    <span
+                                                        key={`${product.id}-inc-${i}`}
+                                                        className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700"
+                                                    >
+                                                        <FiCheck className="h-3.5 w-3.5 text-emerald-600" />
+                                                        <span className="truncate max-w-[220px]">
+                                                            {item}
+                                                        </span>
+                                                    </span>
+                                                ))}
+
+                                            {remainingIncludes.length > 0 && (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setOpenIncludesCard(
+                                                                openIncludesCard ===
+                                                                    cardKey
+                                                                    ? null
+                                                                    : cardKey
+                                                            )
+                                                        }
+                                                        className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                                                    >
+                                                        +{remainingIncludes.length} more included
+                                                        <FiChevronDown
+                                                            className={`h-3.5 w-3.5 transition-transform ${
+                                                                openIncludesCard ===
+                                                                cardKey
+                                                                    ? "rotate-180"
+                                                                    : ""
+                                                            }`}
+                                                        />
+                                                    </button>
+
+                                                    {openIncludesCard ===
+                                                        cardKey && (
+                                                        <div className="absolute left-0 top-full z-20 mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
+                                                            <div className="space-y-1.5">
+                                                                {remainingIncludes.map(
+                                                                    (
+                                                                        item,
+                                                                        moreIndex
+                                                                    ) => (
+                                                                        <div
+                                                                            key={`${cardKey}-more-${moreIndex}`}
+                                                                            className="flex items-start gap-2 text-xs text-slate-700"
+                                                                        >
+                                                                            <FiCheck className="mt-0.5 h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
+                                                                            <span>
+                                                                                {
+                                                                                    item
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
 
                                 {/* Expert Opinion (Generic or from notes if available) */}
                                 {Array.isArray(product.notes) &&
@@ -237,8 +725,8 @@ export default function QuoteResultsPage({ answers }) {
                                     )}
 
                                 {/* Pricing Section */}
-                                <div className="mt-6 rounded-2xl bg-gradient-to-r from-dark to-dark text-white p-5 relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
+                                <div className="mt-6 rounded-2xl bg-gradient-to-r from-emerald-50 via-white to-sky-50 text-slate-900 p-5 relative overflow-hidden border border-emerald-100">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/40 rounded-full -translate-y-16 translate-x-16" />
 
                                     {/* 'What's Included' Button */}
                                     <div className="absolute top-2 right-2 group z-30">
@@ -250,9 +738,9 @@ export default function QuoteResultsPage({ answers }) {
                                                 })
                                             }
                                             aria-label="What's included in my installation"
-                                            className="h-8 w-8 rounded-full bg-white/10 cursor-pointer hover:bg-white/20 border border-white/20 flex items-center justify-center transition"
+                                            className="h-8 w-8 rounded-full bg-white cursor-pointer hover:bg-emerald-50 border border-emerald-200 flex items-center justify-center transition"
                                         >
-                                            <AiOutlineQuestion className="h-3 w-3 text-white transition-transform group-hover:scale-110" />
+                                            <AiOutlineQuestion className="h-3 w-3 text-emerald-700 transition-transform group-hover:scale-110" />
                                         </button>
                                         <div className="pointer-events-none absolute right-0 mt-2 w-max max-w-[220px] rounded-lg bg-white px-3 py-1.5 text-xs text-dark opacity-0 translate-y-1 shadow-lg transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0">
                                             What's included in my installation?
@@ -260,35 +748,25 @@ export default function QuoteResultsPage({ answers }) {
                                     </div>
 
                                     <div className="relative z-10">
-                                        <div className="text-sm opacity-80 flex items-center gap-2">
+                                        <div className="text-sm text-slate-600 flex items-center gap-2">
                                             Total Price
                                         </div>
 
                                         <div className="flex justify-between items-end mt-3">
                                             {/* Full Price */}
-                                            <div>
+                                            <div className="flex items-end gap-2">
                                                 <div className="text-3xl font-bold tracking-tight">
                                                     £
                                                     {finalPrice.toLocaleString()}
                                                 </div>
+                                                <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+                                                    (inc VAT)
+                                                </div>
                                             </div>
 
-                                            {monthlyFrom && (
-                                                <div className="text-right">
-                                                    <div className="text-xs uppercase tracking-wider text-white/70">
-                                                        Finance
-                                                    </div>
-                                                    <div className="text-lg font-semibold">
-                                                        from £{monthlyFrom}/mo
-                                                    </div>
-                                                    <div className="text-[11px] text-white/60">
-                                                        @ 9.9% APR
-                                                    </div>
-                                                </div>
-                                            )}
                                         </div>
-                                        <div className="mt-2 text-xs text-white/70">
-                                            Includes installation, materials & certification
+                                        <div className="mt-2 text-xs text-slate-600">
+                                            Includes labour, materials, commissioning & certification
                                         </div>
                                     </div>
                                 </div>
@@ -322,13 +800,18 @@ export default function QuoteResultsPage({ answers }) {
                                                 // extras
                                                 notes: product.notes,
                                                 includes: product.includes,
+                                                selectedExtras,
+                                                addOnsTotal: Number(
+                                                    product?.pricing
+                                                        ?.addOnsTotal || 0
+                                                ),
                                             })
                                         }
 
                                         }
-                                        className="w-full rounded-xl border-2 cursor-pointer border-primary/25 hover:border-primary hover:bg-primary/5 py-3.5 text-primary font-semibold transition-all duration-200 flex items-center justify-center gap-2 group"
+                                        className="w-full rounded-xl border-2 cursor-pointer border-primary/25 hover:border-primary hover:bg-primary/5 active:scale-[0.99] py-3.5 text-primary font-semibold transition-all duration-200 flex items-center justify-center gap-2 group"
                                     >
-                                        View Full Breakdown
+                                        See Full Specification
                                         <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
                                     </button>
 
@@ -353,20 +836,27 @@ export default function QuoteResultsPage({ answers }) {
                                                 })
                                             )
                                         }
-                                        className="w-full rounded-xl cursor-pointer bg-gradient-to-r from-primary/90 to-secondary/80 hover:from-primary hover:to-secondary text-white py-3.5 font-semibold shadow-lg hover:shadow-dark/20 hover:shadow-lg transition-colors duration-300"
+                                        className="w-full rounded-2xl cursor-pointer bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.99] text-white py-3.5 font-semibold shadow-lg hover:shadow-[0_20px_50px_rgba(16,185,129,0.35)] transition-all duration-300 group"
                                     >
-                                        Select This Boiler
+                                        <span className="inline-flex items-center gap-2">
+                                            Continue With This Package
+                                            <FiChevronRight className="transition-transform group-hover:translate-x-1" />
+                                        </span>
+                                        <span className="block text-[11px] font-medium text-white/85 mt-0.5">
+                                            Secure checkout • takes ~2 minutes
+                                        </span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     );
                 })}
+                </div>
             </div>
 
             {products.length > 3 && (
                 <div
-                    className="max-w-7xl mx-auto mt-12 flex justify-center transition-all duration-300 ease-out
+                    className="max-w-7xl mx-auto mt-12 hidden justify-center transition-all duration-300 ease-out lg:flex
 "
                 >
                     {visibleCount < products.length ? (
@@ -376,16 +866,16 @@ export default function QuoteResultsPage({ answers }) {
                                     Math.min(prev + 3, products.length)
                                 )
                             }
-                            className="px-8 py-3 rounded-xl bg-dark cursor-pointer text-white font-semibold hover:bg-dark transition-all shadow-lg"
+                            className="px-8 py-3 rounded-xl border border-primary/20 bg-white cursor-pointer text-primary font-semibold hover:bg-primary/5 transition-all shadow"
                         >
-                            View more options
+                            Show more packages
                         </button>
                     ) : (
                         <button
                             onClick={() => setVisibleCount(3)}
                             className="px-8 py-3 rounded-xl bg-slate-200 cursor-pointer text-dark font-semibold hover:bg-slate-300 transition-all shadow"
                         >
-                            View less
+                            Show fewer packages
                         </button>
                     )}
                 </div>
@@ -396,21 +886,42 @@ export default function QuoteResultsPage({ answers }) {
                 <>
                     <div
                         onClick={() => setActiveQuote(null)}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-fadeIn"
+                        className="fixed inset-0 bg-primary/10 backdrop-blur-sm z-40 animate-fadeIn"
                     />
 
-                    <aside className="fixed right-0 top-0 h-full w-full sm:w-[480px] bg-white z-50 shadow-2xl animate-slideFromRight">
+                    <aside className="fixed right-0 top-0 h-full w-full sm:w-[520px] bg-white z-50 shadow-2xl animate-slideFromRight">
                         <div className="h-full flex flex-col">
                             {/* Sidebar Header */}
                             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 to-white">
                                 <div>
                                     <h2 className="text-xl font-bold text-dark">
-                                        What's Included
+                                        Full package breakdown
                                     </h2>
                                     <p className="text-sm text-slate-500 mt-1">
-                                        Full breakdown of {activeQuote.brand}{" "}
-                                        {activeQuote.model} package
+                                        Everything included in your {activeQuote.brand}{" "}
+                                        {activeQuote.model} installation
                                     </p>
+                                    {getBrandLogo(activeQuote.brand) && (
+                                        <div className="mt-3 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2">
+                                            <img
+                                                src={getBrandLogo(activeQuote.brand)}
+                                                alt={`${activeQuote.brand} logo`}
+                                                className="h-5 w-auto object-contain"
+                                                loading="lazy"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = "none";
+                                                    const fallback = e.currentTarget.nextElementSibling;
+                                                    if (fallback) fallback.style.display = "inline";
+                                                }}
+                                            />
+                                            <span
+                                                className="hidden text-xs font-semibold text-slate-600"
+                                                style={{ display: "none" }}
+                                            >
+                                                {activeQuote.brand}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                                 <button
                                     onClick={() => setActiveQuote(null)}
@@ -422,6 +933,26 @@ export default function QuoteResultsPage({ answers }) {
 
                             {/* Sidebar List Content */}
                             <div className="flex-1 overflow-y-auto p-6 ">
+                                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 mb-5">
+                                    <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                                        Why this package inspires confidence
+                                    </div>
+                                    <div className="mt-2 space-y-1.5 text-sm text-slate-700">
+                                        <div className="flex items-center gap-2">
+                                            <FiShield className="text-emerald-600" />
+                                            Gas Safe compliant installation
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <FiAward className="text-sky-600" />
+                                            Manufacturer-backed warranty included
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <FiFileText className="text-slate-600" />
+                                            Full scope in writing before checkout
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="space-y-4">
                                     {/* Map over the 'includes' array from the API */}
                                     {activeQuote.includes?.map(
@@ -430,12 +961,23 @@ export default function QuoteResultsPage({ answers }) {
                                                 key={i}
                                                 className="flex gap-4 items-start p-4 rounded-2xl border border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-all group"
                                             >
-                                                <div className="h-12 w-12 rounded-xl bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 group-hover:bg-primary/30 transition-colors">
+                                                <div className="h-12 w-12 rounded-xl bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 group-hover:bg-primary/30 transition-colors font-bold">
                                                     <FiCheck size={20} />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-dark pt-3">
-                                                        {itemString}
+                                                    <h3 className="font-semibold text-dark pt-3 leading-snug flex items-center gap-1.5">
+                                                        <span>{itemString}</span>
+                                                        {isCompatibilityDependentItem(
+                                                            itemString
+                                                        ) && (
+                                                            <span
+                                                                title={compatibilityTooltipText}
+                                                                aria-label={compatibilityTooltipText}
+                                                                className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500"
+                                                            >
+                                                                <FiInfo className="h-3 w-3" />
+                                                            </span>
+                                                        )}
                                                     </h3>
                                                 </div>
                                             </div>
@@ -444,22 +986,22 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
 
                                 {/* Price Summary in Sidebar */}
-                                <div className="mt-8 p-6 rounded-2xl bg-gradient-to-r from-dark/80 to-dark text-white">
+                                <div className="mt-8 p-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-emerald-50 via-white to-sky-50 text-slate-900">
                                     <h3 className="font-bold text-lg mb-4">
-                                        Total Value Breakdown
+                                        Price summary
                                     </h3>
                                     <div className="space-y-3">
-                                        <div className="flex justify-between items-center py-2 border-b border-white/10">
-                                            <span className="text-sm opacity-80">
-                                                Boiler & Installation
+                                        <div className="flex justify-between items-center py-2 border-b border-slate-200">
+                                            <span className="text-sm text-slate-600">
+                                                Boiler + installation
                                             </span>
                                             <span className="font-semibold">
                                                 £
                                                 {activeQuote.price?.toLocaleString()}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-white/10">
-                                            <span className="text-sm opacity-80">
+                                        <div className="flex justify-between items-center py-2 border-b border-slate-200">
+                                            <span className="text-sm text-slate-600">
                                                 Warranty (
                                                 {activeQuote.warrantyYears}{" "}
                                                 Years)
@@ -470,7 +1012,7 @@ export default function QuoteResultsPage({ answers }) {
                                         </div>
                                         <div className="flex justify-between items-center pt-2">
                                             <span className="font-bold">
-                                                Total Package Value
+                                                Total (inc VAT)
                                             </span>
                                             <span className="text-2xl font-bold">
                                                 £

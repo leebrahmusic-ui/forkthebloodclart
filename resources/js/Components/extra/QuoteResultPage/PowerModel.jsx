@@ -18,7 +18,6 @@ export default function PowerModel({
     setSelectedPower,
     onClose,
 }) {
-    const { brand, name, price, monthly } = powerModal;
     return (
         <>
             {/* Simple overlay - allows scrolling */}
@@ -318,17 +317,6 @@ export default function PowerModel({
                                                 : (
                                                       powerModal.price + 100
                                                   ).toLocaleString()}
-                                        </div>
-                                        <div className="text-slate-500">
-                                            or £
-                                            {selectedPower === "25"
-                                                ? powerModal.monthly
-                                                : (
-                                                      parseFloat(
-                                                          powerModal.monthly
-                                                      ) + 5.56
-                                                  ).toFixed(2)}
-                                            /month
                                         </div>
                                     </div>
                                 </div>

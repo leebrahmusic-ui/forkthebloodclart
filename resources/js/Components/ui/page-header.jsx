@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import { Flame, MessageSquare, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 const STEPS = ["Choose", "Customise", "Book", "Complete"];
@@ -62,46 +62,16 @@ export function PageHeader({ variant = "default", currentStep = 4 }) {
                         </div>
                     )}
 
-                    {/* Slim contact bar (relative so status-blink can be positioned) */}
+                    {/* WhatsApp button */}
                     <a
                         href={waHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="slim-bar relative inline-flex items-center rounded-md px-3 pr-8 py-1.5 gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(0,103,255,0.16)]"
+                        className="inline-flex items-center gap-2 rounded-full bg-dark text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                         aria-label={`Chat on WhatsApp ${waNumber}`}
                     >
-                        {/* icon tile */}
-                        <span
-                            className="icon-square inline-flex items-center justify-center h-8 w-8 rounded-sm"
-                            style={{
-                                background: "rgba(0,103,255,0.06)",
-                                border: "1px solid rgba(0,103,255,0.06)",
-                            }}
-                        >
-                            <FaWhatsapp className="h-4 w-4 text-primary" />
-                        </span>
-
-                        {/* divider */}
-                        <span className="divider hidden sm:block" aria-hidden />
-
-                        {/* label (hidden on very small screens) */}
-                        <span className="hidden sm:block text-xs font-medium text-dark">
-                            Chat now
-                        </span>
-
-                        <span
-                            className="chev hidden sm:inline-flex items-center justify-center h-6 w-6 rounded-sm"
-                            aria-hidden
-                        >
-                            <ChevronRight className="h-4 w-4 text-primary" />
-                        </span>
-
-                        {/* --- ONLINE STATUS: on the RIGHT side of the chat card --- */}
-                        <span
-                            className="status-blink"
-                            aria-hidden="true"
-                            title="Online"
-                        />
+                        <FaWhatsapp className="h-4 w-4" />
+                        <span>WhatsApp 24/7</span>
                     </a>
                 </div>
             </div>
