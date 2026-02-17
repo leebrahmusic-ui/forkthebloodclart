@@ -24,6 +24,8 @@ class QuoteCheckoutService
         // dd($payload);
 
         $serviceType = QuotePayloadNormalizer::serviceKey($payload['service']);
+        $embedded = (bool) ($payload['embedded'] ?? false);
+        $paymentElement = (bool) ($payload['payment_element'] ?? false);
         $form = $payload['form'];
         $amount = $payload['amount'];
         // dd($amount);
@@ -45,7 +47,7 @@ class QuoteCheckoutService
         $startsAtLocal = QuotePayloadNormalizer::parseStartsAt($apptData['date'], $apptData['time'], $tz);
         $appointmentDate = $startsAtLocal->toDateString();
 
-        return DB::transaction(function () use ($serviceType, $customerData, $answers, $startsAtLocal, $appointmentDate, $tz, $amount, $product, $addonsPayload) {
+        return DB::transaction(function () use ($serviceType, $embedded, $paymentElement, $customerData, $answers, $startsAtLocal, $appointmentDate, $tz, $amount, $product, $addonsPayload) {
 
             // 1) Customer by email
             $customer = Customer::query()->updateOrCreate(
@@ -206,12 +208,24 @@ class QuoteCheckoutService
                 'status' => 'initiated',
             ]);
 
-            $checkoutUrl = $this->createStripeCheckout($booking, $tx);
+            if ($paymentElement && $serviceType === 'boiler_service') {
+                $checkout = $this->createStripePaymentElementIntent($booking, $tx);
+            } else {
+                $checkout = $this->createStripeCheckout(
+                    $booking,
+                    $tx,
+                    $embedded && $serviceType === 'boiler_service'
+                );
+            }
 
             return [
                 'booking_id' => $booking->id,
                 'transaction_id' => $tx->id,
-                'checkout_url' => $checkoutUrl,
+                'checkout_url' => $checkout['checkout_url'] ?? null,
+                'checkout_client_secret' => $checkout['checkout_client_secret'] ?? null,
+                'checkout_mode' => $checkout['checkout_mode'] ?? 'redirect',
+                'payment_intent_id' => $checkout['payment_intent_id'] ?? null,
+                'return_url' => $checkout['return_url'] ?? null,
             ];
         });
     }
@@ -245,7 +259,7 @@ class QuoteCheckoutService
         return (float) ($sum > 0 ? $sum : 0);
     }
 
-    private function createStripeCheckout(Booking $booking, Transaction $tx): string
+    private function createStripeCheckout(Booking $booking, Transaction $tx, bool $embedded = false): array
     {
         $stripe = new StripeClient(config('services.stripe.secret'));
 
@@ -274,11 +288,8 @@ class QuoteCheckoutService
         //         ],
         //     ]],
         // ]);
-        $session = $stripe->checkout->sessions->create([
+        $sessionPayload = [
             'mode' => 'payment',
-            'success_url' => $success . '&session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => $cancel,
-            // 'automatic_payment_methods' => ['enabled' => true],
             'client_reference_id' => (string) $booking->id,
             'customer_email' => $booking->customer->email,
             'metadata' => [
@@ -295,7 +306,17 @@ class QuoteCheckoutService
                     ],
                 ],
             ]],
-        ]);
+        ];
+
+        if ($embedded) {
+            $sessionPayload['ui_mode'] = 'embedded';
+            $sessionPayload['return_url'] = $success . '&session_id={CHECKOUT_SESSION_ID}';
+        } else {
+            $sessionPayload['success_url'] = $success . '&session_id={CHECKOUT_SESSION_ID}';
+            $sessionPayload['cancel_url'] = $cancel;
+        }
+
+        $session = $stripe->checkout->sessions->create($sessionPayload);
 
         // store provider ids in transactions (NOT bookings)
         $tx->update([
@@ -304,7 +325,46 @@ class QuoteCheckoutService
             'provider_payload' => ['checkout_session' => $session->toArray()],
         ]);
 
-        return $session->url;
+        return [
+            'checkout_mode' => $embedded ? 'embedded' : 'redirect',
+            'checkout_url' => $session->url ?? null,
+            'checkout_client_secret' => $session->client_secret ?? null,
+        ];
+    }
+
+    private function createStripePaymentElementIntent(Booking $booking, Transaction $tx): array
+    {
+        $stripe = new StripeClient(config('services.stripe.secret'));
+
+        $intent = $stripe->paymentIntents->create([
+            'amount' => (int) round(((float) $booking->total) * 100),
+            'currency' => strtolower($booking->currency),
+            'automatic_payment_methods' => ['enabled' => true],
+            'receipt_email' => $booking->customer->email,
+            'metadata' => [
+                'booking_id' => (string) $booking->id,
+                'transaction_id' => (string) $tx->id,
+            ],
+            'description' => 'MD Gas Booking',
+        ]);
+
+        $tx->update([
+            'provider_payment_intent_id' => $intent->id,
+            'status' => 'processing',
+            'provider_payload' => [
+                'payment_intent' => $intent->toArray(),
+            ],
+        ]);
+
+        return [
+            'checkout_mode' => 'payment_element',
+            'checkout_client_secret' => $intent->client_secret,
+            'payment_intent_id' => $intent->id,
+            'return_url' => route('checkout.success.intent', [
+                'booking' => $booking->id,
+                'tx' => $tx->id,
+            ]),
+        ];
     }
 
 

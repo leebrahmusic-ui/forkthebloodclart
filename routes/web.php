@@ -43,7 +43,9 @@ Route::get('/appointments/availability', function (Request $request, Appointment
 });
 
 Route::post('/quote/checkout', [QuoteCheckoutController::class, 'store']);
+Route::post('/quote/checkout/confirm-intent', [QuoteCheckoutController::class, 'confirmIntent']);
 Route::get('/checkout/success', [QuoteCheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/success-intent', [QuoteCheckoutController::class, 'successIntent'])->name('checkout.success.intent');
 Route::get('/checkout/cancel', [QuoteCheckoutController::class, 'cancel'])->name('checkout.cancel');
 Route::get('/booking/{booking}/confirmed', [QuoteCheckoutController::class, 'confirmed'])
     ->name('booking.confirmed');

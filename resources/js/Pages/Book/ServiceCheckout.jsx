@@ -7,9 +7,10 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { FiCreditCard, FiLoader, FiCheck, FiShield, FiCalendar, FiMapPin } from "react-icons/fi";
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
+import { loadStripe } from "@stripe/stripe-js";
 
 export default function ServiceCheckout() {
-    const { answers, basePrice, symbol, title } = usePage().props;
+    const { answers, basePrice, symbol, title, stripePublishableKey } = usePage().props;
 
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState(null);
@@ -27,7 +28,18 @@ export default function ServiceCheckout() {
 
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [paymentClientSecret, setPaymentClientSecret] = useState(null);
+    const [paymentBookingId, setPaymentBookingId] = useState(null);
+    const [paymentTxId, setPaymentTxId] = useState(null);
+    const [paymentReturnUrl, setPaymentReturnUrl] = useState(null);
+    const [paymentError, setPaymentError] = useState("");
     const mounted = useRef(true);
+    const paymentElementContainerRef = useRef(null);
+    const paymentSectionRef = useRef(null);
+    const stripeRef = useRef(null);
+    const elementsRef = useRef(null);
+    const paymentElementRef = useRef(null);
+    const lastAutoInitKeyRef = useRef("");
 
     useEffect(() => {
         mounted.current = true;
@@ -58,6 +70,55 @@ export default function ServiceCheckout() {
         ],
         []
     );
+
+    const stripePromise = useMemo(() => {
+        if (!stripePublishableKey) return null;
+        return loadStripe(stripePublishableKey);
+    }, [stripePublishableKey]);
+
+    useEffect(() => {
+        if (!paymentClientSecret || !paymentElementContainerRef.current || !stripePromise)
+            return;
+
+        let disposed = false;
+
+        (async () => {
+            try {
+                const stripe = await stripePromise;
+                if (!stripe || disposed) return;
+
+                const elements = stripe.elements({
+                    clientSecret: paymentClientSecret,
+                    appearance: { theme: "stripe" },
+                });
+
+                const paymentElement = elements.create("payment", {
+                    layout: "tabs",
+                });
+
+                paymentElement.mount(paymentElementContainerRef.current);
+
+                stripeRef.current = stripe;
+                elementsRef.current = elements;
+                paymentElementRef.current = paymentElement;
+                setPaymentError("");
+            } catch (error) {
+                const msg =
+                    "Unable to load secure payment form. Please try again, or refresh this page.";
+                toast.error(msg);
+                setPaymentError(msg);
+                setPaymentClientSecret(null);
+            }
+        })();
+
+        return () => {
+            disposed = true;
+            paymentElementRef.current?.destroy?.();
+            paymentElementRef.current = null;
+            elementsRef.current = null;
+            stripeRef.current = null;
+        };
+    }, [paymentClientSecret, stripePromise]);
 
     const clearError = (key) => {
         setErrors((prev) => {
@@ -97,6 +158,31 @@ export default function ServiceCheckout() {
         return next;
     };
 
+    const checkoutReadyKey = useMemo(() => {
+        if (!selectedDate || !selectedTime) return "";
+        if (!formData.title?.trim()) return "";
+        if (!formData.firstName?.trim()) return "";
+        if (!formData.lastName?.trim()) return "";
+        if (!formData.email?.trim()) return "";
+        if (!formData.phone?.trim()) return "";
+        if (!formData.postcode?.trim()) return "";
+        if (!formData.address?.trim()) return "";
+
+        return [
+            selectedDate,
+            selectedTime,
+            formData.title,
+            formData.firstName,
+            formData.lastName,
+            formData.email,
+            formData.phone,
+            formData.postcode,
+            formData.address,
+        ]
+            .map((v) => String(v || "").trim())
+            .join("|");
+    }, [selectedDate, selectedTime, formData]);
+
     const scrollToRef = (ref) => {
         const el = ref?.current;
         if (!el) return;
@@ -132,18 +218,20 @@ export default function ServiceCheckout() {
         clearError("appointment");
     };
 
-    const handlePayAndBook = async () => {
-        if (processing) return;
-
+    const initialisePaymentElement = async ({ showValidationToast = false } = {}) => {
         const nextErrors = validateAll();
         if (Object.keys(nextErrors).length) {
-            setErrors(nextErrors);
-            const first = fieldOrder.find((f) => nextErrors[f.key]);
-            if (first) scrollToRef(first.ref);
-            return;
+            if (showValidationToast) {
+                setErrors(nextErrors);
+                setPaymentError("Please complete the highlighted fields first.");
+                const first = fieldOrder.find((f) => nextErrors[f.key]);
+                if (first) scrollToRef(first.ref);
+                toast.error("Please complete the required details first.");
+            }
+            return false;
         }
 
-        setProcessing(true);
+        setPaymentError("");
 
         const customerName = `${formData.title} ${formData.firstName} ${formData.lastName}`.trim();
 
@@ -171,20 +259,135 @@ export default function ServiceCheckout() {
         };
 
         try {
+            setProcessing(true);
             const res = await axios.post(
                 "/quote/checkout",
                 {
                     service: SERVICES_KEY_VALUE.BOILER_SERVICE,
                     form: payload,
                     amount: basePrice,
+                    payment_element: true,
                 },
                 { timeout: 15000 }
             );
 
-            const checkoutUrl = res?.data?.data?.checkout_url;
-            if (!checkoutUrl) throw new Error("Checkout URL missing from response.");
+            const checkoutClientSecret =
+                res?.data?.data?.checkout_client_secret;
+            const checkoutMode = res?.data?.data?.checkout_mode;
 
-            window.location.assign(checkoutUrl);
+            if (
+                checkoutMode === "payment_element" &&
+                checkoutClientSecret &&
+                stripePublishableKey
+            ) {
+                setPaymentClientSecret(checkoutClientSecret);
+                setPaymentBookingId(res?.data?.data?.booking_id || null);
+                setPaymentTxId(res?.data?.data?.transaction_id || null);
+                setPaymentReturnUrl(res?.data?.data?.return_url || null);
+                setProcessing(false);
+                return true;
+            }
+
+            throw new Error("Unable to initialise secure payment form.");
+        } catch (err) {
+            const status = err?.response?.status;
+
+            if (status === 422) {
+                if (showValidationToast) showValidationErrors(err?.response?.data?.errors);
+            } else if (status >= 500) {
+                toast.error("Payment service is temporarily unavailable. Please try again shortly.", {
+                    duration: 5000,
+                    position: "top-center",
+                });
+            } else if (err?.code === "ECONNABORTED") {
+                toast.error("Request timed out. Please check your connection and try again.", {
+                    duration: 5000,
+                    position: "top-center",
+                });
+            } else if (showValidationToast) {
+                const message =
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    "Unable to initiate payment. Please try again.";
+                toast.error(message, { duration: 5000, position: "top-center" });
+            }
+
+            if (mounted.current) setProcessing(false);
+            return false;
+        }
+    };
+
+    useEffect(() => {
+        if (!checkoutReadyKey || paymentClientSecret || processing) return;
+        if (lastAutoInitKeyRef.current === checkoutReadyKey) return;
+
+        lastAutoInitKeyRef.current = checkoutReadyKey;
+
+        const timer = setTimeout(() => {
+            initialisePaymentElement({ showValidationToast: false });
+        }, 250);
+
+        return () => clearTimeout(timer);
+    }, [checkoutReadyKey, paymentClientSecret, processing]);
+
+    const handlePayAndBook = async () => {
+        if (processing) return;
+
+        if (!paymentClientSecret) {
+            await initialisePaymentElement({ showValidationToast: true });
+            return;
+        }
+
+        setPaymentError("");
+
+        try {
+            setProcessing(true);
+
+            if (!stripeRef.current || !elementsRef.current) {
+                throw new Error("Payment form is still loading. Please try again.");
+            }
+
+            const { error, paymentIntent } = await stripeRef.current.confirmPayment(
+                {
+                    elements: elementsRef.current,
+                    confirmParams: {
+                        return_url:
+                            paymentReturnUrl ||
+                            `${window.location.origin}/checkout/success-intent?booking=${paymentBookingId}&tx=${paymentTxId}`,
+                    },
+                    redirect: "if_required",
+                }
+            );
+
+            if (error) {
+                setPaymentError(
+                    error.message ||
+                        "Payment could not be confirmed. Please check your details and try again."
+                );
+                toast.error(error.message || "Payment failed.");
+                setProcessing(false);
+                return;
+            }
+
+            if (paymentIntent?.status === "succeeded") {
+                const confirmRes = await axios.post(
+                    "/quote/checkout/confirm-intent",
+                    {
+                        booking_id: paymentBookingId,
+                        tx_id: paymentTxId,
+                        payment_intent_id: paymentIntent.id,
+                    },
+                    { timeout: 15000 }
+                );
+
+                const redirectUrl = confirmRes?.data?.data?.redirect_url;
+                if (redirectUrl) {
+                    window.location.assign(redirectUrl);
+                    return;
+                }
+            }
+
+            setProcessing(false);
         } catch (err) {
             const status = err?.response?.status;
 
@@ -446,13 +649,30 @@ export default function ServiceCheckout() {
                                     ) : (
                                         <>
                                             <FiCreditCard />
-                                            Pay & Book Service
+                                            {paymentClientSecret
+                                                ? "Confirm & Book Service"
+                                                : "Continue to secure payment"}
                                         </>
                                     )}
                                 </button>
+
+                                {paymentClientSecret && (
+                                    <div
+                                        ref={paymentSectionRef}
+                                        className="mt-4 rounded-2xl bg-white p-3"
+                                    >
+                                        <div ref={paymentElementContainerRef} />
+                                    </div>
+                                )}
+
                                 <p className="text-xs text-emerald-50/90 text-center mt-3">
                                     Your details are encrypted and processed by Stripe.
                                 </p>
+                                {paymentError && (
+                                    <p className="text-xs text-amber-100 text-center mt-2 font-semibold">
+                                        {paymentError}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>

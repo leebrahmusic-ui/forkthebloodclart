@@ -13,7 +13,9 @@ class QuoteCheckoutRequest extends FormRequest
         return [
             'service' => ['required'], // accept key/value or string
             'form' => ['required', 'array'],
-            'amount' => ['required']
+            'amount' => ['required'],
+            'embedded' => ['nullable', 'boolean'],
+            'payment_element' => ['nullable', 'boolean'],
         ];
     }
 }

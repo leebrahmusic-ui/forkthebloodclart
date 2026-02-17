@@ -174,6 +174,7 @@ class BookController extends Controller
             'basePrice' => $basePrice,
             'symbol' => $symbol,
             'title' => 'Boiler Service Checkout',
+            'stripePublishableKey' => config('services.stripe.api'),
         ]);
     }
 

@@ -123,6 +123,102 @@ class QuoteCheckoutController extends Controller
         return redirect()->route('booking.cancelled', ['booking' => $booking->id]);
     }
 
+    public function confirmIntent(Request $request)
+    {
+        $data = $request->validate([
+            'booking_id' => ['required', 'integer'],
+            'tx_id' => ['required', 'integer'],
+            'payment_intent_id' => ['required', 'string'],
+        ]);
+
+        $isPaid = $this->finalizePaymentIntent(
+            (int) $data['booking_id'],
+            (int) $data['tx_id'],
+            (string) $data['payment_intent_id']
+        );
+
+        return response()->json([
+            'data' => [
+                'redirect_url' => $isPaid
+                    ? route('booking.confirmed', ['booking' => (int) $data['booking_id']])
+                    : route('booking.failed', ['booking' => (int) $data['booking_id']]),
+            ],
+        ]);
+    }
+
+    public function successIntent(Request $request)
+    {
+        $bookingId = (int) $request->query('booking');
+        $txId = (int) $request->query('tx');
+        $paymentIntentId = (string) $request->query('payment_intent', '');
+
+        if (!$bookingId || !$txId || !$paymentIntentId) {
+            throw ValidationException::withMessages([
+                'payment' => ['Missing booking/transaction/payment details.'],
+            ]);
+        }
+
+        $isPaid = $this->finalizePaymentIntent($bookingId, $txId, $paymentIntentId);
+
+        return $isPaid
+            ? redirect()->route('booking.confirmed', ['booking' => $bookingId])
+            : redirect()->route('booking.failed', ['booking' => $bookingId]);
+    }
+
+    private function finalizePaymentIntent(int $bookingId, int $txId, string $paymentIntentId): bool
+    {
+        $booking = Booking::findOrFail($bookingId);
+        $tx = Transaction::where('id', $txId)
+            ->where('booking_id', $bookingId)
+            ->firstOrFail();
+
+        if ($tx->status === 'succeeded' && $booking->payment_status === 'paid') {
+            return true;
+        }
+
+        $stripe = new StripeClient(config('services.stripe.secret'));
+        $intent = $stripe->paymentIntents->retrieve($paymentIntentId);
+
+        $metaBookingId = (int) ($intent->metadata['booking_id'] ?? 0);
+        if ($metaBookingId !== $booking->id) {
+            return false;
+        }
+
+        if ($intent->status !== 'succeeded') {
+            return false;
+        }
+
+        $tx->update([
+            'status' => 'succeeded',
+            'succeeded_at' => now(),
+            'provider_payment_intent_id' => $intent->id,
+            'provider_payload' => array_merge($tx->provider_payload ?? [], [
+                'success_payment_intent' => $intent->toArray(),
+            ]),
+        ]);
+
+        $booking->update([
+            'payment_status' => 'paid',
+            'paid_at' => now(),
+            'status' => 'confirmed',
+        ]);
+
+        if (method_exists($booking, 'appointment') && $booking->appointment) {
+            $booking->appointment()->update(['status' => 'confirmed']);
+        }
+
+        try {
+            app(BookingNotificationService::class)->sendConfirmed($booking);
+        } catch (\Throwable $e) {
+            \Log::error('Booking email send failed (payment intent)', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return true;
+    }
+
 
 
     public function confirmed(Booking $booking)
