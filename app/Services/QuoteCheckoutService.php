@@ -27,7 +27,11 @@ class QuoteCheckoutService
         $embedded = (bool) ($payload['embedded'] ?? false);
         $paymentElement = (bool) ($payload['payment_element'] ?? false);
         $form = $payload['form'];
-        $amount = $payload['amount'];
+        $amount = $this->normalizeAmount(
+            $payload['amount']
+                ?? ($payload['form']['product']['amount'] ?? null)
+                ?? ($payload['form']['product']['price'] ?? 0)
+        );
         // dd($amount);
 
         $customerData = QuotePayloadNormalizer::customer($form);
@@ -42,6 +46,12 @@ class QuoteCheckoutService
         }
         if (empty($apptData['date']) || empty($apptData['time'])) {
             throw ValidationException::withMessages(['visit_time' => ['Visit date and time are required.']]);
+        }
+
+        if ($amount <= 0) {
+            throw ValidationException::withMessages([
+                'amount' => ['Invalid quote amount. Please refresh and try again.'],
+            ]);
         }
 
         $startsAtLocal = QuotePayloadNormalizer::parseStartsAt($apptData['date'], $apptData['time'], $tz);
@@ -208,7 +218,7 @@ class QuoteCheckoutService
                 'status' => 'initiated',
             ]);
 
-            if ($paymentElement && $serviceType === 'boiler_service') {
+            if ($paymentElement && in_array($serviceType, ['boiler_service', 'new_boiler_quote'], true)) {
                 $checkout = $this->createStripePaymentElementIntent($booking, $tx);
             } else {
                 $checkout = $this->createStripeCheckout(
@@ -398,4 +408,24 @@ class QuoteCheckoutService
         return Carbon::parse("{$date} {$time}", $tz);
     }
 
+    private function normalizeAmount(mixed $amount): float
+    {
+        if (is_numeric($amount)) {
+            return (float) $amount;
+        }
+
+        if (is_string($amount)) {
+            $clean = preg_replace('/[^\d,.-]/', '', $amount) ?? '';
+
+            if (str_contains($clean, ',') && str_contains($clean, '.')) {
+                $clean = str_replace(',', '', $clean);
+            } elseif (str_contains($clean, ',')) {
+                $clean = str_replace(',', '.', $clean);
+            }
+
+            return is_numeric($clean) ? (float) $clean : 0.0;
+        }
+
+        return 0.0;
+    }
 }

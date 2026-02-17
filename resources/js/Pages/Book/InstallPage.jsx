@@ -5,6 +5,7 @@ import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { loadStripe } from "@stripe/stripe-js";
 import {
     FiCreditCard,
     FiInfo,
@@ -13,7 +14,7 @@ import {
 } from "react-icons/fi";
 
 export default function InstallPage({ booking }) {
-    const { symbol, title } = usePage().props;
+    const { symbol, title, stripePublishableKey } = usePage().props;
     console.log("Postcode ", booking);
 
     const [selectedDate, setSelectedDate] = useState("");
@@ -42,7 +43,18 @@ export default function InstallPage({ booking }) {
 
     // processing like InstantQuoteModal
     const [processing, setProcessing] = useState(false);
+    const [paymentClientSecret, setPaymentClientSecret] = useState(null);
+    const [paymentBookingId, setPaymentBookingId] = useState(null);
+    const [paymentTxId, setPaymentTxId] = useState(null);
+    const [paymentReturnUrl, setPaymentReturnUrl] = useState(null);
+    const [paymentError, setPaymentError] = useState("");
     const mounted = useRef(true);
+    const paymentElementContainerRef = useRef(null);
+    const paymentSectionRef = useRef(null);
+    const stripeRef = useRef(null);
+    const elementsRef = useRef(null);
+    const paymentElementRef = useRef(null);
+    const lastAutoInitKeyRef = useRef("");
 
     // scroll to customer details
     const autoScrolledRef = useRef(false);
@@ -91,6 +103,37 @@ export default function InstallPage({ booking }) {
 
     const includes = Array.isArray(booking?.includes) ? booking.includes : [];
     const visibleIncludes = showAllIncludes ? includes : includes.slice(0, 3);
+
+    const quoteAmount = useMemo(() => {
+        const raw =
+            booking?.price ??
+            booking?.amount ??
+            booking?.product?.amount ??
+            0;
+
+        if (typeof raw === "number") return raw;
+        if (typeof raw !== "string") return 0;
+
+        const cleaned = raw.replace(/[^\d.,-]/g, "");
+        if (!cleaned) return 0;
+
+        const hasComma = cleaned.includes(",");
+        const hasDot = cleaned.includes(".");
+
+        if (hasComma && hasDot) {
+            return Number(cleaned.replace(/,/g, "")) || 0;
+        }
+
+        if (hasComma && !hasDot) {
+            const parts = cleaned.split(",");
+            if (parts.length === 2 && parts[1].length <= 2) {
+                return Number(`${parts[0]}.${parts[1]}`) || 0;
+            }
+            return Number(cleaned.replace(/,/g, "")) || 0;
+        }
+
+        return Number(cleaned) || 0;
+    }, [booking]);
 
     const visibleAddOns = booking?.answers?.addOns;
     console.log("Add Ons", visibleAddOns);
@@ -189,11 +232,83 @@ export default function InstallPage({ booking }) {
         []
     );
 
+    const stripePromise = useMemo(() => {
+        if (!stripePublishableKey) return null;
+        return loadStripe(stripePublishableKey);
+    }, [stripePublishableKey]);
+
+    useEffect(() => {
+        if (!paymentClientSecret || !paymentElementContainerRef.current || !stripePromise)
+            return;
+
+        let disposed = false;
+
+        (async () => {
+            try {
+                const stripe = await stripePromise;
+                if (!stripe || disposed) return;
+
+                const elements = stripe.elements({
+                    clientSecret: paymentClientSecret,
+                    appearance: { theme: "stripe" },
+                });
+
+                const paymentElement = elements.create("payment", {
+                    layout: "tabs",
+                });
+
+                paymentElement.mount(paymentElementContainerRef.current);
+
+                stripeRef.current = stripe;
+                elementsRef.current = elements;
+                paymentElementRef.current = paymentElement;
+                setPaymentError("");
+            } catch (error) {
+                const msg =
+                    "Unable to load secure payment form. Please try again, or refresh this page.";
+                toast.error(msg);
+                setPaymentError(msg);
+                setPaymentClientSecret(null);
+            }
+        })();
+
+        return () => {
+            disposed = true;
+            paymentElementRef.current?.destroy?.();
+            paymentElementRef.current = null;
+            elementsRef.current = null;
+            stripeRef.current = null;
+        };
+    }, [paymentClientSecret, stripePromise]);
+
     const isFormValid = useMemo(() => {
         const e = validateAll();
         return Object.keys(e).length === 0;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData, selectedDate, selectedTime]);
+
+    const checkoutReadyKey = useMemo(() => {
+        if (!selectedDate || !selectedTime) return "";
+        if (!formData.title?.trim()) return "";
+        if (!formData.firstName?.trim()) return "";
+        if (!formData.lastName?.trim()) return "";
+        if (!formData.email?.trim()) return "";
+        if (!formData.phone?.trim()) return "";
+        if (!formData.address?.trim()) return "";
+
+        return [
+            selectedDate,
+            selectedTime,
+            formData.title,
+            formData.firstName,
+            formData.lastName,
+            formData.email,
+            formData.phone,
+            formData.address,
+        ]
+            .map((v) => String(v || "").trim())
+            .join("|");
+    }, [selectedDate, selectedTime, formData]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -268,36 +383,22 @@ export default function InstallPage({ booking }) {
         }
     };
 
-    // ✅ This replaces router.post("/book/installation/confirm"...)
-    // It applies InstantQuoteModal "Pay now" behavior: POST -> get checkout_url -> redirect
-    const handlePayAndBook = async () => {
-        if (processing) return;
-
+    const initialisePaymentElement = async ({ showValidationToast = false } = {}) => {
         const nextErrors = validateAll();
-        setErrors(nextErrors);
-
         if (Object.keys(nextErrors).length > 0) {
-            const firstInvalid = fieldOrder.find((f) => nextErrors[f.key]);
-            if (firstInvalid) scrollToRef(firstInvalid.ref);
-            toast.error("Please complete the required fields.", {
-                duration: 4000,
-                position: "top-center",
-            });
-            return;
+            if (showValidationToast) {
+                setErrors(nextErrors);
+                const firstInvalid = fieldOrder.find((f) => nextErrors[f.key]);
+                if (firstInvalid) scrollToRef(firstInvalid.ref);
+                toast.error("Please complete the required fields.", {
+                    duration: 4000,
+                    position: "top-center",
+                });
+            }
+            return false;
         }
 
-        if (!acceptedTerms) {
-            setTermsError(
-                "Please confirm you agree to the Terms & Conditions before continuing."
-            );
-            toast.error("Please agree to the Terms & Conditions to continue.", {
-                duration: 4000,
-                position: "top-center",
-            });
-            scrollToRef(termsRef);
-            return;
-        }
-
+        setPaymentError("");
         setProcessing(true);
 
         const productDetails = {
@@ -306,10 +407,17 @@ export default function InstallPage({ booking }) {
             model: booking.model,
             kw: booking.kw,
             warrantyYears: booking.warrantyYears,
-            amount: booking.price, // keep naming consistent with backend if it expects amount
+            amount: quoteAmount,
             includes: booking.includes,
             images: booking.images,
         };
+
+        if (quoteAmount <= 0) {
+            setPaymentError("Invalid quote amount. Please refresh and try again.");
+            toast.error("Invalid quote amount. Please refresh and try again.");
+            setProcessing(false);
+            return false;
+        }
 
         // console.log(booking);
 
@@ -340,36 +448,51 @@ export default function InstallPage({ booking }) {
             product: productDetails,
         };
 
-        // console.log("Form Data", payload);
-        // console.log("Answers", answers);
-        // return false;
         try {
-            // If your checkout endpoint expects { service, form, amount } like InstantQuoteModal:
-            // const res = await axios.post("/quote/checkout", { service: "new_boiler_install", form: payload, amount: booking.price }, { timeout: 15000 });
-
-            // If you want install flow to use the exact same endpoint signature you already built:
             const res = await axios.post(
                 "/quote/checkout",
                 {
-                    service: "new_boiler_quote", // change if you use another service key
+                    service: "new_boiler_quote",
                     form: payload,
-                    amount: booking.price,
+                    amount: quoteAmount,
+                    payment_element: true,
                 },
                 { timeout: 15000 }
             );
 
-            const checkoutUrl = res?.data?.data?.checkout_url;
-            if (!checkoutUrl)
-                throw new Error("Checkout URL missing from response.");
+            const checkoutClientSecret =
+                res?.data?.data?.checkout_client_secret;
+            const checkoutMode = res?.data?.data?.checkout_mode;
 
-            window.location.assign(checkoutUrl);
+            if (
+                checkoutMode === "payment_element" &&
+                checkoutClientSecret &&
+                stripePublishableKey
+            ) {
+                setPaymentClientSecret(checkoutClientSecret);
+                setPaymentBookingId(res?.data?.data?.booking_id || null);
+                setPaymentTxId(res?.data?.data?.transaction_id || null);
+                setPaymentReturnUrl(res?.data?.data?.return_url || null);
+                setProcessing(false);
+                setTimeout(() => {
+                    paymentSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    });
+                }, 100);
+                return true;
+            }
+
+            throw new Error("Unable to initialise secure payment form.");
         } catch (err) {
             const status = err?.response?.status;
 
             if (status === 422) {
                 const backendErrors = err?.response?.data?.errors;
-                showValidationErrors(backendErrors);
-                hydrateInlineErrorsFromBackend(backendErrors);
+                if (showValidationToast) {
+                    showValidationErrors(backendErrors);
+                    hydrateInlineErrorsFromBackend(backendErrors);
+                }
             } else if (status >= 500) {
                 toast.error(
                     "Payment service is temporarily unavailable. Please try again shortly.",
@@ -386,7 +509,7 @@ export default function InstallPage({ booking }) {
                         position: "top-center",
                     }
                 );
-            } else {
+            } else if (showValidationToast) {
                 const message =
                     err?.response?.data?.message ||
                     err?.message ||
@@ -395,6 +518,117 @@ export default function InstallPage({ booking }) {
                     duration: 5000,
                     position: "top-center",
                 });
+            }
+
+            if (mounted.current) setProcessing(false);
+            return false;
+        }
+    };
+
+    useEffect(() => {
+        if (!checkoutReadyKey || paymentClientSecret || processing) return;
+        if (lastAutoInitKeyRef.current === checkoutReadyKey) return;
+
+        lastAutoInitKeyRef.current = checkoutReadyKey;
+
+        const timer = setTimeout(() => {
+            initialisePaymentElement({ showValidationToast: false });
+        }, 250);
+
+        return () => clearTimeout(timer);
+    }, [checkoutReadyKey, paymentClientSecret, processing]);
+
+    const handlePayAndBook = async () => {
+        if (processing) return;
+
+        if (!paymentClientSecret) {
+            await initialisePaymentElement({ showValidationToast: true });
+            return;
+        }
+
+        if (!acceptedTerms) {
+            setTermsError(
+                "Please confirm you agree to the Terms & Conditions before continuing."
+            );
+            toast.error("Please agree to the Terms & Conditions to continue.", {
+                duration: 4000,
+                position: "top-center",
+            });
+            scrollToRef(termsRef);
+            return;
+        }
+
+        setPaymentError("");
+
+        try {
+            setProcessing(true);
+
+            if (!stripeRef.current || !elementsRef.current) {
+                throw new Error("Payment form is still loading. Please try again.");
+            }
+
+            const { error, paymentIntent } = await stripeRef.current.confirmPayment(
+                {
+                    elements: elementsRef.current,
+                    confirmParams: {
+                        return_url:
+                            paymentReturnUrl ||
+                            `${window.location.origin}/checkout/success-intent?booking=${paymentBookingId}&tx=${paymentTxId}`,
+                    },
+                    redirect: "if_required",
+                }
+            );
+
+            if (error) {
+                setPaymentError(
+                    error.message ||
+                        "Payment could not be confirmed. Please check your details and try again."
+                );
+                toast.error(error.message || "Payment failed.");
+                setProcessing(false);
+                return;
+            }
+
+            if (paymentIntent?.status === "succeeded") {
+                const confirmRes = await axios.post(
+                    "/quote/checkout/confirm-intent",
+                    {
+                        booking_id: paymentBookingId,
+                        tx_id: paymentTxId,
+                        payment_intent_id: paymentIntent.id,
+                    },
+                    { timeout: 15000 }
+                );
+
+                const redirectUrl = confirmRes?.data?.data?.redirect_url;
+                if (redirectUrl) {
+                    window.location.assign(redirectUrl);
+                    return;
+                }
+            }
+
+            setProcessing(false);
+        } catch (err) {
+            const status = err?.response?.status;
+
+            if (status === 422) {
+                showValidationErrors(err?.response?.data?.errors);
+            } else if (status >= 500) {
+                toast.error("Payment service is temporarily unavailable. Please try again shortly.", {
+                    duration: 5000,
+                    position: "top-center",
+                });
+            } else if (err?.code === "ECONNABORTED") {
+                toast.error("Request timed out. Please check your connection and try again.", {
+                    duration: 5000,
+                    position: "top-center",
+                });
+            } else {
+                const message =
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    "Unable to complete payment. Please try again.";
+                toast.error(message, { duration: 5000, position: "top-center" });
             }
 
             if (mounted.current) setProcessing(false);
@@ -1356,7 +1590,8 @@ export default function InstallPage({ booking }) {
                                                 disabled={
                                                     !isFormValid ||
                                                     processing ||
-                                                    !acceptedTerms
+                                                    (paymentClientSecret &&
+                                                        !acceptedTerms)
                                                 }
                                                 aria-busy={processing}
                                                 className={[
@@ -1376,10 +1611,27 @@ export default function InstallPage({ booking }) {
                                                 ) : (
                                                     <>
                                                         <FiCreditCard />
-                                                        Pay & Book Now
+                                                        {paymentClientSecret
+                                                            ? "Confirm & Book Installation"
+                                                            : "Continue to secure payment"}
                                                     </>
                                                 )}
                                             </button>
+
+                                            {paymentClientSecret && (
+                                                <div
+                                                    ref={paymentSectionRef}
+                                                    className="mt-4 rounded-2xl border border-slate-200 bg-white p-3"
+                                                >
+                                                    <div ref={paymentElementContainerRef} />
+                                                </div>
+                                            )}
+
+                                            {paymentError && (
+                                                <p className="mt-3 text-center text-xs font-semibold text-red-600">
+                                                    {paymentError}
+                                                </p>
+                                            )}
 
                                             <div className="mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
                                                 <span className="rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm">
@@ -1426,7 +1678,11 @@ export default function InstallPage({ booking }) {
                     <button
                         type="button"
                         onClick={handlePayAndBook}
-                        disabled={!isFormValid || processing || !acceptedTerms}
+                        disabled={
+                            !isFormValid ||
+                            processing ||
+                            (paymentClientSecret && !acceptedTerms)
+                        }
                         aria-busy={processing}
                         className={[
                             "rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
@@ -1437,7 +1693,11 @@ export default function InstallPage({ booking }) {
                                 : "bg-slate-200 text-slate-500 cursor-not-allowed",
                         ].join(" ")}
                     >
-                        {processing ? "Processing…" : "Pay & Book"}
+                        {processing
+                            ? "Processing…"
+                            : paymentClientSecret
+                            ? "Confirm payment"
+                            : "Secure payment"}
                     </button>
                 </div>
             </div>

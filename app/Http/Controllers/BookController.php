@@ -257,6 +257,7 @@ class BookController extends Controller
             'booking' => $data,
             'symbol' => $symbol,
             'title' => 'Select Your Boiler',
+            'stripePublishableKey' => config('services.stripe.api'),
             // 'answers' => $data
         ]);
     }
