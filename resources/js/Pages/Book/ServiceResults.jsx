@@ -1,5 +1,6 @@
 import QuoteResultsPage from "@/Components/extra/QuoteResultsPage";
 import { PageHeader } from "@/Components/ui/page-header";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { usePage, Head } from "@inertiajs/react";
 
 export default function ServiceResults() {
@@ -8,8 +9,10 @@ export default function ServiceResults() {
     return (
         <>
             <Head title={title} />
-            <PageHeader />
-            <QuoteResultsPage answers={answers} />{" "}
+            <BlueQuoteSkin>
+                <PageHeader />
+                <QuoteResultsPage answers={answers} />
+            </BlueQuoteSkin>
         </>
     );
 }

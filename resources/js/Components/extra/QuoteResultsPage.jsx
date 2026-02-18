@@ -66,25 +66,6 @@ export default function QuoteResultsPage({ answers }) {
     // --- Helpers for Dynamic Data ---
 
     // Generate gradients based on index so api data doesn't need style info
-    const getCardStyle = (index) => {
-        const styles = [
-            {
-                gradient: "from-slate-50 to-white",
-                accent: "bg-slate-100",
-            },
-            {
-                gradient: "from-blue-50 to-white",
-                accent: "bg-blue-100",
-            },
-            {
-                gradient: "from-emerald-50 to-white",
-                accent: "bg-emerald-100",
-            },
-        ];
-
-        return styles[index % styles.length];
-    };
-
     // Calculate Price: Handle nulls from your screenshot (base + margin + addons)
     const calculatePrice = (product) => {
         if (product.pricing?.total) return product.pricing.total;
@@ -220,7 +201,7 @@ export default function QuoteResultsPage({ answers }) {
     };
 
     return (
-        <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50/40 px-4 py-8 md:px-6 md:py-10 overflow-hidden">
+        <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50/40 px-4 py-8 md:px-6 md:py-10 overflow-hidden quote-page-bg">
             <div className="pointer-events-none absolute -top-24 -left-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-12 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" />
             {/* HEADER */}
@@ -476,7 +457,6 @@ export default function QuoteResultsPage({ answers }) {
                     className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible"
                 >
                 {visibleProducts.map((product, index) => {
-                    const style = getCardStyle(index);
                     const finalPrice = calculatePrice(product);
                     const tierLabel = getTierLabel(index);
                     const confidenceLine = getConfidenceLine(index);
@@ -492,15 +472,11 @@ export default function QuoteResultsPage({ answers }) {
                             key={cardKey}
                             id={`quote-product-card-${index}`}
                             data-card-index={index}
-                            className={`relative min-w-[88%] snap-center rounded-3xl bg-gradient-to-b ${style.gradient} shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden border border-slate-200 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0`}
+                            className="relative min-w-[88%] snap-center rounded-3xl bg-slate-50 shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden border border-slate-200 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0"
                         >
-                            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-emerald-300 to-sky-300" />
+                            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary to-secondary" />
                             {/* Header Section */}
-                            <div
-                                className={`h-28 ${style.accent} relative overflow-hidden`}
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
-                                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent" />
+                            <div className="h-28 bg-slate-50 relative overflow-hidden">
 
                                 <div className="relative p-6 flex justify-between items-start">
                                     {tierLabel && (
@@ -534,12 +510,6 @@ export default function QuoteResultsPage({ answers }) {
                                         }}
                                     />
                                 </div>
-                            </div>
-
-                            {/* Divider */}
-                            <div className="relative my-4">
-                                <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                                <div className="absolute inset-x-0 top-1/2 h-px w-full bg-gradient-to-r from-transparent via-white/60 to-transparent blur-sm" />
                             </div>
 
                             {/* Content Body */}
@@ -603,9 +573,9 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
 
                                 {/* Warranty */}
-                                <div className="mt-5 flex items-center gap-3 p-3 bg-gradient-to-r from-emerald-50 to-white rounded-2xl border border-emerald-100">
-                                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                                        <FiShield className="text-emerald-600" />
+                                <div className="mt-5 flex items-center gap-3 p-3 rounded-2xl border border-slate-200 bg-slate-50">
+                                    <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center">
+                                        <FiShield className="text-primary" />
                                     </div>
                                     <div>
                                         <div className="font-semibold text-dark">
@@ -628,7 +598,7 @@ export default function QuoteResultsPage({ answers }) {
                                                         key={`${product.id}-inc-${i}`}
                                                         className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700"
                                                     >
-                                                        <FiCheck className="h-3.5 w-3.5 text-emerald-600" />
+                                                        <FiCheck className="h-3.5 w-3.5 text-primary" />
                                                         <span className="truncate max-w-[220px]">
                                                             {item}
                                                         </span>
@@ -673,7 +643,7 @@ export default function QuoteResultsPage({ answers }) {
                                                                             key={`${cardKey}-more-${moreIndex}`}
                                                                             className="flex items-start gap-2 text-xs text-slate-700"
                                                                         >
-                                                                            <FiCheck className="mt-0.5 h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
+                                                                            <FiCheck className="mt-0.5 h-3.5 w-3.5 text-primary flex-shrink-0" />
                                                                             <span>
                                                                                 {
                                                                                     item
@@ -693,10 +663,10 @@ export default function QuoteResultsPage({ answers }) {
                                 {/* Expert Opinion (Generic or from notes if available) */}
                                 {Array.isArray(product.notes) &&
                                     product.notes.length > 0 && (
-                                        <div className="mt-5 rounded-2xl bg-gradient-to-r from-blue-50/80 to-indigo-50/50 p-4 border border-blue-100">
+                                        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                                             <div className="flex gap-3">
-                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                    <FiInfo className="text-blue-600" />
+                                                <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+                                                    <FiInfo className="text-primary" />
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-dark">
@@ -725,8 +695,8 @@ export default function QuoteResultsPage({ answers }) {
                                     )}
 
                                 {/* Pricing Section */}
-                                <div className="mt-6 rounded-2xl bg-gradient-to-r from-emerald-50 via-white to-sky-50 text-slate-900 p-5 relative overflow-hidden border border-emerald-100">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/40 rounded-full -translate-y-16 translate-x-16" />
+                                <div className="mt-6 rounded-2xl bg-slate-50 text-slate-900 p-5 relative overflow-hidden border border-slate-200">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -translate-y-16 translate-x-16" />
 
                                     {/* 'What's Included' Button */}
                                     <div className="absolute top-2 right-2 group z-30">

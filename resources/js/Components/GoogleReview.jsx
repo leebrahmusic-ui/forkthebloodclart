@@ -69,21 +69,43 @@ export function GoogleReview() {
     }, []);
 
     return (
-        <section className="bg-slate-50 py-16">
+        <section className="bg-slate-50 py-16 no-auto-dark-surface google-review-light-lock">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
                 <div className="flex justify-center">
                     <div
                         ref={containerRef}
-                        className={`w-full max-w-4xl rounded-3xl bg-white p-4 ring-1 ring-slate-200 shadow-sm transition-all duration-300 ${
+                        className={`w-full max-w-4xl rounded-3xl bg-white p-4 ring-1 ring-slate-200 shadow-sm transition-all duration-300 no-auto-dark-card ${
                             brandingRemoved ? "pb-4" : "pb-8"
                         }`}
                     >
                         <style>{`
                             #shapo-widget-1569ee68f38a1e8430cb {
                                 background: #ffffff !important;
+                                color-scheme: only light !important;
+                                forced-color-adjust: none !important;
                             }
                             #shapo-widget-1569ee68f38a1e8430cb iframe {
                                 background: #ffffff !important;
+                                color-scheme: only light !important;
+                                forced-color-adjust: none !important;
+                            }
+
+                            @media (prefers-color-scheme: dark) {
+                                .google-review-light-lock,
+                                .google-review-light-lock * {
+                                    color-scheme: only light !important;
+                                    forced-color-adjust: none !important;
+                                }
+
+                                #shapo-widget-1569ee68f38a1e8430cb,
+                                #shapo-widget-1569ee68f38a1e8430cb iframe {
+                                    background: #ffffff !important;
+                                }
+
+                                #shapo-widget-1569ee68f38a1e8430cb :is(p, span, a, h1, h2, h3, h4, h5, h6, strong, small) {
+                                    color: #0f172a !important;
+                                    -webkit-text-fill-color: #0f172a !important;
+                                }
                             }
                         `}</style>
                         <div id="shapo-widget-1569ee68f38a1e8430cb" />

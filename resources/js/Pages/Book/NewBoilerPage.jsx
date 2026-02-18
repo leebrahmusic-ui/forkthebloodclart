@@ -1,6 +1,7 @@
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import Stepper from "@/Components/extra/Stepper";
 import { SERVICE_QUESTIONS } from "@/Components/extra/boilerSteps";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { useMemo } from "react";
 import { Head, usePage } from "@inertiajs/react";
 
@@ -39,13 +40,15 @@ export default function NewBoilerQuote() {
     return (
         <>
             <Head title={title} />
-            <Stepper
-                title="New boiler quote"
-                steps={steps}
-                basePrice={0}
-                serviceKey={SERVICES_KEY_VALUE.NEW_BOILER_QUOTE}
-                autoAdvance
-            />
+            <BlueQuoteSkin>
+                <Stepper
+                    title="New boiler quote"
+                    steps={steps}
+                    basePrice={0}
+                    serviceKey={SERVICES_KEY_VALUE.NEW_BOILER_QUOTE}
+                    autoAdvance
+                />
+            </BlueQuoteSkin>
         </>
     );
 }

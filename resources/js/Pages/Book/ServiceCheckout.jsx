@@ -1,5 +1,6 @@
 import AppointmentDateTimePicker from "@/Components/extra/AppointmentDateTimePicker";
 import { PageHeader } from "@/Components/ui/page-header";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { Head, usePage } from "@inertiajs/react";
 import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
@@ -429,9 +430,11 @@ export default function ServiceCheckout() {
     return (
         <>
             <Head title={title} />
-            <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50" />
-            <div className="min-h-screen">
-                <PageHeader />
+            <BlueQuoteSkin>
+                <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50 quote-page-bg" />
+                <div className="min-h-screen quote-page-bg">
+                    <PageHeader />
+                
 
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
                     <div className="flex flex-col gap-2">
@@ -679,7 +682,8 @@ export default function ServiceCheckout() {
                 </div>
 
                 <GoogleReview />
-            </div>
+                </div>
+            </BlueQuoteSkin>
         </>
     );
 }

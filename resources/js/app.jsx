@@ -23,6 +23,21 @@ router.on("navigate", () => {
 const appName =
     import.meta.env.VITE_APP_NAME || document.title || "MD GAS SERVICES";
 
+function syncBodyThemeFromPage(page) {
+    const component = page?.component || "";
+    const pageUrl = page?.url || window.location.pathname || "";
+    const rawPath = pageUrl.split("?")[0] || "";
+    const path = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+    const isQuoteQuestionStep =
+        component === "Book/NewBoilerPage" ||
+        path === "/book/quote/new" ||
+        path === "/book/quote/new/";
+    const shouldUseForcedTheme = !isQuoteQuestionStep;
+
+    if (!document.body) return;
+    document.body.classList.toggle("force-purple-theme", shouldUseForcedTheme);
+}
+
 function syncPricingOverridesFromPage(page) {
     const props = page?.props || {};
     window.__PRICING_OVERRIDES__ = props.pricingOverrides || {};
@@ -39,12 +54,15 @@ createInertiaApp({
     setup({ el, App, props }) {
         // ✅ Initial sync
         const initialPage = props?.initialPage || props?.page || {};
+        syncBodyThemeFromPage(initialPage);
         syncPricingOverridesFromPage(initialPage);
 
         // ✅ Sync on every Inertia navigation / reload
         router.on("navigate", (event) => {
             // Inertia provides the new page in event.detail.page
-            syncPricingOverridesFromPage(event?.detail?.page);
+            const nextPage = event?.detail?.page;
+            syncBodyThemeFromPage(nextPage);
+            syncPricingOverridesFromPage(nextPage);
         });
 
         const root = createRoot(el);

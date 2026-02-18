@@ -1,5 +1,6 @@
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import Stepper from "@/Components/extra/Stepper";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { Head, usePage } from "@inertiajs/react";
 import React from "react";
 
@@ -257,16 +258,17 @@ export default function RepairQuote() {
     return (
         <>
             <Head title={title} />
-            <Stepper
-                title="Boiler Repair Quote"
-                basePrice={basePrice}
-                steps={STEPS}
-                serviceKey={SERVICES_KEY_VALUE.BOILER_REPAIR}
-                currency={symbol}
-                onSubmit={onSubmit}
-                autoAdvance
-            />
-            ;
+            <BlueQuoteSkin>
+                <Stepper
+                    title="Boiler Repair Quote"
+                    basePrice={basePrice}
+                    steps={STEPS}
+                    serviceKey={SERVICES_KEY_VALUE.BOILER_REPAIR}
+                    currency={symbol}
+                    onSubmit={onSubmit}
+                    autoAdvance
+                />
+            </BlueQuoteSkin>
         </>
     );
 }

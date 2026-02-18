@@ -1,5 +1,6 @@
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import Stepper from "@/Components/extra/Stepper";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { usePage, Head } from "@inertiajs/react";
 import React from "react";
 
@@ -134,14 +135,16 @@ export default function PowerflushQuote() {
     return (
         <>
             <Head title={title} />
-            <Stepper
-                title="Power Flush"
-                basePrice={basePriceForStepper}
-                steps={STEPS}
-                currency={symbol}
-                serviceKey={SERVICES_KEY_VALUE.POWER_FLUSH}
-                autoAdvance
-            />
+            <BlueQuoteSkin>
+                <Stepper
+                    title="Power Flush"
+                    basePrice={basePriceForStepper}
+                    steps={STEPS}
+                    currency={symbol}
+                    serviceKey={SERVICES_KEY_VALUE.POWER_FLUSH}
+                    autoAdvance
+                />
+            </BlueQuoteSkin>
         </>
     );
 }

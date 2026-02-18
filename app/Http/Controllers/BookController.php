@@ -34,9 +34,7 @@ class BookController extends Controller
 
 
     public function index(){
-        return Inertia::render('Book/Home', [
-            'title' => 'Book a Service',
-        ]);
+        return redirect('/book/quote/new');
     }
 
     public function quote(){

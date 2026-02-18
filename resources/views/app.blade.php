@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: dark)">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
@@ -15,6 +19,17 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <script>
+        (function() {
+            var root = document.documentElement;
+            root.classList.remove('dark');
+            document.body && document.body.classList.remove('dark');
+            try {
+                localStorage.removeItem('theme');
+                localStorage.removeItem('color-theme');
+            } catch (e) {}
+        })();
+    </script>
     @php($gtmId = env('VITE_GTM_ID'))
 
     @if ($gtmId)
@@ -46,7 +61,7 @@
     @inertiaHead
 </head>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased {{ request()->routeIs('book.quote.new') ? '' : 'force-purple-theme' }}">
     @inertia
 </body>
 

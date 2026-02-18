@@ -9,7 +9,10 @@ export function PageHeader({ variant = "default", currentStep = 4 }) {
     const waNumber = "+447454796398";
 
     return (
-        <header className="border border-b-dark/15 bg-foreground">
+        <header
+            className="page-header-clean border-b border-slate-200 bg-white"
+            style={{ backgroundColor: "#ffffff", borderBottomColor: "#e2e8f0" }}
+        >
             <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
                 <div className="flex h-[75px] items-center justify-between">
                     {/* Logo */}
@@ -46,7 +49,7 @@ export function PageHeader({ variant = "default", currentStep = 4 }) {
                                         <span
                                             className={`text-sm ${
                                                 active
-                                                    ? "font-semibold text-dark"
+                                                    ? "font-semibold text-slate-900"
                                                     : "text-gray-400"
                                             }`}
                                         >
@@ -67,7 +70,7 @@ export function PageHeader({ variant = "default", currentStep = 4 }) {
                         href={waHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-dark text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                        className="inline-flex items-center gap-2 rounded-full bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                         aria-label={`Chat on WhatsApp ${waNumber}`}
                     >
                         <FaWhatsapp className="h-4 w-4" />

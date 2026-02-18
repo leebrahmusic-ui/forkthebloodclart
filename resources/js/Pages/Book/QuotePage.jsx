@@ -3,6 +3,7 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import { PageHeader } from "@/Components/ui/page-header";
 import { GoogleReview } from "@/Components/GoogleReview";
 import { TechnicianButton } from "@/Components/TechnicianButton";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 
 const pageTitle = "Get a Quote";
 
@@ -158,8 +159,9 @@ export default function QuotePage() {
         <>
             <Head title={title} />
 
+            <BlueQuoteSkin>
             {/* ✅ FIXED: no black bottom gap */}
-            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-white overflow-x-hidden">
+            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-white overflow-x-hidden quote-page-bg">
                 <PageHeader title={pageTitle} />
 
                 <main className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
@@ -741,6 +743,7 @@ export default function QuotePage() {
                     </div>
                 </main>
             </div>
+            </BlueQuoteSkin>
         </>
     );
 }

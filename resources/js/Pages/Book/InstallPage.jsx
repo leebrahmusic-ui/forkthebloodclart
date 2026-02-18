@@ -1,5 +1,6 @@
 import AppointmentDateRangePicker from "@/Components/extra/AppointmentDateTimePicker";
 import { PageHeader } from "@/Components/ui/page-header";
+import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { Head, usePage } from "@inertiajs/react";
 import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
@@ -638,9 +639,10 @@ export default function InstallPage({ booking }) {
     return (
         <>
             <Head title={title} />
-            <PageHeader />
+            <BlueQuoteSkin>
+                <PageHeader />
 
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-white quote-page-bg">
                 <div className="max-w-7xl mx-auto px-4 py-10 md:py-14 pb-28 lg:pb-10">
                     <div className="flex items-end gap-6 mb-10">
                         <button
@@ -1702,6 +1704,7 @@ export default function InstallPage({ booking }) {
                 </div>
             </div>
             <GoogleReview />
+            </BlueQuoteSkin>
         </>
     );
 }

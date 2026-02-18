@@ -5,23 +5,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* @custom-variant dark (&:is(.dark *)); */
-
-/* @custom-variant dark (&:is(.dark *)); */
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-    --background: #000000;
-    --foreground: #ffffff;
+    --background: #ffffff;
+    --foreground: #0b2a40;
 
-    --primary: #0067ff;
-    --dark: #172a44;
+    --primary: #36c1ff;
+    --dark: #0b2a40;
     --light-background: #ffffff;
-    --secondary: #4a90ff;
-    --neutral: #cee7d5;
-    --light-grey: #f8f9fb;
+    --secondary: #8bdfff;
+    --neutral: #e6f6ff;
+    --light-grey: #f3faff;
 
     /* for text-muted-foreground */
-    --muted-foreground: #6b7c93;
+    --muted-foreground: #4f7b99;
     --card-radius: 20px;
 }
 
@@ -70,6 +68,39 @@
 
 html {
     scroll-behavior: auto;
+}
+
+/* Hard lock site to light color scheme to stop mobile auto-dark rendering */
+html,
+body {
+    color-scheme: light !important;
+    background-color: #ffffff !important;
+    color: #0f172a;
+    forced-color-adjust: none;
+}
+
+body,
+body * {
+    forced-color-adjust: none;
+}
+
+/* Targeted anti-auto-dark surfaces for mobile browser color inversion */
+.no-auto-dark-surface {
+    background-color: #f8fafc !important;
+    background-image: none !important;
+    forced-color-adjust: none;
+    color: #0f172a;
+}
+
+.no-auto-dark-card {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    forced-color-adjust: none;
+    color: #0f172a;
+}
+
+.no-auto-dark-card * {
+    -webkit-text-fill-color: currentColor;
 }
 
 .badge-rotate-slow {
@@ -606,7 +637,7 @@ aside::-webkit-scrollbar-thumb:hover {
 }
 
 .rdp-selected {
-    background: #00bf37;
+    background: #592fc1;
     border-radius: 14px;
     color: #fff;
 }
@@ -621,3 +652,168 @@ aside::-webkit-scrollbar-thumb:hover {
         padding: 4px;
     }
 }
+
+/* Global forced purple theme (coherent across cards, pages, and loaders) */
+:root {
+    --site-purple-bg: #06263f;
+    --site-purple-surface: #0b3654;
+    --site-purple-surface-2: #114c73;
+    --site-purple-border: #36c1ff;
+    --site-purple-accent: #36c1ff;
+    --site-purple-accent-2: #8bdfff;
+    --site-purple-text: #eaf7ff;
+    --site-purple-text-soft: #cbeeff;
+}
+
+body.force-purple-theme,
+.force-purple-theme {
+    background-color: var(--site-purple-bg) !important;
+    color: var(--site-purple-text) !important;
+}
+
+/* Backgrounds */
+.force-purple-theme [class*="bg-white"],
+.force-purple-theme [class*="bg-slate"],
+.force-purple-theme [class*="bg-gray"],
+.force-purple-theme [class*="bg-blue"],
+.force-purple-theme [class*="bg-sky"],
+.force-purple-theme [class*="bg-cyan"],
+.force-purple-theme [class*="bg-indigo"],
+.force-purple-theme [class*="bg-zinc"],
+.force-purple-theme [class*="bg-neutral"] {
+    background-color: var(--site-purple-surface) !important;
+    background-image: none !important;
+}
+
+.force-purple-theme [class*="bg-slate-50"],
+.force-purple-theme [class*="bg-slate-100"],
+.force-purple-theme [class*="bg-white/"],
+.force-purple-theme [class*="bg-slate-50/"] {
+    background-color: var(--site-purple-surface-2) !important;
+}
+
+/* Borders */
+.force-purple-theme [class*="border-slate"],
+.force-purple-theme [class*="border-gray"],
+.force-purple-theme [class*="border-blue"],
+.force-purple-theme [class*="border-sky"],
+.force-purple-theme [class*="border-cyan"],
+.force-purple-theme [class*="border-indigo"],
+.force-purple-theme [class*="border-zinc"],
+.force-purple-theme [class*="border-white"],
+.force-purple-theme [class*="border-neutral"],
+.force-purple-theme [class*="border-dark"] {
+    border-color: color-mix(in srgb, var(--site-purple-border) 72%, white) !important;
+}
+
+/* Text */
+.force-purple-theme [class*="text-slate"],
+.force-purple-theme [class*="text-gray"],
+.force-purple-theme [class*="text-blue"],
+.force-purple-theme [class*="text-sky"],
+.force-purple-theme [class*="text-cyan"],
+.force-purple-theme [class*="text-indigo"],
+.force-purple-theme [class*="text-zinc"],
+.force-purple-theme [class*="text-neutral"],
+.force-purple-theme [class*="text-dark"],
+.force-purple-theme [class*="text-black"] {
+    color: var(--site-purple-text-soft) !important;
+    -webkit-text-fill-color: currentColor !important;
+}
+
+.force-purple-theme h1,
+.force-purple-theme h2,
+.force-purple-theme h3,
+.force-purple-theme h4,
+.force-purple-theme h5,
+.force-purple-theme h6,
+.force-purple-theme [class*="font-bold"],
+.force-purple-theme [class*="font-semibold"] {
+    color: var(--site-purple-text) !important;
+}
+
+/* Accent colors forced to purple */
+.force-purple-theme [class*="text-green"],
+.force-purple-theme [class*="text-emerald"],
+.force-purple-theme [class*="text-lime"],
+.force-purple-theme [class*="text-violet"],
+.force-purple-theme [class*="text-purple"] {
+    color: var(--site-purple-accent-2) !important;
+}
+
+.force-purple-theme [class*="bg-green"],
+.force-purple-theme [class*="bg-emerald"],
+.force-purple-theme [class*="bg-lime"],
+.force-purple-theme [class*="bg-violet"],
+.force-purple-theme [class*="bg-purple"] {
+    background-color: var(--site-purple-accent) !important;
+    color: #ffffff !important;
+}
+
+.force-purple-theme [class*="border-green"],
+.force-purple-theme [class*="border-emerald"],
+.force-purple-theme [class*="border-lime"],
+.force-purple-theme [class*="border-violet"],
+.force-purple-theme [class*="border-purple"] {
+    border-color: var(--site-purple-accent-2) !important;
+}
+
+/* Gradients remapped to purple to avoid half-slate cards */
+.force-purple-theme [class*="from-"],
+.force-purple-theme [class*="via-"],
+.force-purple-theme [class*="to-"] {
+    --tw-gradient-from: var(--site-purple-surface-2) var(--tw-gradient-from-position) !important;
+    --tw-gradient-via: var(--site-purple-surface) var(--tw-gradient-via-position) !important;
+    --tw-gradient-to: var(--site-purple-bg) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
+}
+
+/* Remove glass shine / blur artifacts */
+.force-purple-theme [class*="backdrop-blur"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.force-purple-theme [class*="shadow"] {
+    box-shadow: 0 16px 40px rgba(8, 4, 20, 0.35) !important;
+}
+
+.force-purple-theme input,
+.force-purple-theme textarea,
+.force-purple-theme select {
+    background-color: #0d4f79 !important;
+    color: #eaf7ff !important;
+    border-color: #36c1ff !important;
+}
+
+.force-purple-theme input::placeholder,
+.force-purple-theme textarea::placeholder {
+    color: #a9e3ff !important;
+    -webkit-text-fill-color: #a9e3ff !important;
+}
+
+/* Keep internal booking/service header clean like landing */
+.force-purple-theme .page-header-clean,
+.force-purple-theme .page-header-clean [class*="bg-white"] {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    opacity: 1 !important;
+}
+
+.force-purple-theme .page-header-clean {
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04) !important;
+}
+
+.force-purple-theme .page-header-clean a,
+.force-purple-theme .page-header-clean span,
+.force-purple-theme .page-header-clean svg {
+    color: #0f172a;
+}
+
+.force-purple-theme .page-header-clean a.bg-primary,
+.force-purple-theme .page-header-clean .bg-primary {
+    background-color: #36c1ff !important;
+    color: #ffffff !important;
+}
+

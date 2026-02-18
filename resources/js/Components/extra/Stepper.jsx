@@ -383,8 +383,22 @@ export default function Stepper({
 
     return (
         <>
-            <div className="fixed inset-0 bg-light-grey -z-10"></div>
-            <div className="min-h-screen bg-light-grey overflow-hidden">
+            <div
+                className="fixed inset-0 bg-light-grey -z-10 quote-page-bg"
+                style={{
+                    backgroundColor: "#f7faf9",
+                    backgroundImage:
+                        "radial-gradient(circle at top, rgba(16,185,129,0.30), transparent 45%)",
+                }}
+            ></div>
+            <div
+                className="min-h-screen bg-light-grey overflow-hidden quote-page-bg"
+                style={{
+                    backgroundColor: "#f7faf9",
+                    backgroundImage:
+                        "radial-gradient(circle at top, rgba(16,185,129,0.30), transparent 45%)",
+                }}
+            >
                 <PageHeader />
 
                 {/* Hidden service identifiers */}
@@ -404,7 +418,14 @@ export default function Stepper({
                             </p>
                         </div>
                         {/* RIGHT: Trust Rail */}
-                        <div className="group relative flex items-center gap-4 px-5 py-3 rounded-2xl bg-white border border-primary/50 shadow-sm overflow-hidden">
+                        <div
+                            className="group relative flex items-center gap-4 px-5 py-3 rounded-2xl bg-white border border-primary/50 shadow-sm overflow-hidden quote-trust-card"
+                            style={{
+                                backgroundColor: "#ffffff",
+                                borderColor: "rgba(15,23,42,0.12)",
+                                boxShadow: "0 10px 28px rgba(0,0,0,0.08)",
+                            }}
+                        >
                             {/* animated edge accent */}
                             <span className="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-primary to-dark/90" />
 
@@ -437,7 +458,16 @@ export default function Stepper({
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
                         {/* ================= RIGHT ================= */}
                         <section className="md:col-span-12 h-full flex">
-                            <div className="glass-root p-8 rounded-3xl w-full flex flex-col relative min-h-[75vh] sm:min-h-[640px]">
+                            <div
+                                className="glass-root p-8 rounded-3xl w-full flex flex-col relative min-h-[75vh] sm:min-h-[640px] quote-question-shell"
+                                style={{
+                                    background:
+                                        "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,252,255,0.98))",
+                                    border: "1px solid rgba(15,23,42,0.10)",
+                                    boxShadow:
+                                        "0 20px 48px rgba(0,0,0,0.10)",
+                                }}
+                            >
                                 <div className="radial-highlight absolute inset-0 pointer-events-none" />
 
                                 <div className="mb-4 flex items-center justify-between">

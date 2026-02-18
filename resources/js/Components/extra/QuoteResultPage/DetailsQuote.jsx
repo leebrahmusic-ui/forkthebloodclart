@@ -12,7 +12,7 @@ import {
     FiMapPin,
 } from "react-icons/fi";
 import ProductTabs from "./Tabs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { router } from "@inertiajs/react";
 
 export default function DetailsQuoteSidebar({
@@ -36,6 +36,31 @@ export default function DetailsQuoteSidebar({
 
     const scrollContainerRef = useRef(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        if (typeof document === "undefined") return;
+
+        const { body, documentElement } = document;
+        const prevBodyOverflow = body.style.overflow;
+        const prevHtmlOverflow = documentElement.style.overflow;
+        const prevBodyPaddingRight = body.style.paddingRight;
+
+        const scrollbarWidth =
+            window.innerWidth - document.documentElement.clientWidth;
+
+        body.style.overflow = "hidden";
+        documentElement.style.overflow = "hidden";
+
+        if (scrollbarWidth > 0) {
+            body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+
+        return () => {
+            body.style.overflow = prevBodyOverflow;
+            documentElement.style.overflow = prevHtmlOverflow;
+            body.style.paddingRight = prevBodyPaddingRight;
+        };
+    }, []);
 
     const {
         brand = "",
@@ -99,14 +124,106 @@ export default function DetailsQuoteSidebar({
 
     return (
         <>
+            <style>{`
+                .spec-sheet-modal,
+                .spec-sheet-modal * {
+                    color-scheme: light !important;
+                    forced-color-adjust: none !important;
+                }
+
+                .spec-sheet-modal {
+                    background-color: #00abdb !important;
+                }
+
+                .spec-sheet-overlay {
+                    background: rgba(2, 6, 23, 0.65) !important;
+                }
+
+                /* Only the pop-up bar (sticky top header) gets the 00ABDB look */
+                .spec-sheet-modal .sticky.top-0 {
+                    background: linear-gradient(180deg, #00abdb 0%, #008db6 100%) !important;
+                    border-bottom-color: rgba(255, 255, 255, 0.32) !important;
+                }
+
+                /* Keep the entire sidebar solid (not transparent) */
+                .spec-sheet-modal [class*="bg-white"],
+                .spec-sheet-modal [class*="bg-white/"],
+                .spec-sheet-modal [class*="bg-slate-50"],
+                .spec-sheet-modal [class*="bg-slate-50/"],
+                .spec-sheet-modal [class*="bg-slate-100"],
+                .spec-sheet-modal [class*="bg-slate-100/"],
+                .spec-sheet-modal [class*="bg-slate-200"],
+                .spec-sheet-modal [class*="bg-slate-200/"] {
+                    background-color: #0098c4 !important;
+                    background-image: none !important;
+                }
+
+                .spec-sheet-modal [class*="border-"] {
+                    border-color: rgba(255, 255, 255, 0.35) !important;
+                }
+
+                .spec-sheet-modal [class*="text-slate-900"],
+                .spec-sheet-modal [class*="text-slate-800"],
+                .spec-sheet-modal [class*="text-slate-700"],
+                .spec-sheet-modal [class*="text-slate-600"],
+                .spec-sheet-modal [class*="text-slate-500"],
+                .spec-sheet-modal [class*="text-dark"] {
+                    color: #ffffff !important;
+                    -webkit-text-fill-color: #ffffff !important;
+                }
+
+
+                .spec-sheet-modal .cta-book-now {
+                    background: linear-gradient(90deg, #fb923c 0%, #f97316 100%) !important;
+                    border-color: #fdba74 !important;
+                    color: #7c2d12 !important;
+                    opacity: 1 !important;
+                    box-shadow: 0 18px 46px rgba(249, 115, 22, 0.42) !important;
+                }
+
+                .spec-sheet-modal .cta-book-now:hover {
+                    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%) !important;
+                    box-shadow: 0 24px 58px rgba(249, 115, 22, 0.56) !important;
+                }
+
+                .spec-sheet-modal .cta-book-now * {
+                    color: #7c2d12 !important;
+                    -webkit-text-fill-color: #7c2d12 !important;
+                }
+
+                .spec-sheet-modal .cta-book-now .cta-book-now-icon,
+                .spec-sheet-modal .cta-book-now .cta-book-now-icon * {
+                    color: #ea580c !important;
+                    -webkit-text-fill-color: #ea580c !important;
+                }
+                .spec-sheet-modal .sticky.top-0 h2,
+                .spec-sheet-modal .sticky.top-0 span,
+                .spec-sheet-modal .sticky.top-0 p,
+                .spec-sheet-modal .sticky.top-0 svg,
+                .spec-sheet-modal .sticky.top-0 [class*="text-"] {
+                    color: #ffffff !important;
+                    -webkit-text-fill-color: #ffffff !important;
+                }
+
+                .spec-sheet-modal .sticky.top-0 button,
+                .spec-sheet-modal .sticky.top-0 button * {
+                    background-color: rgba(255, 255, 255, 0.14) !important;
+                    border-color: rgba(255, 255, 255, 0.30) !important;
+                    color: #ffffff !important;
+                    -webkit-text-fill-color: #ffffff !important;
+                }
+            `}</style>
             <div
                 onClick={onClose}
-                className="fixed inset-0 bg-primary/10 backdrop-blur-sm z-40"
+                className="fixed inset-0 bg-black/70 z-40 spec-sheet-overlay"
             />
 
-            <aside className="fixed right-0 top-0 h-full w-full overflow-y-auto lg:w-[95vw] xl:w-[1200px] bg-gradient-to-b from-white to-slate-50 z-50 border-l border-slate-200 shadow-2xl animate-slideFromRight">
+            <aside
+                className="fixed right-0 top-0 h-full w-full overflow-y-auto overscroll-contain [touch-action:pan-y] lg:w-[95vw] xl:w-[1200px] bg-slate-50 z-50 border-l border-slate-200 shadow-2xl animate-slideFromRight isolate spec-sheet-modal"
+                style={{ WebkitOverflowScrolling: "touch" }}
+            >
                 <div className="h-full flex flex-col">
-                    <div className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+                    <div className="sticky top-0 z-30 bg-slate-50 border-b border-slate-200">
                         <div className="px-8 py-6 flex justify-between items-center">
                             <div className="flex items-center gap-3">
                                 <h2 className="text-lg font-semibold text-slate-900">
@@ -479,20 +596,23 @@ export default function DetailsQuoteSidebar({
                                             })
                                         )
                                     }
-                                    className="group relative cursor-pointer w-full flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-primary to-secondary border border-primary/60 hover:shadow-[0_20px_50px_rgba(16,185,129,0.35)] transition-all duration-300"
+                                    className="group relative cursor-pointer w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-300 cta-book-now"
                                 >
-                                    <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-white text-slate-900 shadow-sm shrink-0">
+                                    <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-white shadow-sm shrink-0 cta-book-now-icon">
                                         <FiCalendar className="text-2xl" />
                                     </div>
                                     <div className="flex flex-col text-left flex-1 min-w-0">
-                                        <span className="text-xs text-white/80 font-medium uppercase tracking-wider">
+                                        <span className="text-xs text-orange-950/85 font-bold uppercase tracking-wider">
                                             Ready to book
                                         </span>
-                                        <span className="text-white font-bold text-xl">
-                                            Continue to secure checkout
+                                        <span className="text-orange-950 font-extrabold text-xl leading-tight">
+                                            BOOK THIS PACKAGE NOW
+                                        </span>
+                                        <span className="text-[12px] text-orange-950/80 font-semibold mt-1">
+                                            See live engineer availability next
                                         </span>
                                     </div>
-                                    <FiArrowRight className="text-white group-hover:translate-x-1 transition-transform text-2xl shrink-0" />
+                                    <FiArrowRight className="text-orange-950 group-hover:translate-x-1 transition-transform text-2xl shrink-0" />
                                 </button>
                             </div>
 

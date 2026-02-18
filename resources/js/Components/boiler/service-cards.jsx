@@ -36,7 +36,7 @@ export function ServiceCards() {
     return (
         <section
             id="service-cards"
-            className="relative scroll-mt-24 overflow-hidden rounded-t-[45px] bg-slate-50 py-16 sm:py-24"
+            className="relative scroll-mt-24 overflow-hidden rounded-t-[45px] bg-slate-50 no-auto-dark-surface py-16 sm:py-24"
         >
             {/* soft background blobs */}
             <div className="pointer-events-none absolute -left-32 top-0 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl" />
@@ -69,7 +69,7 @@ export function ServiceCards() {
                                     return (
                                         <article
                                             key={step.title}
-                                            className="relative z-[1] flex h-full flex-col items-center rounded-[24px] bg-white px-4 py-5 text-center sm:px-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition-colors duration-300 hover:shadow-[0_22px_55px_rgba(15,23,42,0.12)]"
+                                            className="relative z-[1] flex h-full flex-col items-center rounded-[24px] bg-white no-auto-dark-card px-4 py-5 text-center sm:px-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition-colors duration-300 hover:shadow-[0_22px_55px_rgba(15,23,42,0.12)]"
                                         >
                                             {/* top row: icon + badge */}
                                             <div className="flex flex-col items-center gap-2">
