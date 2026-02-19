@@ -26,6 +26,8 @@ export default function InstallPage({ booking }) {
     const [openInstallCompatibilityTip, setOpenInstallCompatibilityTip] =
         useState(null);
     const [openPetTooltip, setOpenPetTooltip] = useState(false);
+    const [openCancellationTooltip, setOpenCancellationTooltip] =
+        useState(false);
 
     const titleOptions = ["Mr", "Mrs", "Ms", "Miss", "Dr"];
 
@@ -147,6 +149,34 @@ export default function InstallPage({ booking }) {
             document.removeEventListener("keydown", handleEscape);
         };
     }, [openPetTooltip]);
+
+    useEffect(() => {
+        if (!openCancellationTooltip) return;
+
+        const handleOutside = (event) => {
+            const target = event.target;
+            if (
+                target instanceof Element &&
+                !target.closest('[data-cancel-policy-wrap="true"]')
+            ) {
+                setOpenCancellationTooltip(false);
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                setOpenCancellationTooltip(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutside);
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutside);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [openCancellationTooltip]);
 
     // refs to scroll/focus to invalid section
     const dateRef = useRef(null);
@@ -1593,19 +1623,30 @@ export default function InstallPage({ booking }) {
                                         {/* ✅ Pay Now button functionality applied here */}
                                         <div className="bg-slate-50 -mx-6 -mb-6 p-6 pb-10 mt-6 border-t border-slate-200 text-slate-900">
                                             <div className="mb-4 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                                <div className="relative inline-flex items-center gap-1.5 text-xs text-slate-600 group/cancel-policy">
+                                                <div data-cancel-policy-wrap="true" className="relative inline-flex items-center gap-1.5 text-xs text-slate-600 group/cancel-policy">
                                                     <span className="font-semibold text-slate-800">
                                                         Cancellation policy
                                                     </span>
                                                     <button
                                                         type="button"
+                                                        onClick={() =>
+                                                            setOpenCancellationTooltip(
+                                                                (prev) => !prev
+                                                            )
+                                                        }
                                                         className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary"
                                                         aria-label="Show cancellation policy"
                                                     >
                                                         <FiInfo className="h-3.5 w-3.5" />
                                                     </button>
 
-                                                    <div className="quote-solid-popover pointer-events-none absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl opacity-0 translate-y-1 transition-all duration-200 group-hover/cancel-policy:pointer-events-auto group-hover/cancel-policy:opacity-100 group-hover/cancel-policy:translate-y-0 group-focus-within/cancel-policy:pointer-events-auto group-focus-within/cancel-policy:opacity-100 group-focus-within/cancel-policy:translate-y-0">
+                                                    <div
+                                                        className={`quote-solid-popover absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${
+                                                            openCancellationTooltip
+                                                                ? "pointer-events-auto opacity-100 translate-y-0"
+                                                                : "pointer-events-none opacity-0 group-hover/cancel-policy:pointer-events-auto group-hover/cancel-policy:opacity-100 group-hover/cancel-policy:translate-y-0 group-focus-within/cancel-policy:pointer-events-auto group-focus-within/cancel-policy:opacity-100 group-focus-within/cancel-policy:translate-y-0"
+                                                        }`}
+                                                    >
                                                         <p>
                                                             You can cancel for a full refund up to 24 hours before your booking.
                                                         </p>
