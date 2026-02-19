@@ -25,6 +25,7 @@ export default function InstallPage({ booking }) {
     const [termsError, setTermsError] = useState("");
     const [openInstallCompatibilityTip, setOpenInstallCompatibilityTip] =
         useState(null);
+    const [openPetTooltip, setOpenPetTooltip] = useState(false);
 
     const titleOptions = ["Mr", "Mrs", "Ms", "Miss", "Dr"];
 
@@ -118,6 +119,34 @@ export default function InstallPage({ booking }) {
             document.removeEventListener("keydown", handleEscape);
         };
     }, [openInstallCompatibilityTip]);
+
+    useEffect(() => {
+        if (!openPetTooltip) return;
+
+        const handleOutside = (event) => {
+            const target = event.target;
+            if (
+                target instanceof Element &&
+                !target.closest('[data-pet-policy-wrap="true"]')
+            ) {
+                setOpenPetTooltip(false);
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                setOpenPetTooltip(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutside);
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutside);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [openPetTooltip]);
 
     // refs to scroll/focus to invalid section
     const dateRef = useRef(null);
@@ -1235,7 +1264,7 @@ export default function InstallPage({ booking }) {
                                                             />
                                                         </div>
 
-                                                        <div className="relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 group/pet-policy">
+                                                        <div data-pet-policy-wrap="true" className="relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 group/pet-policy">
                                                             <span className="pet-doggy-wrap inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100/90 ring-1 ring-amber-200">
                                                                 <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" aria-hidden="true">
                                                                     <path className="pet-doggy-ear-left" d="M7 7.2c-.8-1.5-2.3-1.9-3.2-.8-.8 1-.6 2.5.8 3.4L7 10.9V7.2Z" fill="#c08457" />
@@ -1252,13 +1281,25 @@ export default function InstallPage({ booking }) {
                                                             </span>
                                                             <button
                                                                 type="button"
+                                                                onClick={() =>
+                                                                    setOpenPetTooltip(
+                                                                        (prev) =>
+                                                                            !prev
+                                                                    )
+                                                                }
                                                                 className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary"
                                                                 aria-label="Show pet-friendly information"
                                                             >
                                                                 <FiInfo className="h-3.5 w-3.5" />
                                                             </button>
 
-                                                            <div className="quote-solid-popover pointer-events-none absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl opacity-0 translate-y-1 transition-all duration-200 group-hover/pet-policy:pointer-events-auto group-hover/pet-policy:opacity-100 group-hover/pet-policy:translate-y-0 group-focus-within/pet-policy:pointer-events-auto group-focus-within/pet-policy:opacity-100 group-focus-within/pet-policy:translate-y-0">
+                                                            <div
+                                                                className={`quote-solid-popover absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${
+                                                                    openPetTooltip
+                                                                        ? "pointer-events-auto opacity-100 translate-y-0"
+                                                                        : "pointer-events-none opacity-0 group-hover/pet-policy:pointer-events-auto group-hover/pet-policy:opacity-100 group-hover/pet-policy:translate-y-0 group-focus-within/pet-policy:pointer-events-auto group-focus-within/pet-policy:opacity-100 group-focus-within/pet-policy:translate-y-0"
+                                                                }`}
+                                                            >
                                                                 <p>
                                                                     We are dog-friendly and happy for them to be around during the visit.
                                                                 </p>

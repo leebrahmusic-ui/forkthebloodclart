@@ -849,15 +849,57 @@ export default function QuoteResultsPage({ answers }) {
             {/* WHAT'S INCLUDED SIDEBAR */}
             {activeQuote && (
                 <>
+                    <style>{`
+                        .question-include-sidebar {
+                            background: linear-gradient(180deg, #00abdb 0%, #008db6 100%) !important;
+                            border-left: 1px solid rgba(255, 255, 255, 0.32) !important;
+                        }
+
+                        .question-include-sidebar .sidebar-surface {
+                            background: rgba(0, 143, 182, 0.92) !important;
+                            border-color: rgba(255, 255, 255, 0.32) !important;
+                        }
+
+                        .question-include-sidebar,
+                        .question-include-sidebar h1,
+                        .question-include-sidebar h2,
+                        .question-include-sidebar h3,
+                        .question-include-sidebar p,
+                        .question-include-sidebar span,
+                        .question-include-sidebar div,
+                        .question-include-sidebar [class*="text-"] {
+                            color: #ffffff !important;
+                            -webkit-text-fill-color: #ffffff !important;
+                        }
+
+                        .question-include-sidebar [class*="border-slate"],
+                        .question-include-sidebar [class*="border-gray"] {
+                            border-color: rgba(255, 255, 255, 0.30) !important;
+                        }
+
+                        .question-include-sidebar [class*="bg-white"],
+                        .question-include-sidebar [class*="bg-slate"],
+                        .question-include-sidebar [class*="bg-gray"] {
+                            background-color: rgba(255, 255, 255, 0.10) !important;
+                            background-image: none !important;
+                        }
+
+                        .question-include-sidebar .question-sidebar-close {
+                            background: rgba(255, 255, 255, 0.14) !important;
+                            border-color: rgba(255, 255, 255, 0.42) !important;
+                            color: #ffffff !important;
+                            -webkit-text-fill-color: #ffffff !important;
+                        }
+                    `}</style>
                     <div
                         onClick={() => setActiveQuote(null)}
                         className="fixed inset-0 bg-primary/10 backdrop-blur-sm z-40 animate-fadeIn"
                     />
 
-                    <aside className="quote-solid-sidebar fixed right-0 top-0 h-full w-full sm:w-[520px] bg-white z-50 shadow-2xl animate-slideFromRight">
+                    <aside className="question-include-sidebar quote-solid-sidebar fixed right-0 top-0 h-full w-full sm:w-[520px] bg-white z-50 shadow-2xl animate-slideFromRight">
                         <div className="h-full flex flex-col">
                             {/* Sidebar Header */}
-                            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 to-white">
+                            <div className="sidebar-surface p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-slate-50 to-white">
                                 <div>
                                     <h2 className="text-xl font-bold text-dark">
                                         Full package breakdown
@@ -867,7 +909,7 @@ export default function QuoteResultsPage({ answers }) {
                                         {activeQuote.model} installation
                                     </p>
                                     {getBrandLogo(activeQuote.brand) && (
-                                        <div className="mt-3 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2">
+                                        <div className="sidebar-surface mt-3 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2">
                                             <img
                                                 src={getBrandLogo(activeQuote.brand)}
                                                 alt={`${activeQuote.brand} logo`}
@@ -890,9 +932,10 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
                                 <button
                                     onClick={() => setActiveQuote(null)}
-                                    className="h-10 w-10 rounded-full cursor-pointer bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                                    className="question-sidebar-close h-10 sm:h-10 w-auto min-w-[2.75rem] px-3 rounded-xl cursor-pointer border-2 flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                                 >
-                                    <FiX className="text-slate-600" />
+                                    <FiX className="text-white" />
+                                    <span className="text-[11px] font-semibold text-white sm:hidden">Close</span>
                                 </button>
                             </div>
 
@@ -904,7 +947,7 @@ export default function QuoteResultsPage({ answers }) {
                                         (itemString, i) => (
                                             <div
                                                 key={i}
-                                                className="flex gap-4 items-start p-4 rounded-2xl border border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-all group"
+                                                className="sidebar-surface flex gap-4 items-start p-4 rounded-2xl border border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-all group"
                                             >
                                                 <div className="h-12 w-12 rounded-xl bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 group-hover:bg-primary/30 transition-colors font-bold">
                                                     <FiCheck size={20} />
@@ -989,7 +1032,7 @@ export default function QuoteResultsPage({ answers }) {
                                     )}
 
                                 {/* Price Summary in Sidebar */}
-                                <div className="mt-8 p-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-emerald-50 via-white to-sky-50 text-slate-900">
+                                <div className="sidebar-surface mt-8 p-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-emerald-50 via-white to-sky-50 text-slate-900">
                                     <h3 className="font-bold text-lg mb-4">
                                         Price summary
                                     </h3>
