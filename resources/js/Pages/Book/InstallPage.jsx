@@ -23,9 +23,8 @@ export default function InstallPage({ booking }) {
     const [showAllIncludes, setShowAllIncludes] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [termsError, setTermsError] = useState("");
-    const [showCancellationTooltip, setShowCancellationTooltip] =
-        useState(false);
-    const [showPetTooltip, setShowPetTooltip] = useState(false);
+    const [openInstallCompatibilityTip, setOpenInstallCompatibilityTip] =
+        useState(null);
 
     const titleOptions = ["Mr", "Mrs", "Ms", "Miss", "Dr"];
 
@@ -91,6 +90,34 @@ export default function InstallPage({ booking }) {
             mounted.current = false;
         };
     }, []);
+
+    useEffect(() => {
+        if (openInstallCompatibilityTip === null) return;
+
+        const handleOutside = (event) => {
+            const target = event.target;
+            if (
+                target instanceof Element &&
+                !target.closest('[data-install-compat-wrap="true"]')
+            ) {
+                setOpenInstallCompatibilityTip(null);
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                setOpenInstallCompatibilityTip(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutside);
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutside);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [openInstallCompatibilityTip]);
 
     // refs to scroll/focus to invalid section
     const dateRef = useRef(null);
@@ -639,6 +666,28 @@ export default function InstallPage({ booking }) {
     return (
         <>
             <Head title={title} />
+            <style>{`
+                .pet-doggy-wrap {
+                    animation: pet-doggy-bob 1.8s ease-in-out infinite;
+                    transform-origin: center;
+                }
+
+                .pet-doggy-ear-left,
+                .pet-doggy-ear-right {
+                    animation: pet-doggy-ear 1.2s ease-in-out infinite;
+                    transform-origin: center top;
+                }
+
+                @keyframes pet-doggy-bob {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-1.5px); }
+                }
+
+                @keyframes pet-doggy-ear {
+                    0%, 100% { transform: rotate(0deg); }
+                    50% { transform: rotate(7deg); }
+                }
+            `}</style>
             <BlueQuoteSkin>
                 <PageHeader />
 
@@ -716,7 +765,19 @@ export default function InstallPage({ booking }) {
                             <p className="mt-1 text-sm font-semibold text-slate-900">Rated Excellent by local customers</p>
                         </div>
                         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-                            <p className="text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">Gas Safe</p>
+                            <div className="flex items-center gap-2">
+                                <img
+                                    src="/images/gas%20safe%20logo%20mega.png"
+                                    alt="Gas Safe Register"
+                                    className="h-5 w-auto object-contain"
+                                    loading="lazy"
+                                    onError={(e) => {
+                                        e.currentTarget.src =
+                                            "/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png";
+                                    }}
+                                />
+                                <p className="text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">Gas Safe</p>
+                            </div>
                             <p className="mt-1 text-sm font-semibold text-emerald-900">Registered business: 636354</p>
                         </div>
                         <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
@@ -1174,45 +1235,40 @@ export default function InstallPage({ booking }) {
                                                             />
                                                         </div>
 
-                                                        <div className="relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                                                        <div className="relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 group/pet-policy">
+                                                            <span className="pet-doggy-wrap inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100/90 ring-1 ring-amber-200">
+                                                                <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" aria-hidden="true">
+                                                                    <path className="pet-doggy-ear-left" d="M7 7.2c-.8-1.5-2.3-1.9-3.2-.8-.8 1-.6 2.5.8 3.4L7 10.9V7.2Z" fill="#c08457" />
+                                                                    <path className="pet-doggy-ear-right" d="M17 7.2c.8-1.5 2.3-1.9 3.2-.8.8 1 .6 2.5-.8 3.4L17 10.9V7.2Z" fill="#c08457" />
+                                                                    <circle cx="12" cy="12" r="7" fill="#f5c892" />
+                                                                    <circle cx="9.4" cy="11.3" r="0.9" fill="#1f2937" />
+                                                                    <circle cx="14.6" cy="11.3" r="0.9" fill="#1f2937" />
+                                                                    <ellipse cx="12" cy="13.7" rx="1.2" ry="0.9" fill="#111827" />
+                                                                    <path d="M10.8 15.4c.3.5.7.8 1.2.8s.9-.3 1.2-.8" stroke="#7c2d12" strokeWidth="1" strokeLinecap="round" fill="none" />
+                                                                </svg>
+                                                            </span>
                                                             <span className="font-semibold text-slate-800">
                                                                 Pet-friendly visits
                                                             </span>
                                                             <button
                                                                 type="button"
-                                                                onClick={() =>
-                                                                    setShowPetTooltip(
-                                                                        (v) => !v
-                                                                    )
-                                                                }
-                                                                onBlur={() =>
-                                                                    setTimeout(
-                                                                        () =>
-                                                                            setShowPetTooltip(
-                                                                                false
-                                                                            ),
-                                                                        120
-                                                                    )
-                                                                }
                                                                 className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary"
                                                                 aria-label="Show pet-friendly information"
                                                             >
                                                                 <FiInfo className="h-3.5 w-3.5" />
                                                             </button>
 
-                                                            {showPetTooltip && (
-                                                                <div className="absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-white p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl">
-                                                                    <p>
-                                                                        We are dog-friendly and happy for them to be around during the visit.
-                                                                    </p>
-                                                                    <p className="mt-1.5">
-                                                                        If your dog is feeling social, we are always glad to say hello first.
-                                                                    </p>
-                                                                    <p className="mt-1.5">
-                                                                        During active work, we ask that pets are kept clear of tools and working areas for everyone’s safety.
-                                                                    </p>
-                                                                </div>
-                                                            )}
+                                                            <div className="quote-solid-popover pointer-events-none absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl opacity-0 translate-y-1 transition-all duration-200 group-hover/pet-policy:pointer-events-auto group-hover/pet-policy:opacity-100 group-hover/pet-policy:translate-y-0 group-focus-within/pet-policy:pointer-events-auto group-focus-within/pet-policy:opacity-100 group-focus-within/pet-policy:translate-y-0">
+                                                                <p>
+                                                                    We are dog-friendly and happy for them to be around during the visit.
+                                                                </p>
+                                                                <p className="mt-1.5">
+                                                                    If your dog is feeling social, we are always glad to say hello first.
+                                                                </p>
+                                                                <p className="mt-1.5">
+                                                                    During active work, we ask that pets are kept clear of tools and working areas for everyone’s safety.
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
 
@@ -1289,12 +1345,7 @@ export default function InstallPage({ booking }) {
 
                                             {includes.length > 0 && (
                                                 <div className="space-y-3">
-                                                    <ul
-                                                        className={`space-y-2 overflow-hidden transition-all duration-500 ease-in-out ${showAllIncludes
-                                                                ? "max-h-[600px]"
-                                                                : "max-h-[180px]"
-                                                            }`}
-                                                    >
+                                                    <ul className="space-y-2">
                                                         <div className="space-y-3">
                                                             {/* TRV */}
                                                             {trvItem && (
@@ -1425,14 +1476,14 @@ export default function InstallPage({ booking }) {
                                                             (item, i) => (
                                                                 <li
                                                                     key={i}
-                                                                    className="flex justify-between items-center font-medium text-dark opacity-0 included-animation"
+                                                                    className="relative flex justify-between items-center font-medium text-dark opacity-0 included-animation"
                                                                     style={{
                                                                         animationDelay: `${i *
                                                                             40
                                                                             }ms`,
                                                                     }}
                                                                 >
-                                                                    <span className="max-w-[90%] text-[15px] line-clamp-1 inline-flex items-center gap-1.5">
+                                                                    <span className="max-w-[90%] text-[15px] inline-flex items-center gap-1.5">
                                                                         <span>
                                                                             {item}
                                                                         </span>
@@ -1440,11 +1491,34 @@ export default function InstallPage({ booking }) {
                                                                             item
                                                                         ) && (
                                                                             <span
-                                                                                title={compatibilityTooltipText}
-                                                                                aria-label={compatibilityTooltipText}
-                                                                                className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500"
+                                                                                data-install-compat-wrap="true"
+                                                                                className="relative inline-flex items-center group/compat"
                                                                             >
-                                                                                <FiInfo className="h-3 w-3" />
+                                                                                <button
+                                                                                    type="button"
+                                                                                    aria-label={compatibilityTooltipText}
+                                                                                    onClick={() =>
+                                                                                        setOpenInstallCompatibilityTip(
+                                                                                            openInstallCompatibilityTip ===
+                                                                                                i
+                                                                                                ? null
+                                                                                                : i
+                                                                                        )
+                                                                                    }
+                                                                                    className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500"
+                                                                                >
+                                                                                    <FiInfo className="h-3 w-3" />
+                                                                                </button>
+                                                                                <div
+                                                                                    className={`quote-solid-popover absolute left-0 top-[calc(100%+0.3rem)] z-40 w-[240px] rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-relaxed text-slate-700 shadow-lg translate-y-1 transition-all duration-200 ${
+                                                                                        openInstallCompatibilityTip ===
+                                                                                        i
+                                                                                            ? "pointer-events-auto opacity-100 translate-y-0"
+                                                                                            : "pointer-events-none opacity-0 group-hover/compat:pointer-events-auto group-hover/compat:opacity-100 group-hover/compat:translate-y-0 group-focus-within/compat:pointer-events-auto group-focus-within/compat:opacity-100 group-focus-within/compat:translate-y-0"
+                                                                                    }`}
+                                                                                >
+                                                                                    {compatibilityTooltipText}
+                                                                                </div>
                                                                             </span>
                                                                         )}
                                                                     </span>
@@ -1478,53 +1552,37 @@ export default function InstallPage({ booking }) {
                                         {/* ✅ Pay Now button functionality applied here */}
                                         <div className="bg-slate-50 -mx-6 -mb-6 p-6 pb-10 mt-6 border-t border-slate-200 text-slate-900">
                                             <div className="mb-4 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                                <div className="relative inline-flex items-center gap-1.5 text-xs text-slate-600">
+                                                <div className="relative inline-flex items-center gap-1.5 text-xs text-slate-600 group/cancel-policy">
                                                     <span className="font-semibold text-slate-800">
                                                         Cancellation policy
                                                     </span>
                                                     <button
                                                         type="button"
-                                                        onClick={() =>
-                                                            setShowCancellationTooltip(
-                                                                (v) => !v
-                                                            )
-                                                        }
-                                                        onBlur={() =>
-                                                            setTimeout(
-                                                                () =>
-                                                                    setShowCancellationTooltip(
-                                                                        false
-                                                                    ),
-                                                                120
-                                                            )
-                                                        }
                                                         className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary"
                                                         aria-label="Show cancellation policy"
                                                     >
                                                         <FiInfo className="h-3.5 w-3.5" />
                                                     </button>
 
-                                                    {showCancellationTooltip && (
-                                                        <div className="absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-white p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl">
-                                                            <p>
-                                                                You can cancel for a full refund up to 24 hours before your booking.
-                                                            </p>
-                                                            <p className="mt-1.5">
-                                                                Cancellations made with less than 24 hours’ notice may be chargeable, including where materials have already been ordered or engineer time has been allocated.
-                                                            </p>
-                                                            <p className="mt-2 text-slate-500">
-                                                                This does not affect your statutory rights. Full terms:
-                                                                <a
-                                                                    href="/terms-conditions"
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="ml-1 font-semibold text-primary underline underline-offset-2"
-                                                                >
-                                                                    view full terms
-                                                                </a>
-                                                            </p>
-                                                        </div>
-                                                    )}
+                                                    <div className="quote-solid-popover pointer-events-none absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl opacity-0 translate-y-1 transition-all duration-200 group-hover/cancel-policy:pointer-events-auto group-hover/cancel-policy:opacity-100 group-hover/cancel-policy:translate-y-0 group-focus-within/cancel-policy:pointer-events-auto group-focus-within/cancel-policy:opacity-100 group-focus-within/cancel-policy:translate-y-0">
+                                                        <p>
+                                                            You can cancel for a full refund up to 24 hours before your booking.
+                                                        </p>
+                                                        <p className="mt-1.5">
+                                                            Cancellations made with less than 24 hours’ notice may be chargeable, including where materials have already been ordered or engineer time has been allocated.
+                                                        </p>
+                                                        <p className="mt-2 text-slate-500">
+                                                            This does not affect your statutory rights. Full terms:
+                                                            <a
+                                                                href="/terms-conditions"
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="ml-1 font-semibold text-primary underline underline-offset-2"
+                                                            >
+                                                                view full terms
+                                                            </a>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
 

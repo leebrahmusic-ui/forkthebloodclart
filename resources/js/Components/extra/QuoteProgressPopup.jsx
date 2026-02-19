@@ -19,9 +19,12 @@ export default function QuoteProcessingModal({
     onComplete,
     onClose,
 }) {
+    const STEP_DURATION_MS = 1200;
+    const REDIRECT_DELAY_MS = 650;
+
     const [activeStep, setActiveStep] = useState(0);
     const [waveOffset, setWaveOffset] = useState(0);
-    const [energyLevels, setEnergyLevels] = useState([0, 0, 0]);
+    const [displayProgress, setDisplayProgress] = useState(0);
     const canvasRef = useRef(null);
 
     const [quote, setQuote] = useState(null);
@@ -90,21 +93,37 @@ export default function QuoteProcessingModal({
 
         raf = requestAnimationFrame(animate);
 
-        const energyInterval = setInterval(() => {
-            setEnergyLevels((prev) =>
-                prev.map((v, i) => {
-                    if (i === activeStep)
-                        return Math.min(100, v + 2 + Math.random() * 3);
-                    return Math.max(15, v - 1.5);
-                })
-            );
-        }, 120);
+        return () => {
+            cancelAnimationFrame(raf);
+        };
+    }, [open, activeStep]);
+
+    useEffect(() => {
+        if (!open) {
+            setDisplayProgress(0);
+            return;
+        }
+
+        const totalDuration = steps.length * STEP_DURATION_MS;
+        let raf;
+        const start = performance.now();
+
+        const tick = (now) => {
+            const elapsed = now - start;
+            const pct = Math.min(100, (elapsed / totalDuration) * 100);
+            setDisplayProgress(pct);
+
+            if (pct < 100) {
+                raf = requestAnimationFrame(tick);
+            }
+        };
+
+        raf = requestAnimationFrame(tick);
 
         return () => {
             cancelAnimationFrame(raf);
-            clearInterval(energyInterval);
         };
-    }, [open, activeStep]);
+    }, [open, steps.length]);
 
     useEffect(() => {
         if (!canvasRef.current || !open) return;
@@ -137,15 +156,18 @@ export default function QuoteProcessingModal({
     useEffect(() => {
         if (!open) {
             setActiveStep(0);
-            setEnergyLevels([0, 0, 0]);
+            setDisplayProgress(0);
             return;
         }
 
         if (activeStep >= steps.length) return;
 
-        const timer = setTimeout(() => setActiveStep((s) => s + 1), 2400);
+        const timer = setTimeout(
+            () => setActiveStep((s) => s + 1),
+            STEP_DURATION_MS
+        );
         return () => clearTimeout(timer);
-    }, [open, activeStep, steps.length]);
+    }, [open, activeStep, steps.length, STEP_DURATION_MS]);
 
     // Prevent background scroll on mobile while modal open
     useEffect(() => {
@@ -159,10 +181,7 @@ export default function QuoteProcessingModal({
 
     const completed = activeStep >= steps.length;
     const currentStep = steps[Math.min(activeStep, steps.length - 1)];
-    const progressPercent = Math.min(
-        100,
-        Math.round((activeStep / steps.length) * 100)
-    );
+    const progressPercent = Math.min(100, Math.round(displayProgress));
     const ringRadius = 52;
     const ringCircumference = 2 * Math.PI * ringRadius;
     const ringDashOffset =
@@ -180,10 +199,10 @@ export default function QuoteProcessingModal({
             router.post(`/book/quote/new/results`, payload, {
                 preserveScroll: true,
             });
-        }, 1800);
+        }, REDIRECT_DELAY_MS);
 
         return () => clearTimeout(timer);
-    }, [open, completed, quote]);
+    }, [open, completed, quote, REDIRECT_DELAY_MS]);
 
     if (!open) return null;
 
@@ -482,24 +501,13 @@ export default function QuoteProcessingModal({
                                         <div className="mt-6">
                                             <div className="flex justify-between text-xs modal-soft-text mb-1">
                                                 <span>Finishing up</span>
-                                                <span>
-                                                    {Math.round(
-                                                        (activeStep /
-                                                            steps.length) *
-                                                            100
-                                                    )}
-                                                    %
-                                                </span>
+                                                <span>{progressPercent}%</span>
                                             </div>
                                             <div className="h-1.5 modal-track rounded-full overflow-hidden">
                                                 <div
-                                                    className="h-full modal-progress transition-all"
+                                                    className="h-full modal-progress transition-[width] duration-300 ease-out"
                                                     style={{
-                                                        width: `${
-                                                            (activeStep /
-                                                                steps.length) *
-                                                            100
-                                                        }%`,
+                                                        width: `${progressPercent}%`,
                                                     }}
                                                 />
                                             </div>
