@@ -43,7 +43,7 @@ const services = [
         id: "quote",
         title: "New Boiler Quote",
         description: "Worcester Bosch Greenstar 1000",
-        priceLine: "Installed from £1895 (24kW)",
+        priceLine: "Installed from £1595 (24kW)",
         specs: [
             "5-year warranty included",
             "Filter included",
