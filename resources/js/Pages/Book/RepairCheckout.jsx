@@ -6,7 +6,7 @@ import { GoogleReview } from "@/Components/GoogleReview";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { FiCreditCard, FiLoader, FiCheck, FiShield, FiCalendar, FiMapPin } from "react-icons/fi";
+import { FiCreditCard, FiLoader, FiCheck, FiShield, FiCalendar, FiMapPin, FiInfo } from "react-icons/fi";
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 
 export default function RepairCheckout() {
@@ -28,6 +28,7 @@ export default function RepairCheckout() {
 
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [openPetTooltip, setOpenPetTooltip] = useState(false);
     const mounted = useRef(true);
     const prefilled = useRef(false);
 
@@ -37,6 +38,34 @@ export default function RepairCheckout() {
             mounted.current = false;
         };
     }, []);
+
+    useEffect(() => {
+        if (!openPetTooltip) return;
+
+        const handleOutside = (event) => {
+            const target = event.target;
+            if (
+                target instanceof Element &&
+                !target.closest('[data-pet-policy-wrap="true"]')
+            ) {
+                setOpenPetTooltip(false);
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                setOpenPetTooltip(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutside);
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutside);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [openPetTooltip]);
 
     useEffect(() => {
         if (prefilled.current) return;
@@ -259,6 +288,28 @@ export default function RepairCheckout() {
     return (
         <>
             <Head title={title} />
+            <style>{`
+                .pet-doggy-wrap {
+                    animation: pet-doggy-bob 1.8s ease-in-out infinite;
+                    transform-origin: center;
+                }
+
+                .pet-doggy-ear-left,
+                .pet-doggy-ear-right {
+                    animation: pet-doggy-ear 1.2s ease-in-out infinite;
+                    transform-origin: center top;
+                }
+
+                @keyframes pet-doggy-bob {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-1.5px); }
+                }
+
+                @keyframes pet-doggy-ear {
+                    0%, 100% { transform: rotate(0deg); }
+                    50% { transform: rotate(7deg); }
+                }
+            `}</style>
             <BlueQuoteSkin>
                 <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50 quote-page-bg" />
                 <div className="min-h-screen quote-page-bg">
@@ -485,6 +536,55 @@ export default function RepairCheckout() {
                                         </>
                                     )}
                                 </button>
+
+                                <div data-pet-policy-wrap="true" className="relative mt-3 inline-flex w-fit items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-xs text-emerald-800 group/pet-policy">
+                                    <span className="pet-doggy-wrap inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100/90 ring-1 ring-amber-200">
+                                        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" aria-hidden="true">
+                                            <path className="pet-doggy-ear-left" d="M7 7.2c-.8-1.5-2.3-1.9-3.2-.8-.8 1-.6 2.5.8 3.4L7 10.9V7.2Z" fill="#c08457" />
+                                            <path className="pet-doggy-ear-right" d="M17 7.2c.8-1.5 2.3-1.9 3.2-.8.8 1 .6 2.5-.8 3.4L17 10.9V7.2Z" fill="#c08457" />
+                                            <circle cx="12" cy="12" r="7" fill="#f5c892" />
+                                            <circle cx="9.4" cy="11.3" r="0.9" fill="#1f2937" />
+                                            <circle cx="14.6" cy="11.3" r="0.9" fill="#1f2937" />
+                                            <ellipse cx="12" cy="13.7" rx="1.2" ry="0.9" fill="#111827" />
+                                            <path d="M10.8 15.4c.3.5.7.8 1.2.8s.9-.3 1.2-.8" stroke="#7c2d12" strokeWidth="1" strokeLinecap="round" fill="none" />
+                                        </svg>
+                                    </span>
+                                    <span className="font-semibold text-emerald-900">
+                                        Pet-friendly visits
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setOpenPetTooltip(
+                                                (prev) =>
+                                                    !prev
+                                            )
+                                        }
+                                        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-emerald-300 text-emerald-700 transition-colors hover:border-emerald-500 hover:text-emerald-800"
+                                        aria-label="Show pet-friendly information"
+                                    >
+                                        <FiInfo className="h-3.5 w-3.5" />
+                                    </button>
+
+                                    <div
+                                        className={`quote-solid-popover absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${
+                                            openPetTooltip
+                                                ? "pointer-events-auto opacity-100 translate-y-0"
+                                                : "pointer-events-none opacity-0 group-hover/pet-policy:pointer-events-auto group-hover/pet-policy:opacity-100 group-hover/pet-policy:translate-y-0 group-focus-within/pet-policy:pointer-events-auto group-focus-within/pet-policy:opacity-100 group-focus-within/pet-policy:translate-y-0"
+                                        }`}
+                                    >
+                                        <p>
+                                            We are dog-friendly and happy for them to be around during the visit.
+                                        </p>
+                                        <p className="mt-1.5">
+                                            If your dog is feeling social, we are always glad to say hello first.
+                                        </p>
+                                        <p className="mt-1.5">
+                                            During active work, we ask that pets are kept clear of tools and working areas for everyone’s safety.
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <p className="text-xs text-emerald-50/90 text-center mt-3">
                                     Card payments are encrypted via Stripe. Approved parts or extra labour are billed separately per our Terms & Conditions.
                                 </p>

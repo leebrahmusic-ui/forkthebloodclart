@@ -11,9 +11,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Http\Controllers\QuoteCheckoutController;
 use App\Http\Controllers\Admin\OrderManagementController;
+use App\Http\Controllers\Admin\BoilerCatalogController;
 use App\Http\Controllers\Admin\RadiatorPriceController;
 use App\Http\Controllers\Admin\PricingOverridesController;
 use App\Http\Controllers\Admin\SchedulingController;
+use App\Http\Controllers\GoogleReviewController;
 
 
 Route::get('/health', function () {
@@ -24,6 +26,8 @@ Route::get('/health', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/google-reviews', [GoogleReviewController::class, 'index'])->name('google.reviews');
 
 
 //Extra Routes
@@ -182,6 +186,10 @@ Route::middleware(['auth']) // add your admin middleware if you have one
         Route::get('/pricing', [PricingOverridesController::class, 'index'])->name('pricing.index');
         Route::post('/pricing/save', [PricingOverridesController::class, 'save'])->name('pricing.save');
         Route::post('/pricing/reset', [PricingOverridesController::class, 'reset'])->name('pricing.reset');
+
+        Route::get('/boilers', [BoilerCatalogController::class, 'index'])->name('boilers.index');
+        Route::post('/boilers/save', [BoilerCatalogController::class, 'save'])->name('boilers.save');
+        Route::post('/boilers/reset', [BoilerCatalogController::class, 'reset'])->name('boilers.reset');
 
         // Scheduling controls
         Route::get('/scheduling', [SchedulingController::class, 'index'])->name('scheduling.index');

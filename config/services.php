@@ -60,7 +60,25 @@ return [
     'stripe' => [
         'secret' => env('STRIPE_SECRET'),
         'api'   => env('STRIPE_KEY')
-    ]
+    ],
+
+    'google_places' => [
+        'api_key' => env('GOOGLE_PLACES_API_KEY'),
+        'place_id' => env('GOOGLE_PLACES_PLACE_ID'),
+        'cache_minutes' => env('GOOGLE_PLACES_CACHE_MINUTES', 30),
+    ],
+
+    'google_business' => [
+        'client_id' => env('GOOGLE_BUSINESS_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_BUSINESS_CLIENT_SECRET'),
+        'refresh_token' => env('GOOGLE_BUSINESS_REFRESH_TOKEN'),
+        'location_name' => env('GOOGLE_BUSINESS_LOCATION_NAME'),
+        'account_id' => env('GOOGLE_BUSINESS_ACCOUNT_ID'),
+        'location_id' => env('GOOGLE_BUSINESS_LOCATION_ID'),
+        'display_name' => env('GOOGLE_BUSINESS_DISPLAY_NAME', 'MD Gas Leeds'),
+        'maps_url' => env('GOOGLE_BUSINESS_MAPS_URL'),
+        'cache_minutes' => env('GOOGLE_BUSINESS_CACHE_MINUTES', 30),
+    ],
 
 
 ];

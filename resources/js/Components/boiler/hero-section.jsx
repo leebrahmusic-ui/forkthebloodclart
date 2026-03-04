@@ -3,6 +3,14 @@ import { HeroServices } from "../HeroService";
 import { BadgeCheck, ShieldCheck, Clock4, PhoneCall } from "lucide-react";
 
 export function HeroSection() {
+    const scrollToServices = () => {
+        const target = document.getElementById("hero-services-grid");
+        if (!target) return;
+
+        const top = window.scrollY + target.getBoundingClientRect().top - 24;
+        window.scrollTo({ top, behavior: "smooth" });
+    };
+
     return (
         <section
             id="services"
@@ -35,9 +43,13 @@ export function HeroSection() {
                                 >
                                     Get a fixed quote
                                 </a>
-                                <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700">
+                                <button
+                                    type="button"
+                                    onClick={scrollToServices}
+                                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                                >
                                     See services below
-                                </span>
+                                </button>
                             </div>
 
                             <p className="text-xs text-slate-500 mx-auto">
@@ -118,7 +130,9 @@ export function HeroSection() {
                         </div>
                     </div>
                 </div>
-                <HeroServices />
+                <div id="hero-services-grid">
+                    <HeroServices />
+                </div>
 
                 <GoogleReview />
             </div>

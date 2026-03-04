@@ -242,9 +242,20 @@ export default function InstallPage({ booking }) {
 
     const hasSmartThermostat = addOns.some((x) => x.key === "smart_stat");
 
+    const selectedThermostat =
+        booking?.answers?.inputs?.thermostat ||
+        booking?.answers?.raw?.thermostat_type?.label ||
+        "";
+
+    const usesExistingThermostat =
+        String(selectedThermostat).toLowerCase() ===
+        "use existing thermostat";
+
     const thermostatLabel = hasSmartThermostat
         ? "Smart Thermostat"
-        : "Standard Wireless Thermostat";
+        : usesExistingThermostat
+            ? "Use Existing Thermostat"
+            : "Standard Wireless Thermostat";
 
     const isCompatibilityDependentItem = (label = "") => {
         const normalized = String(label).toLowerCase();

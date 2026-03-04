@@ -55,6 +55,12 @@ export default function AuthenticatedLayout({ header, children }) {
                         label: "New Quote Price Management",
                         href: route("admin.pricing.index"),
                         isActive: () => route().current("admin.pricing.index"),
+                    },
+                    {
+                        key: "pricing.boiler.catalogue",
+                        label: "Boiler Catalogue",
+                        href: route("admin.boilers.index"),
+                        isActive: () => route().current("admin.boilers.index"),
                     }
                     // add more pricing items here later
                 ],

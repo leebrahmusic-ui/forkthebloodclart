@@ -13,11 +13,33 @@ const numOr = (v, fallback) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+const normalizeLegacyProduct = (p) => {
+    const next = { ...p };
+    const brand = String(next.brand || "");
+    const model = String(next.model || "").toLowerCase();
+
+    if (
+        (next.id === "wb_greenstar_1000_35" || model.includes("8000")) &&
+        Number(next.kw) === 35
+    ) {
+        next.kw = 36;
+    }
+
+    if (/\b36\s*kw\b/i.test(brand)) {
+        next.brand = brand.replace(/\s*36\s*kw\b/i, "").trim() || "Worcester Bosch";
+    }
+
+    return next;
+};
+
 const applyEffectiveConfig = () => {
   const o = getOverrides();
   const oRules = o.rules || {};
   const oAddons = o.addons || {};
   const oProducts = o.products || {};
+    const catalogProducts = Array.isArray(o?.catalog?.products) && o.catalog.products.length
+        ? o.catalog.products
+        : DEFAULT_PRODUCTS;
 
   const RULES = {
     ...DEFAULT_RULES,
@@ -33,8 +55,8 @@ const applyEffectiveConfig = () => {
     }
   });
 
-  const PRODUCTS = DEFAULT_PRODUCTS.map((p) => {
-    const next = { ...p };
+    const PRODUCTS = catalogProducts.map((p) => {
+    const next = normalizeLegacyProduct(p);
 
     if (oProducts[`${p.id}.basePrice`] !== undefined) {
       const v = oProducts[`${p.id}.basePrice`];

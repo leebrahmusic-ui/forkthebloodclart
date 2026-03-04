@@ -293,7 +293,7 @@ export const SERVICE_QUESTIONS = {
                 badge: "Tip",
                 text: `A smart thermostat allows you to control your heating remotely via iOS or Android, set schedules, and improve efficiency.
 
-If you’re happy to keep your existing thermostat, please select Basic.
+You can also keep your current thermostat at no extra cost.
 • Standard wireless thermostat (included)
 `,
             },
@@ -307,7 +307,12 @@ If you’re happy to keep your existing thermostat, please select Basic.
                     label: "Smart",
                     priceNote: "+£100",
                     image: "/images/stepper/SMART_room_thermostat-removebg-preview.png",
-                }
+                },
+                {
+                    label: "Use existing thermostat",
+                    priceNote: "Free",
+                    image: "/images/stepper/STANDARD_room_thermostat-removebg-preview.png",
+                },
             ],
             preset: { label: "Basic" },
             showIf: (a) => !!a.radiators,

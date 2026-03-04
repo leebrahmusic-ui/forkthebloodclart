@@ -10,25 +10,35 @@ export default function BlueQuoteSkin({ children }) {
                     forced-color-adjust: none !important;
                 }
 
+                .quote-blue-skin {
+                    --qb-base: #00ABDB;
+                    --qb-mid: #0098c4;
+                    --qb-deep: #007ea3;
+                    --qb-panel: #0089b2;
+                    --qb-panel-dark: #00779b;
+                    --qb-option: #0082a8;
+                    --qb-option-active: #006f91;
+                }
+
                 .quote-blue-skin .quote-page-bg {
-                    background: #00ABDB !important;
-                    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, #0098c4 0%, #007ea3 100%) !important;
+                    background: var(--qb-base) !important;
+                    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
                 }
 
                 .quote-blue-skin .page-header-clean {
-                    background: #0089b2 !important;
+                    background: var(--qb-panel) !important;
                     border-color: rgba(255, 255, 255, 0.30) !important;
                     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.10) !important;
                 }
 
                 .quote-blue-skin .quote-trust-card {
-                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)), #008db6 !important;
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)), var(--qb-panel) !important;
                     border-color: rgba(255, 255, 255, 0.35) !important;
                     box-shadow: 0 8px 20px rgba(0, 65, 88, 0.14) !important;
                 }
 
                 .quote-blue-skin .quote-question-shell {
-                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)), #0088b0 !important;
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)), var(--qb-panel) !important;
                     border: 1px solid rgba(255, 255, 255, 0.35) !important;
                     box-shadow: 0 14px 34px rgba(0, 65, 88, 0.16) !important;
                 }
@@ -98,12 +108,12 @@ export default function BlueQuoteSkin({ children }) {
                 }
 
                 .quote-blue-skin .option-inactive {
-                    background: #0082a8 !important;
+                    background: var(--qb-option) !important;
                     color: #ffffff !important;
                 }
 
                 .quote-blue-skin .option-active {
-                    background: #006f91 !important;
+                    background: var(--qb-option-active) !important;
                     border-color: rgba(255, 255, 255, 0.58) !important;
                     box-shadow: 0 10px 24px rgba(0, 53, 72, 0.28) !important;
                     color: #ffffff !important;
@@ -128,7 +138,7 @@ export default function BlueQuoteSkin({ children }) {
                 .quote-blue-skin input,
                 .quote-blue-skin select,
                 .quote-blue-skin textarea {
-                    background: #00799c !important;
+                    background: var(--qb-panel-dark) !important;
                     color: #ffffff !important;
                     border-color: rgba(255, 255, 255, 0.45) !important;
                 }
@@ -165,14 +175,14 @@ export default function BlueQuoteSkin({ children }) {
 
                 @media (prefers-color-scheme: dark) {
                     .quote-blue-skin .quote-page-bg {
-                        background: #00ABDB !important;
-                        background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, #0098c4 0%, #007ea3 100%) !important;
+                        background: var(--qb-base) !important;
+                        background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
                     }
 
                     .quote-blue-skin .page-header-clean,
                     .quote-blue-skin .quote-trust-card,
                     .quote-blue-skin .quote-question-shell {
-                        background-color: #0088b0 !important;
+                        background-color: var(--qb-panel) !important;
                     }
 
                     .quote-blue-skin .page-header-clean,

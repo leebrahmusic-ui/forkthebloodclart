@@ -104,10 +104,10 @@ export const PRODUCTS = [
     {
         id: "wb_greenstar_1000_35",
         type: "combi",
-        brand: "Worcester Bosch 36KW",
+        brand: "Worcester Bosch",
         model: "Greenstar 8000+",
         warrantyYears: 12,
-        kw: 35,
+        kw: 36,
         priceType: "variable",
         basePrice: null,
         images: ["/assets/productImages/greenstar-boiler8000.png"],

@@ -41,17 +41,26 @@ const services = [
     },
     {
         id: "quote",
-        title: "New Boiler Quote",
-        description: "Worcester Bosch Greenstar 1000",
-        priceLine: "Installed from £1595 (24kW)",
+        title: "Get your fixed-price boiler quote in under 60 seconds",
+        description: "",
+        priceLine: "From £1,395 inc VAT",
+        brands: [
+            { name: "Worcester Bosch", logo: "/images/brands/worcester-bosch.svg" },
+            { name: "Ideal", logo: "/images/idealheating.png" },
+            { name: "& many more...", logo: null },
+        ],
+        boilerImages: [
+            "/assets/productImages/greenstar-boiler.png",
+            "/assets/productImages/max-combi-image.png",
+            "/assets/productImages/baxi-image.png",
+        ],
         specs: [
-            "5-year warranty included",
-            "Filter included",
-            "Chemical flush",
-            "Wireless room thermostat",
+            "Manufacturer warranties from 5 to 12 years",
+            "Magnetic filter + system flush included",
+            "Wireless thermostat included",
         ],
         image: "/assets/productImages/greenstar-boiler.png",
-        highlight: "Next‑day install",
+        highlight: "Most booked this month",
         href: "/book",
         featured: true,
 
@@ -94,25 +103,65 @@ export function HeroServices() {
                     </div>
 
                     <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-                        <div className="space-y-3 flex flex-col items-center">
+                        <div className="space-y-4 flex flex-col items-center lg:items-start">
                             <CardHeader className="p-0 w-full">
-                                <CardTitle className="w-full text-[22px] font-semibold text-slate-900">
+                                <CardTitle className="w-full text-[24px] font-semibold text-slate-900 text-center lg:text-left">
                                     {featuredService.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0 w-full">
-                                <CardDescription className="text-[14px] leading-relaxed text-slate-600">
+                                <CardDescription className="text-[14px] leading-relaxed text-slate-600 text-center lg:text-left">
                                     {featuredService.description}
                                 </CardDescription>
                                 {featuredService.priceLine && (
-                                    <p className="mt-2 text-[15px] font-semibold text-slate-900">
+                                    <Link
+                                        href={featuredService.href}
+                                        className="mt-3 inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[16px] font-bold text-emerald-800 transition hover:bg-emerald-100"
+                                    >
                                         {featuredService.priceLine}
-                                    </p>
+                                    </Link>
+                                )}
+
+                                <div className="mt-2 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+                                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
+                                        Gas Safe registered
+                                    </span>
+                                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
+                                        Fixed quote
+                                    </span>
+                                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
+                                        Next-day installs available
+                                    </span>
+                                </div>
+
+                                {featuredService.brands?.length > 0 && (
+                                    <div className="mt-3">
+                                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 text-center lg:text-left">
+                                            Available makes
+                                        </p>
+                                        <div className="mt-2 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                                            {featuredService.brands.map((brand) => (
+                                                <div
+                                                    key={brand.name}
+                                                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5"
+                                                >
+                                                    {brand.logo ? (
+                                                        <img
+                                                            src={brand.logo}
+                                                            alt={brand.name}
+                                                            className="h-4 w-auto object-contain"
+                                                        />
+                                                    ) : null}
+                                                    <span className="text-xs font-semibold text-slate-700">{brand.name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
                                 {featuredService.specs?.length > 0 && (
                                     <ul className="mt-3 space-y-1 text-sm text-slate-600">
                                         {featuredService.specs.map((spec) => (
-                                            <li key={spec} className="flex items-center justify-center gap-2">
+                                            <li key={spec} className="flex items-center justify-center gap-2 lg:justify-start">
                                                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                                                 <span>{spec}</span>
                                             </li>
@@ -121,25 +170,34 @@ export function HeroServices() {
                                 )}
                             </CardContent>
 
-                            <div className="mt-4 inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-600">
-                                Example package shown • Final selection happens in your quote
-                            </div>
-
                             <Link
                                 href={featuredService.href}
-                                className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                                className="mt-3 inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-emerald-600 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
                             >
                                 Get fixed quote
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
+                            <p className="text-xs text-slate-500 text-center lg:text-left">
+                                Rated 5.0 on Google • No-obligation quote
+                            </p>
                         </div>
 
-                        <div className="relative flex h-48 items-center justify-center rounded-2xl bg-slate-50">
-                            <img
-                                src={featuredService.image}
-                                alt={featuredService.title}
-                                className="max-h-36 object-contain"
-                            />
+                        <div className="relative grid h-56 grid-cols-3 gap-3 rounded-2xl bg-slate-50 p-3">
+                            {(featuredService.boilerImages?.length
+                                ? featuredService.boilerImages
+                                : [featuredService.image]
+                            ).map((imgSrc, idx) => (
+                                <div
+                                    key={`${imgSrc}-${idx}`}
+                                    className="flex items-center justify-center rounded-xl bg-white border border-slate-200 p-2"
+                                >
+                                    <img
+                                        src={imgSrc}
+                                        alt={`${featuredService.title} ${idx + 1}`}
+                                        className={`h-36 w-full object-contain ${idx === 0 ? "scale-[1.38]" : "scale-125"}`}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </Card>

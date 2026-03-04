@@ -12,11 +12,33 @@ function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+function normalizeLegacyProduct(p) {
+  const next = { ...p };
+  const brand = String(next.brand || "");
+  const model = String(next.model || "").toLowerCase();
+
+  if (
+    (next.id === "wb_greenstar_1000_35" || model.includes("8000")) &&
+    Number(next.kw) === 35
+  ) {
+    next.kw = 36;
+  }
+
+  if (/\b36\s*kw\b/i.test(brand)) {
+    next.brand = brand.replace(/\s*36\s*kw\b/i, "").trim() || "Worcester Bosch";
+  }
+
+  return next;
+}
+
 export function useEffectiveConfig() {
   const { pricingOverrides } = usePage().props || {};
   const oRules = pricingOverrides?.rules || {};
   const oAddons = pricingOverrides?.addons || {};
   const oProducts = pricingOverrides?.products || {};
+  const catalogProducts = Array.isArray(pricingOverrides?.catalog?.products) && pricingOverrides.catalog.products.length
+    ? pricingOverrides.catalog.products
+    : DEFAULT_PRODUCTS;
 
   // RULES
   const RULES = {
@@ -35,8 +57,8 @@ export function useEffectiveConfig() {
   });
 
   // PRODUCTS (override by id.field)
-  const PRODUCTS = DEFAULT_PRODUCTS.map((p) => {
-    const next = { ...p };
+  const PRODUCTS = catalogProducts.map((p) => {
+    const next = normalizeLegacyProduct(p);
 
     if (oProducts[`${p.id}.basePrice`] !== undefined) {
       next.basePrice = oProducts[`${p.id}.basePrice`] === null
