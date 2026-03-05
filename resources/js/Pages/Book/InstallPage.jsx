@@ -51,6 +51,10 @@ export default function InstallPage({ booking }) {
     const [paymentTxId, setPaymentTxId] = useState(null);
     const [paymentReturnUrl, setPaymentReturnUrl] = useState(null);
     const [paymentError, setPaymentError] = useState("");
+    const [couponCode, setCouponCode] = useState("");
+    const [couponApplied, setCouponApplied] = useState(null);
+    const [couponError, setCouponError] = useState("");
+    const [applyingCoupon, setApplyingCoupon] = useState(false);
     const mounted = useRef(true);
     const paymentElementContainerRef = useRef(null);
     const paymentSectionRef = useRef(null);
@@ -221,6 +225,22 @@ export default function InstallPage({ booking }) {
 
         return Number(cleaned) || 0;
     }, [booking]);
+
+    const payableAmount = useMemo(() => {
+        if (couponApplied && Number.isFinite(Number(couponApplied.total))) {
+            return Number(couponApplied.total);
+        }
+        return Number(quoteAmount || 0);
+    }, [couponApplied, quoteAmount]);
+
+    const discountAmount = useMemo(() => {
+        if (couponApplied && Number.isFinite(Number(couponApplied.discount))) {
+            return Number(couponApplied.discount);
+        }
+        return 0;
+    }, [couponApplied]);
+
+    const formatMoney = (amount) => `${symbol} ${Number(amount || 0).toFixed(2)}`;
 
     const visibleAddOns = booking?.answers?.addOns;
     console.log("Add Ons", visibleAddOns);
@@ -553,6 +573,7 @@ export default function InstallPage({ booking }) {
                     service: "new_boiler_quote",
                     form: payload,
                     amount: quoteAmount,
+                    coupon_code: couponApplied?.coupon?.code || null,
                     payment_element: true,
                 },
                 { timeout: 15000 }
@@ -561,6 +582,14 @@ export default function InstallPage({ booking }) {
             const checkoutClientSecret =
                 res?.data?.data?.checkout_client_secret;
             const checkoutMode = res?.data?.data?.checkout_mode;
+            const pricing = res?.data?.data?.pricing;
+
+            setCouponError("");
+            if (pricing?.coupon) {
+                setCouponApplied(pricing);
+            } else {
+                setCouponApplied(null);
+            }
 
             if (
                 checkoutMode === "payment_element" &&
@@ -587,6 +616,11 @@ export default function InstallPage({ booking }) {
 
             if (status === 422) {
                 const backendErrors = err?.response?.data?.errors;
+                const couponMsg = backendErrors?.coupon_code?.[0];
+                if (couponMsg) {
+                    setCouponError(couponMsg);
+                    setCouponApplied(null);
+                }
                 if (showValidationToast) {
                     showValidationErrors(backendErrors);
                     hydrateInlineErrorsFromBackend(backendErrors);
@@ -623,18 +657,9 @@ export default function InstallPage({ booking }) {
         }
     };
 
-    useEffect(() => {
-        if (!checkoutReadyKey || paymentClientSecret || processing) return;
-        if (lastAutoInitKeyRef.current === checkoutReadyKey) return;
-
-        lastAutoInitKeyRef.current = checkoutReadyKey;
-
-        const timer = setTimeout(() => {
-            initialisePaymentElement({ showValidationToast: false });
-        }, 250);
-
-        return () => clearTimeout(timer);
-    }, [checkoutReadyKey, paymentClientSecret, processing]);
+    // Intentionally no automatic payment initialisation here.
+    // We only initialise when user explicitly clicks Continue / Apply coupon,
+    // to avoid creating duplicate pending bookings and slot re-locking.
 
     const handlePayAndBook = async () => {
         if (processing) return;
@@ -733,6 +758,67 @@ export default function InstallPage({ booking }) {
         }
     };
 
+    const handleApplyCoupon = async () => {
+        if (processing || applyingCoupon) return;
+
+        setCouponError("");
+        setPaymentError("");
+        setApplyingCoupon(true);
+
+        try {
+            const code = couponCode.trim() || null;
+
+            if (paymentClientSecret && paymentBookingId && paymentTxId) {
+                const res = await axios.post(
+                    "/quote/checkout/coupon-update",
+                    {
+                        booking_id: paymentBookingId,
+                        tx_id: paymentTxId,
+                        coupon_code: code,
+                    },
+                    { timeout: 15000 }
+                );
+
+                const pricing = res?.data?.data?.pricing || null;
+                setCouponApplied(pricing);
+                toast.success(code ? "Coupon applied." : "Coupon removed.");
+                return;
+            }
+
+            const preview = await axios.post(
+                "/quote/checkout/coupon-preview",
+                {
+                    service: "new_boiler_quote",
+                    amount: quoteAmount,
+                    coupon_code: code,
+                },
+                { timeout: 15000 }
+            );
+
+            const pricing = preview?.data?.data || null;
+            setCouponApplied(pricing);
+            if (code) {
+                toast.success("Coupon applied.");
+            } else {
+                toast.success("Coupon cleared.");
+            }
+        } catch (err) {
+            const couponMsg = err?.response?.data?.errors?.coupon_code?.[0];
+            if (couponMsg) {
+                setCouponError(couponMsg);
+                return;
+            }
+
+            const message =
+                err?.response?.data?.message ||
+                err?.message ||
+                "Unable to apply coupon right now.";
+            toast.error(message, { duration: 4500, position: "top-center" });
+        } finally {
+            setApplyingCoupon(false);
+        }
+    };
+
     return (
         <>
             <Head title={title} />
@@ -822,8 +908,13 @@ export default function InstallPage({ booking }) {
                             <div className="text-left sm:text-right">
                                 <p className="text-xs uppercase tracking-wider text-slate-500">Total</p>
                                 <div className="text-2xl font-bold text-slate-900">
-                                    {symbol} {booking?.price}
+                                    {formatMoney(payableAmount)}
                                 </div>
+                                {discountAmount > 0 && (
+                                    <p className="text-[11px] text-emerald-700 font-semibold">
+                                        Coupon saved {formatMoney(discountAmount)}
+                                    </p>
+                                )}
                                 <p className="text-[11px] text-slate-500">inc VAT</p>
                             </div>
                         </div>
@@ -1383,9 +1474,14 @@ export default function InstallPage({ booking }) {
                                         </h2>
                                         <div>
                                             <span className="text-5xl font-bold tracking-tight text-slate-900">
-                                                {symbol} {booking?.price}
+                                                {formatMoney(payableAmount)}
                                             </span>
                                         </div>
+                                        {discountAmount > 0 && (
+                                            <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+                                                Coupon discount: {formatMoney(discountAmount)}
+                                            </p>
+                                        )}
                                         <p className="text-[11px] uppercase tracking-wider text-slate-500">Instant price • inc VAT</p>
                                     </div>
 
@@ -1687,6 +1783,45 @@ export default function InstallPage({ booking }) {
                                                         : "border-slate-200 bg-white"
                                                 }`}
                                             >
+                                                <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                                                        Have a coupon code?
+                                                    </p>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={couponCode}
+                                                            onChange={(e) => {
+                                                                setCouponCode(e.target.value.toUpperCase());
+                                                                setCouponError("");
+                                                                setCouponApplied(null);
+                                                            }}
+                                                            placeholder="Enter code"
+                                                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm uppercase"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleApplyCoupon}
+                                                            disabled={processing || applyingCoupon}
+                                                            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+                                                        >
+                                                            {applyingCoupon ? "Applying..." : "Apply"}
+                                                        </button>
+                                                    </div>
+
+                                                    {couponApplied?.coupon?.code && (
+                                                        <p className="mt-2 text-xs font-semibold text-emerald-700">
+                                                            Applied {couponApplied.coupon.code} • -{formatMoney(discountAmount)}
+                                                        </p>
+                                                    )}
+
+                                                    {couponError && (
+                                                        <p className="mt-2 text-xs font-semibold text-red-600">
+                                                            {couponError}
+                                                        </p>
+                                                    )}
+                                                </div>
+
                                                 <label className="flex items-start gap-3 text-sm leading-relaxed text-slate-700">
                                                     <input
                                                         type="checkbox"
@@ -1813,8 +1948,13 @@ export default function InstallPage({ booking }) {
                             Total package
                         </p>
                         <p className="text-lg font-bold text-slate-900 truncate">
-                            {symbol} {booking?.price}
+                            {formatMoney(payableAmount)}
                         </p>
+                        {discountAmount > 0 && (
+                            <p className="text-[11px] font-semibold text-emerald-700">
+                                Coupon: -{formatMoney(discountAmount)}
+                            </p>
+                        )}
                         <label className="mt-1 inline-flex items-center gap-2 text-[11px] text-slate-600">
                             <input
                                 type="checkbox"

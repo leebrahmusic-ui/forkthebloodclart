@@ -21,6 +21,32 @@ class QuoteCheckoutController extends Controller
         return response()->json(['data' => $data], 201);
     }
 
+    public function couponPreview(Request $request, QuoteCheckoutService $svc)
+    {
+        $data = $request->validate([
+            'service' => ['required', 'string'],
+            'amount' => ['required'],
+            'coupon_code' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        return response()->json([
+            'data' => $svc->previewCouponPricing($data),
+        ]);
+    }
+
+    public function couponUpdate(Request $request, QuoteCheckoutService $svc)
+    {
+        $data = $request->validate([
+            'booking_id' => ['required', 'integer'],
+            'tx_id' => ['required', 'integer'],
+            'coupon_code' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        return response()->json([
+            'data' => $svc->updateCouponForPendingCheckout($data),
+        ]);
+    }
+
     public function success(Request $request)
     {
         $bookingId = (int) $request->query('booking');

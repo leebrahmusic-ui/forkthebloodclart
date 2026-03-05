@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\QuoteCheckoutController;
 use App\Http\Controllers\Admin\OrderManagementController;
 use App\Http\Controllers\Admin\BoilerCatalogController;
+use App\Http\Controllers\Admin\CheckoutCouponController;
 use App\Http\Controllers\Admin\RadiatorPriceController;
 use App\Http\Controllers\Admin\PricingOverridesController;
 use App\Http\Controllers\Admin\SchedulingController;
@@ -47,6 +48,8 @@ Route::get('/appointments/availability', function (Request $request, Appointment
 });
 
 Route::post('/quote/checkout', [QuoteCheckoutController::class, 'store']);
+Route::post('/quote/checkout/coupon-preview', [QuoteCheckoutController::class, 'couponPreview']);
+Route::post('/quote/checkout/coupon-update', [QuoteCheckoutController::class, 'couponUpdate']);
 Route::post('/quote/checkout/confirm-intent', [QuoteCheckoutController::class, 'confirmIntent']);
 Route::get('/checkout/success', [QuoteCheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/success-intent', [QuoteCheckoutController::class, 'successIntent'])->name('checkout.success.intent');
@@ -190,6 +193,11 @@ Route::middleware(['auth']) // add your admin middleware if you have one
         Route::get('/boilers', [BoilerCatalogController::class, 'index'])->name('boilers.index');
         Route::post('/boilers/save', [BoilerCatalogController::class, 'save'])->name('boilers.save');
         Route::post('/boilers/reset', [BoilerCatalogController::class, 'reset'])->name('boilers.reset');
+
+        Route::get('/coupons', [CheckoutCouponController::class, 'index'])->name('coupons.index');
+        Route::post('/coupons', [CheckoutCouponController::class, 'store'])->name('coupons.store');
+        Route::put('/coupons/{coupon}', [CheckoutCouponController::class, 'update'])->name('coupons.update');
+        Route::delete('/coupons/{coupon}', [CheckoutCouponController::class, 'destroy'])->name('coupons.destroy');
 
         // Scheduling controls
         Route::get('/scheduling', [SchedulingController::class, 'index'])->name('scheduling.index');

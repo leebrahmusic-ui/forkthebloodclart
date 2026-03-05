@@ -11,6 +11,8 @@ class Booking extends Model
         'appointment_id',
         'subtotal',
         'discount',
+        'coupon_code',
+        'coupon_snapshot',
         'tax',
         'total',
         'currency',
@@ -22,6 +24,7 @@ class Booking extends Model
     protected $casts = [
         'subtotal' => 'decimal:2',
         'discount' => 'decimal:2',
+        'coupon_snapshot' => 'array',
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'paid_at' => 'datetime',

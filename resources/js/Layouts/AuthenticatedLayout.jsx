@@ -61,6 +61,12 @@ export default function AuthenticatedLayout({ header, children }) {
                         label: "Boiler Catalogue",
                         href: route("admin.boilers.index"),
                         isActive: () => route().current("admin.boilers.index"),
+                    },
+                    {
+                        key: "pricing.checkout.coupons",
+                        label: "Checkout Coupons",
+                        href: route("admin.coupons.index"),
+                        isActive: () => route().current("admin.coupons.index"),
                     }
                     // add more pricing items here later
                 ],

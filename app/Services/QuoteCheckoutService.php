@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\{Appointment, Booking, Customer, Question, BookingDetail, Transaction};
+use App\Models\CheckoutCoupon;
 use App\Support\QuotePayloadNormalizer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Stripe\StripeClient;
 use App\Models\CustomerOrderProduct;
@@ -27,11 +29,14 @@ class QuoteCheckoutService
         $embedded = (bool) ($payload['embedded'] ?? false);
         $paymentElement = (bool) ($payload['payment_element'] ?? false);
         $form = $payload['form'];
-        $amount = $this->normalizeAmount(
+        $baseAmount = $this->normalizeAmount(
             $payload['amount']
                 ?? ($payload['form']['product']['amount'] ?? null)
                 ?? ($payload['form']['product']['price'] ?? 0)
         );
+        $couponCode = trim((string) ($payload['coupon_code'] ?? ''));
+        $pricing = $this->applyCoupon($baseAmount, $couponCode, $serviceType);
+        $amount = $pricing['total'];
         // dd($amount);
 
         $customerData = QuotePayloadNormalizer::customer($form);
@@ -48,7 +53,7 @@ class QuoteCheckoutService
             throw ValidationException::withMessages(['visit_time' => ['Visit date and time are required.']]);
         }
 
-        if ($amount <= 0) {
+        if ($baseAmount <= 0) {
             throw ValidationException::withMessages([
                 'amount' => ['Invalid quote amount. Please refresh and try again.'],
             ]);
@@ -57,7 +62,7 @@ class QuoteCheckoutService
         $startsAtLocal = QuotePayloadNormalizer::parseStartsAt($apptData['date'], $apptData['time'], $tz);
         $appointmentDate = $startsAtLocal->toDateString();
 
-        return DB::transaction(function () use ($serviceType, $embedded, $paymentElement, $customerData, $answers, $startsAtLocal, $appointmentDate, $tz, $amount, $product, $addonsPayload) {
+        return DB::transaction(function () use ($serviceType, $embedded, $paymentElement, $customerData, $answers, $startsAtLocal, $appointmentDate, $tz, $amount, $product, $addonsPayload, $pricing) {
 
             // 1) Customer by email
             $customer = Customer::query()->updateOrCreate(
@@ -114,8 +119,10 @@ class QuoteCheckoutService
             $booking = Booking::create([
                 'customer_id' => $customer->id,
                 'appointment_id' => $appointment->id,
-                'subtotal' => 0,
-                'discount' => 0,
+                'subtotal' => $pricing['base'],
+                'discount' => $pricing['discount'],
+                'coupon_code' => $pricing['coupon']['code'] ?? null,
+                'coupon_snapshot' => $pricing['coupon'],
                 'tax' => 0,
                 'total' => $amount,
                 'currency' => config('services.currency.code'),
@@ -200,13 +207,7 @@ class QuoteCheckoutService
                 ]);
             }
 
-            // Optional: compute totals (for now use base quote price from frontend modal)
-            // Better: compute from fixed_price selection + adjustments.
-            $total = $this->computeTotal($booking);
-            $booking->update([
-                'subtotal' => $total,
-                'total' => $total,
-            ]);
+            // Preserve pre-computed subtotal/discount/total from coupon-adjusted quote.
 
             // 6) Initiate Transaction + Stripe Checkout
             $tx = Transaction::create([
@@ -236,8 +237,170 @@ class QuoteCheckoutService
                 'checkout_mode' => $checkout['checkout_mode'] ?? 'redirect',
                 'payment_intent_id' => $checkout['payment_intent_id'] ?? null,
                 'return_url' => $checkout['return_url'] ?? null,
+                'pricing' => [
+                    'base' => $pricing['base'],
+                    'discount' => $pricing['discount'],
+                    'total' => $pricing['total'],
+                    'coupon' => $pricing['coupon'],
+                ],
             ];
         });
+    }
+
+    public function previewCouponPricing(array $payload): array
+    {
+        $serviceType = QuotePayloadNormalizer::serviceKey($payload['service']);
+        $baseAmount = $this->normalizeAmount($payload['amount'] ?? 0);
+        $couponCode = trim((string) ($payload['coupon_code'] ?? ''));
+
+        if ($baseAmount <= 0) {
+            throw ValidationException::withMessages([
+                'amount' => ['Invalid quote amount. Please refresh and try again.'],
+            ]);
+        }
+
+        return $this->applyCoupon($baseAmount, $couponCode, $serviceType);
+    }
+
+    public function updateCouponForPendingCheckout(array $payload): array
+    {
+        return DB::transaction(function () use ($payload) {
+            $booking = Booking::query()
+                ->with('appointment')
+                ->findOrFail((int) $payload['booking_id']);
+
+            $tx = Transaction::query()
+                ->where('id', (int) $payload['tx_id'])
+                ->where('booking_id', $booking->id)
+                ->firstOrFail();
+
+            if (($booking->appointment?->type ?? null) !== 'new_boiler_quote') {
+                throw ValidationException::withMessages([
+                    'coupon_code' => ['Coupon updates are only available for new boiler checkout.'],
+                ]);
+            }
+
+            if (! in_array($booking->payment_status, ['pending', 'unpaid'], true)) {
+                throw ValidationException::withMessages([
+                    'coupon_code' => ['Checkout is already completed and cannot be changed.'],
+                ]);
+            }
+
+            if (! $tx->provider_payment_intent_id) {
+                throw ValidationException::withMessages([
+                    'coupon_code' => ['Secure payment is not initialized yet.'],
+                ]);
+            }
+
+            $baseAmount = (float) ($booking->subtotal ?? 0);
+            if ($baseAmount <= 0) {
+                $baseAmount = (float) ($booking->total ?? 0) + (float) ($booking->discount ?? 0);
+            }
+
+            if ($baseAmount <= 0) {
+                throw ValidationException::withMessages([
+                    'coupon_code' => ['Unable to update coupon for this booking.'],
+                ]);
+            }
+
+            $couponCode = trim((string) ($payload['coupon_code'] ?? ''));
+            $pricing = $this->applyCoupon($baseAmount, $couponCode, 'new_boiler_quote');
+
+            $booking->update([
+                'subtotal' => $pricing['base'],
+                'discount' => $pricing['discount'],
+                'coupon_code' => $pricing['coupon']['code'] ?? null,
+                'coupon_snapshot' => $pricing['coupon'],
+                'total' => $pricing['total'],
+            ]);
+
+            $tx->update([
+                'amount' => $pricing['total'],
+            ]);
+
+            $stripe = new StripeClient(config('services.stripe.secret'));
+            $stripe->paymentIntents->update($tx->provider_payment_intent_id, [
+                'amount' => (int) round($pricing['total'] * 100),
+                'metadata' => [
+                    'booking_id' => (string) $booking->id,
+                    'transaction_id' => (string) $tx->id,
+                    'coupon_code' => (string) ($pricing['coupon']['code'] ?? ''),
+                ],
+            ]);
+
+            return [
+                'pricing' => $pricing,
+            ];
+        });
+    }
+
+    private function applyCoupon(float $baseAmount, string $couponCode, string $serviceType): array
+    {
+        if ($couponCode !== '' && $serviceType !== 'new_boiler_quote') {
+            throw ValidationException::withMessages([
+                'coupon_code' => ['Coupon codes are only valid for new boiler checkout.'],
+            ]);
+        }
+
+        $result = [
+            'base' => $baseAmount,
+            'discount' => 0.0,
+            'total' => $baseAmount,
+            'coupon' => null,
+        ];
+
+        if ($couponCode === '') {
+            return $result;
+        }
+
+        $now = now();
+        $normalizedCode = Str::upper(trim($couponCode));
+
+        $coupon = CheckoutCoupon::query()
+            ->whereRaw('UPPER(code) = ?', [$normalizedCode])
+            ->where('is_active', true)
+            ->where(function ($q) use ($serviceType) {
+                $q->whereNull('service')->orWhere('service', $serviceType);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            })
+            ->first();
+
+        if (! $coupon) {
+            throw ValidationException::withMessages([
+                'coupon_code' => ['Invalid or inactive coupon code.'],
+            ]);
+        }
+
+        $discount = 0.0;
+        if ($coupon->discount_type === 'percent') {
+            $discount = round($baseAmount * ((float) $coupon->discount_value / 100), 2);
+        } else {
+            $discount = round((float) $coupon->discount_value, 2);
+        }
+
+        if ($discount <= 0) {
+            throw ValidationException::withMessages([
+                'coupon_code' => ['Coupon discount is not valid.'],
+            ]);
+        }
+
+        $discount = min($discount, $baseAmount);
+        $total = max(0, round($baseAmount - $discount, 2));
+
+        $result['discount'] = $discount;
+        $result['total'] = $total;
+        $result['coupon'] = [
+            'code' => $coupon->code,
+            'discount_type' => $coupon->discount_type,
+            'discount_value' => (float) $coupon->discount_value,
+        ];
+
+        return $result;
     }
 
     private function normalize(string $key, mixed $value): array
