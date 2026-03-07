@@ -122,18 +122,6 @@ export function HeroServices() {
                                     </Link>
                                 )}
 
-                                <div className="mt-2 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-                                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
-                                        Gas Safe registered
-                                    </span>
-                                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
-                                        Fixed quote
-                                    </span>
-                                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
-                                        Next-day installs available
-                                    </span>
-                                </div>
-
                                 {featuredService.brands?.length > 0 && (
                                     <div className="mt-3">
                                         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 text-center lg:text-left">

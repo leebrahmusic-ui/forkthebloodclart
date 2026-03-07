@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { PageHeader } from "@/Components/ui/page-header";
-import { GoogleReview } from "@/Components/GoogleReview";
+import { GoogleReview } from "@/Components/GoogleReviewPremium";
 import { TechnicianButton } from "@/Components/TechnicianButton";
 import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 

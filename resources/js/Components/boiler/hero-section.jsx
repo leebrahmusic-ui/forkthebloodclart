@@ -1,4 +1,4 @@
-import { GoogleReview } from "../GoogleReview";
+import { GoogleReview } from "../GoogleReviewPremium";
 import { HeroServices } from "../HeroService";
 import { BadgeCheck, ShieldCheck, Clock4, PhoneCall } from "lucide-react";
 
@@ -24,14 +24,9 @@ export function HeroSection() {
                     <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="space-y-6 text-center flex flex-col items-center">
                             <h2 className="text-4xl sm:text-[40px] lg:text-[52px] font-semibold tracking-tight text-slate-900">
-                                <span className="uppercase">New boiler installation in Leeds & Surrounding</span>{" "}
-                                <img
-                                    src="/images/yorkshire%20rose.png"
-                                    alt="Yorkshire rose"
-                                    className="inline-block h-10 w-10 sm:h-16 sm:w-16 align-middle"
-                                />
+                                <span className="uppercase">Boiler, heating & gas services in Leeds & Surrounding</span>
                                 <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
-                                    Booking slots are available seven days a week, subject to demand.
+                                    Booking slots are available seven days a week for installations, servicing and repairs.
                                 </span>
                             </h2>
 

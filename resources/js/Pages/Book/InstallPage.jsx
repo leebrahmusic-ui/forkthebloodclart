@@ -2,7 +2,7 @@ import AppointmentDateRangePicker from "@/Components/extra/AppointmentDateTimePi
 import { PageHeader } from "@/Components/ui/page-header";
 import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { Head, usePage } from "@inertiajs/react";
-import { GoogleReview } from "@/Components/GoogleReview";
+import { GoogleReview } from "@/Components/GoogleReviewPremium";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";

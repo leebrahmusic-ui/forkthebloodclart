@@ -17,6 +17,12 @@ const initialsFromName = (name = "") => {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 };
 
+const formatRating = (value) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    return n.toFixed(1);
+};
+
 export function GoogleReview({ theme = "light" }) {
     const [loading, setLoading] = useState(true);
     const [payload, setPayload] = useState(null);
@@ -100,7 +106,11 @@ export function GoogleReview({ theme = "light" }) {
                     <div className={isBlue
                         ? "rounded-3xl border border-white/40 bg-[var(--qb-panel)] p-6 shadow-sm"
                         : "rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"}>
-                        <p className={isBlue ? "text-sm text-white/90" : "text-sm text-slate-500"}>Loading Google reviews…</p>
+                        <div className="animate-pulse space-y-4">
+                            <div className={isBlue ? "h-4 w-36 rounded bg-white/30" : "h-4 w-36 rounded bg-slate-200"} />
+                            <div className={isBlue ? "h-7 w-64 rounded bg-white/30" : "h-7 w-64 rounded bg-slate-200"} />
+                            <div className={isBlue ? "h-24 w-full rounded-2xl bg-white/20" : "h-24 w-full rounded-2xl bg-slate-100"} />
+                        </div>
                     </div>
                 </div>
             </section>
@@ -124,26 +134,35 @@ export function GoogleReview({ theme = "light" }) {
                     ? "rounded-3xl border border-white/35 bg-[var(--qb-panel)] p-6 shadow-sm"
                     : "rounded-3xl border border-slate-200 bg-white p-6 shadow-sm no-auto-dark-card"}>
                     <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <p className={isBlue
-                                ? "text-xs font-semibold uppercase tracking-[0.15em] text-white/85"
-                                : "text-xs font-semibold uppercase tracking-[0.15em] text-slate-500"}>
-                                Google Reviews
-                            </p>
-                            <h3 className={isBlue ? "text-xl font-bold text-white" : "text-xl font-bold text-slate-900"} style={isBlue ? { color: "#ffffff" } : undefined}>
-                                {payload.name || "Our customers on Google"}
-                            </h3>
-                            <p className={isBlue ? "mt-1 text-xs text-cyan-100 font-semibold" : "mt-1 text-xs text-emerald-700 font-semibold"}>
-                                Latest Google profile reviews
-                            </p>
+                        <div className="flex items-center gap-3">
+                            <span className={isBlue
+                                ? "inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/35 bg-white/15 text-lg"
+                                : "inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-lg"}>
+                                <span aria-hidden>⭐</span>
+                            </span>
+                            <div>
+                                <p className={isBlue
+                                    ? "text-xs font-semibold uppercase tracking-[0.15em] text-white/85"
+                                    : "text-xs font-semibold uppercase tracking-[0.15em] text-slate-500"}>
+                                    Google Reviews
+                                </p>
+                                <h3 className={isBlue ? "text-xl font-bold text-white" : "text-xl font-bold text-slate-900"} style={isBlue ? { color: "#ffffff" } : undefined}>
+                                    {payload.name || "Our customers on Google"}
+                                </h3>
+                                <p className={isBlue ? "mt-1 text-xs text-cyan-100 font-semibold" : "mt-1 text-xs text-emerald-700 font-semibold"}>
+                                    Verified feedback from local customers
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="text-right">
+                        <div className={isBlue
+                            ? "rounded-2xl border border-white/35 bg-white/10 px-4 py-2 text-right"
+                            : "rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-right"}>
                             <p className={isBlue ? "text-lg font-semibold text-white" : "text-lg font-semibold text-slate-900"}>
                                 {renderStars(payload.rating)}
                             </p>
                             <p className={isBlue ? "text-sm text-cyan-100" : "text-sm text-slate-600"}>
-                                {payload.rating?.toFixed?.(1) ?? "-"} from {payload.user_ratings_total ?? "-"} reviews
+                                {formatRating(payload.rating)} from {payload.user_ratings_total ?? "-"} reviews
                             </p>
                         </div>
                     </div>
@@ -160,6 +179,7 @@ export function GoogleReview({ theme = "light" }) {
                                     key={`${review.author_name || "review"}-${idx}`}
                                     className="w-full shrink-0 p-6 md:p-8"
                                 >
+                                    <div className="mb-2 text-xl leading-none text-amber-500/90">“</div>
                                     <div className="flex items-start gap-4">
                                         {review.profile_photo_url ? (
                                             <img
@@ -243,11 +263,18 @@ export function GoogleReview({ theme = "light" }) {
                             >
                                 →
                             </button>
+
+                            <span className={isBlue ? "ml-2 text-xs text-cyan-100" : "ml-2 text-xs text-slate-500"}>
+                                {activeIndex + 1}/{reviews.length}
+                            </span>
                         </div>
                     ) : null}
 
                     {payload.maps_url ? (
-                        <div className="mt-4 text-right">
+                        <div className="mt-4 flex items-center justify-between gap-3">
+                            <p className={isBlue ? "text-xs text-cyan-100" : "text-xs text-slate-500"}>
+                                Updated from your live Google listing.
+                            </p>
                             <a
                                 href={payload.maps_url}
                                 target="_blank"

@@ -4,7 +4,7 @@ import { Footer } from "@/Components/boiler/footer";
 import WhyChooseUs from "@/Components/boiler/WhyChooseUs";
 import { ServiceCards } from "@/Components/boiler/service-cards";
 import Faq from "@/Components/boiler/Faq";
-import { GoogleReview } from "@/Components/GoogleReview";
+import { GoogleReview } from "@/Components/GoogleReviewPremium";
 import { router, Head, usePage } from "@inertiajs/react";
 
 /**

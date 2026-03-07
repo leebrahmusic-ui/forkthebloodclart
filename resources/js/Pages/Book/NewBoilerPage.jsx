@@ -2,7 +2,7 @@ import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import Stepper from "@/Components/extra/Stepper";
 import { SERVICE_QUESTIONS } from "@/Components/extra/boilerSteps";
 import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
-import { GoogleReview } from "@/Components/GoogleReview";
+import { GoogleReview } from "@/Components/GoogleReviewPremium";
 import { useMemo } from "react";
 import { Head, usePage } from "@inertiajs/react";
 

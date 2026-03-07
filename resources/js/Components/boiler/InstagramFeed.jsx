@@ -2,31 +2,15 @@ import React, { useEffect } from "react";
 
 export function InstagramFeed() {
     useEffect(() => {
-        const container = document.querySelector(".embedsocial-hashtag");
-        if (!container) return;
+        if (document.getElementById("EmbedSocialHashtagScript")) return;
 
-        const loadEmbed = () => {
-            const existing = document.getElementById("EmbedSocialHashtagScript");
-            if (existing) existing.remove();
+        const script = document.createElement("script");
+        script.id = "EmbedSocialHashtagScript";
+        script.async = true;
+        script.src = "https://embedsocial.com/cdn/ht.js";
+        document.head.appendChild(script);
 
-            container.innerHTML = "";
-
-            const script = document.createElement("script");
-            script.id = "EmbedSocialHashtagScript";
-            script.async = true;
-            script.src = `https://embedsocial.com/cdn/ht.js?cache=${Date.now()}`;
-            document.head.appendChild(script);
-        };
-
-        loadEmbed();
-
-        const retry = setTimeout(() => {
-            if (container.childElementCount === 0) {
-                loadEmbed();
-            }
-        }, 2000);
-
-        return () => clearTimeout(retry);
+        return () => {};
     }, []);
 
     return (
@@ -54,7 +38,7 @@ export function InstagramFeed() {
                     `}</style>
                     <div
                         className="embedsocial-hashtag"
-                        data-ref="2598941845b6e27b854fa8073e1485fc1031cb4c"
+                        data-ref="98d397d59cef083016e0312428376fe3ae4f8fe1"
                     />
                 </div>
             </div>
