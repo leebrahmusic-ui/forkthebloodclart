@@ -19,15 +19,17 @@ class QuotePayloadNormalizer
         $c = $form['customer_details'] ?? [];
         $v = $form['visit_time'] ?? [];
 
-        \Log::warning('DEBUG: customer_details', $c);
-        \Log::warning('DEBUG: visit_time', $v);
-
         return [
-            'full_name' => $c['name'] ?? $v['name'] ?? null,
+            'full_name' => $c['full_name'] ?? $c['name'] ?? $v['full_name'] ?? $v['name'] ?? null,
             'email' => $c['email'] ?? $v['email'] ?? null,
             'phone' => $c['phone'] ?? $v['phone'] ?? null,
             'postcode' => $c['postcode'] ?? $v['postcode'] ?? null,
-            'address_full' => $c['address'] ?? null, // if you add later
+            'address_line1' => $c['address_line1'] ?? $c['address'] ?? $v['address_line1'] ?? $v['address'] ?? null,
+            'address_line2' => $c['address_line2'] ?? $v['address_line2'] ?? null,
+            'city' => $c['city'] ?? $v['city'] ?? null,
+            'county' => $c['county'] ?? $v['county'] ?? null,
+            'country' => $c['country'] ?? $v['country'] ?? 'United Kingdom',
+            'address_full' => $c['address_full'] ?? $c['address'] ?? $v['address_full'] ?? $v['address'] ?? null,
         ];
     }
 

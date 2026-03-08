@@ -14,9 +14,46 @@ import {
     FiShield,
 } from "react-icons/fi";
 
+const UK_POSTCODE_RE =
+    /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
+
+const ALLOWED_OUTCODES = ["LS", "WF", "HG", "BD"];
+
+function normalizeUkPostcode(input) {
+    const raw = String(input || "")
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
+
+    if (raw.length <= 3) return raw;
+
+    return `${raw.slice(0, -3)} ${raw.slice(-3)}`.trim();
+}
+
+function getOutcode(value) {
+    const normalized = normalizeUkPostcode(value);
+    if (!normalized) return "";
+
+    return normalized.includes(" ")
+        ? normalized.split(" ")[0]
+        : normalized.length > 3
+            ? normalized.slice(0, -3)
+            : normalized;
+}
+
+function isAllowedOutcode(value) {
+    const outcode = getOutcode(value);
+    return ALLOWED_OUTCODES.some((prefix) => outcode.startsWith(prefix));
+}
+
+function buildAddressFull(parts = []) {
+    return parts
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+        .join(", ");
+}
+
 export default function InstallPage({ booking }) {
     const { symbol, title, stripePublishableKey } = usePage().props;
-    console.log("Postcode ", booking);
 
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState(null);
@@ -37,7 +74,11 @@ export default function InstallPage({ booking }) {
         lastName: "",
         email: "",
         phone: "",
-        address: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        county: "",
+        postcode: "",
         notes: "",
     });
 
@@ -46,6 +87,7 @@ export default function InstallPage({ booking }) {
 
     // processing like InstantQuoteModal
     const [processing, setProcessing] = useState(false);
+    const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
     const [paymentClientSecret, setPaymentClientSecret] = useState(null);
     const [paymentBookingId, setPaymentBookingId] = useState(null);
     const [paymentTxId, setPaymentTxId] = useState(null);
@@ -189,7 +231,11 @@ export default function InstallPage({ booking }) {
     const lastNameRef = useRef(null);
     const emailRef = useRef(null);
     const phoneRef = useRef(null);
-    const addressRef = useRef(null);
+    const addressLine1Ref = useRef(null);
+    const addressLine2Ref = useRef(null);
+    const cityRef = useRef(null);
+    const countyRef = useRef(null);
+    const postcodeRef = useRef(null);
     const termsRef = useRef(null);
 
     const includes = Array.isArray(booking?.includes) ? booking.includes : [];
@@ -240,10 +286,36 @@ export default function InstallPage({ booking }) {
         return 0;
     }, [couponApplied]);
 
+    const quotePostcode = useMemo(() => {
+        const candidates = [
+            booking?.answers?.inputs?.postcode,
+            booking?.answers?.answers?.raw?.details?.postcode,
+            booking?.answers?.answers?.raw?.postcode,
+        ];
+
+        return (
+            candidates.find(
+                (value) => typeof value === "string" && value.trim().length > 0
+            )?.trim() || ""
+        );
+    }, [booking]);
+
+    useEffect(() => {
+        if (!quotePostcode) return;
+
+        setFormData((prev) => {
+            if (String(prev.postcode || "").trim()) return prev;
+
+            return {
+                ...prev,
+                postcode: normalizeUkPostcode(quotePostcode),
+            };
+        });
+    }, [quotePostcode]);
+
     const formatMoney = (amount) => `${symbol} ${Number(amount || 0).toFixed(2)}`;
 
     const visibleAddOns = booking?.answers?.addOns;
-    console.log("Add Ons", visibleAddOns);
 
     const addOns = visibleAddOns?.items || [];
 
@@ -294,6 +366,41 @@ export default function InstallPage({ booking }) {
         if (typeof el.focus === "function") el.focus();
     };
 
+    const syncFormDataFromRefs = () => {
+        const nextValues = {
+            title: titleRef.current?.value ?? formData.title,
+            firstName: firstNameRef.current?.value ?? formData.firstName,
+            lastName: lastNameRef.current?.value ?? formData.lastName,
+            email: emailRef.current?.value ?? formData.email,
+            phone: phoneRef.current?.value ?? formData.phone,
+            addressLine1:
+                addressLine1Ref.current?.value ?? formData.addressLine1,
+            addressLine2:
+                addressLine2Ref.current?.value ?? formData.addressLine2,
+            city: cityRef.current?.value ?? formData.city,
+            county: countyRef.current?.value ?? formData.county,
+            postcode: normalizeUkPostcode(
+                postcodeRef.current?.value ?? formData.postcode
+            ),
+        };
+
+        const hasChanges = Object.entries(nextValues).some(
+            ([key, value]) => value !== formData[key]
+        );
+
+        if (hasChanges) {
+            setFormData((prev) => ({
+                ...prev,
+                ...nextValues,
+            }));
+        }
+
+        return {
+            ...formData,
+            ...nextValues,
+        };
+    };
+
     const clearError = (key) => {
         setErrors((prev) => {
             if (!prev[key]) return prev;
@@ -303,7 +410,7 @@ export default function InstallPage({ booking }) {
         });
     };
 
-    const validateAll = () => {
+    const validateAll = (source = formData) => {
         const next = {};
 
         // appointment
@@ -313,18 +420,18 @@ export default function InstallPage({ booking }) {
             next.appointment = "Please select an installation time.";
 
         // customer fields
-        if (!formData.title) next.title = "Please select a title.";
-        if (!formData.firstName?.trim())
+        if (!source.title) next.title = "Please select a title.";
+        if (!source.firstName?.trim())
             next.firstName = "First name is required.";
-        if (!formData.lastName?.trim())
+        if (!source.lastName?.trim())
             next.lastName = "Last name is required.";
 
-        const email = (formData.email || "").trim();
+        const email = (source.email || "").trim();
         if (!email) next.email = "Email is required.";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
             next.email = "Please enter a valid email address.";
 
-        const phone = (formData.phone || "").trim();
+        const phone = (source.phone || "").trim();
         if (!phone) next.phone = "Phone number is required.";
         else {
             const digits = phone.replace(/[^\d]/g, "");
@@ -332,7 +439,19 @@ export default function InstallPage({ booking }) {
                 next.phone = "Please enter a valid phone number.";
         }
 
-        if (!formData.address?.trim()) next.address = "Address is required.";
+        if (!source.addressLine1?.trim())
+            next.addressLine1 = "Address line 1 is required.";
+        if (!source.city?.trim()) next.city = "Town or city is required.";
+
+        const formattedPostcode = normalizeUkPostcode(source.postcode);
+        if (!formattedPostcode) {
+            next.postcode = "Postcode is required.";
+        } else if (!UK_POSTCODE_RE.test(formattedPostcode)) {
+            next.postcode = "Please enter a valid UK postcode.";
+        } else if (!isAllowedOutcode(formattedPostcode)) {
+            next.postcode =
+                "Checkout is restricted to LS, WF, HG and BD postcodes only.";
+        }
 
         return next;
     };
@@ -345,7 +464,11 @@ export default function InstallPage({ booking }) {
             { key: "lastName", ref: lastNameRef },
             { key: "email", ref: emailRef },
             { key: "phone", ref: phoneRef },
-            { key: "address", ref: addressRef },
+            { key: "addressLine1", ref: addressLine1Ref },
+            { key: "addressLine2", ref: addressLine2Ref },
+            { key: "city", ref: cityRef },
+            { key: "county", ref: countyRef },
+            { key: "postcode", ref: postcodeRef },
         ],
         []
     );
@@ -405,6 +528,28 @@ export default function InstallPage({ booking }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData, selectedDate, selectedTime]);
 
+    useEffect(() => {
+        if (!hasAttemptedSubmit) return;
+
+        const nextErrors = validateAll();
+
+        setErrors((prev) => {
+            const prevKeys = Object.keys(prev);
+            const nextKeys = Object.keys(nextErrors);
+
+            if (prevKeys.length === nextKeys.length) {
+                const isUnchanged = prevKeys.every(
+                    (key) => prev[key] === nextErrors[key]
+                );
+
+                if (isUnchanged) return prev;
+            }
+
+            return nextErrors;
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasAttemptedSubmit, formData, selectedDate, selectedTime]);
+
     const checkoutReadyKey = useMemo(() => {
         if (!selectedDate || !selectedTime) return "";
         if (!formData.title?.trim()) return "";
@@ -412,7 +557,13 @@ export default function InstallPage({ booking }) {
         if (!formData.lastName?.trim()) return "";
         if (!formData.email?.trim()) return "";
         if (!formData.phone?.trim()) return "";
-        if (!formData.address?.trim()) return "";
+        if (!formData.addressLine1?.trim()) return "";
+        if (!formData.city?.trim()) return "";
+
+        const formattedPostcode = normalizeUkPostcode(formData.postcode);
+        if (!formattedPostcode) return "";
+        if (!UK_POSTCODE_RE.test(formattedPostcode)) return "";
+        if (!isAllowedOutcode(formattedPostcode)) return "";
 
         return [
             selectedDate,
@@ -422,7 +573,11 @@ export default function InstallPage({ booking }) {
             formData.lastName,
             formData.email,
             formData.phone,
-            formData.address,
+            formData.addressLine1,
+            formData.addressLine2,
+            formData.city,
+            formData.county,
+            formattedPostcode,
         ]
             .map((v) => String(v || "").trim())
             .join("|");
@@ -430,7 +585,11 @@ export default function InstallPage({ booking }) {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((s) => ({ ...s, [name]: value }));
+        setFormData((s) => ({
+            ...s,
+            [name]:
+                name === "postcode" ? normalizeUkPostcode(value) : value,
+        }));
         clearError(name);
     };
 
@@ -482,7 +641,12 @@ export default function InstallPage({ booking }) {
             if (key === "customer.last_name") return "lastName";
             if (key === "customer.email") return "email";
             if (key === "customer.phone") return "phone";
-            if (key === "customer.address") return "address";
+            if (key === "customer.address") return "addressLine1";
+            if (key === "customer.address_line1") return "addressLine1";
+            if (key === "customer.address_line2") return "addressLine2";
+            if (key === "customer.city") return "city";
+            if (key === "customer.county") return "county";
+            if (key === "customer.postcode") return "postcode";
             return null;
         };
 
@@ -502,9 +666,11 @@ export default function InstallPage({ booking }) {
     };
 
     const initialisePaymentElement = async ({ showValidationToast = false } = {}) => {
-        const nextErrors = validateAll();
+        const syncedFormData = syncFormDataFromRefs();
+        const nextErrors = validateAll(syncedFormData);
         if (Object.keys(nextErrors).length > 0) {
             if (showValidationToast) {
+                setHasAttemptedSubmit(true);
                 setErrors(nextErrors);
                 const firstInvalid = fieldOrder.find((f) => nextErrors[f.key]);
                 if (firstInvalid) scrollToRef(firstInvalid.ref);
@@ -537,10 +703,24 @@ export default function InstallPage({ booking }) {
             return false;
         }
 
-        // console.log(booking);
-
         const answers = booking?.answers?.answers?.raw;
         const addOns = booking?.answers?.addOns;
+        const customerName = [
+            syncedFormData.title,
+            syncedFormData.firstName,
+            syncedFormData.lastName,
+        ]
+            .map((value) => String(value || "").trim())
+            .filter(Boolean)
+            .join(" ");
+        const formattedPostcode = normalizeUkPostcode(syncedFormData.postcode);
+        const addressFull = buildAddressFull([
+            syncedFormData.addressLine1,
+            syncedFormData.addressLine2,
+            syncedFormData.city,
+            syncedFormData.county,
+            formattedPostcode || quotePostcode,
+        ]);
 
         const payload = {
             // booking data
@@ -556,12 +736,17 @@ export default function InstallPage({ booking }) {
             },
             // customer form
             customer_details: {
-                full_name: `${formData.title} ${formData.firstName} ${formData.lastName}`,
-                email: formData.email,
-                phone: formData.phone,
-                postcode: "SW22NN",
-                address: formData.address,
-                notes: formData.notes,
+                full_name: customerName,
+                email: syncedFormData.email,
+                phone: syncedFormData.phone,
+                postcode: formattedPostcode || quotePostcode,
+                address_line1: syncedFormData.addressLine1,
+                address_line2: syncedFormData.addressLine2,
+                city: syncedFormData.city,
+                county: syncedFormData.county,
+                country: "United Kingdom",
+                address_full: addressFull,
+                notes: syncedFormData.notes,
             },
             product: productDetails,
         };
@@ -616,16 +801,25 @@ export default function InstallPage({ booking }) {
 
             if (status === 422) {
                 const backendErrors = err?.response?.data?.errors;
+                const firstBackendError = Object.values(backendErrors || {})
+                    .flat()
+                    .find(Boolean);
                 const couponMsg = backendErrors?.coupon_code?.[0];
                 if (couponMsg) {
                     setCouponError(couponMsg);
                     setCouponApplied(null);
+                }
+                if (firstBackendError) {
+                    setPaymentError(String(firstBackendError));
                 }
                 if (showValidationToast) {
                     showValidationErrors(backendErrors);
                     hydrateInlineErrorsFromBackend(backendErrors);
                 }
             } else if (status >= 500) {
+                setPaymentError(
+                    "Payment service is temporarily unavailable. Please try again shortly."
+                );
                 toast.error(
                     "Payment service is temporarily unavailable. Please try again shortly.",
                     {
@@ -634,6 +828,9 @@ export default function InstallPage({ booking }) {
                     }
                 );
             } else if (err?.code === "ECONNABORTED") {
+                setPaymentError(
+                    "Request timed out. Please check your connection and try again."
+                );
                 toast.error(
                     "Request timed out. Please check your connection and try again.",
                     {
@@ -646,6 +843,7 @@ export default function InstallPage({ booking }) {
                     err?.response?.data?.message ||
                     err?.message ||
                     "Unable to initiate payment. Please try again.";
+                setPaymentError(message);
                 toast.error(message, {
                     duration: 5000,
                     position: "top-center",
@@ -664,10 +862,7 @@ export default function InstallPage({ booking }) {
     const handlePayAndBook = async () => {
         if (processing) return;
 
-        if (!paymentClientSecret) {
-            await initialisePaymentElement({ showValidationToast: true });
-            return;
-        }
+        setHasAttemptedSubmit(true);
 
         if (!acceptedTerms) {
             setTermsError(
@@ -678,6 +873,11 @@ export default function InstallPage({ booking }) {
                 position: "top-center",
             });
             scrollToRef(termsRef);
+            return;
+        }
+
+        if (!paymentClientSecret) {
+            await initialisePaymentElement({ showValidationToast: true });
             return;
         }
 
@@ -1323,63 +1523,185 @@ export default function InstallPage({ booking }) {
                                                     </h3>
 
                                                     <div className="space-y-5">
-                                                        <div className="relative transition-all duration-300 focus-within:-translate-y-1">
-                                                            <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
-                                                                Property Address
-                                                            </label>
-                                                            <div className="relative group/input">
+                                                        <div className="grid md:grid-cols-2 gap-6">
+                                                            <div className="relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2">
+                                                                <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
+                                                                    Address line 1
+                                                                </label>
+                                                                <div className="relative group/input">
+                                                                    <input
+                                                                        ref={addressLine1Ref}
+                                                                        name="addressLine1"
+                                                                        placeholder="House number/name and street"
+                                                                        value={
+                                                                            formData.addressLine1
+                                                                        }
+                                                                        onChange={
+                                                                            handleInputChange
+                                                                        }
+                                                                        autoComplete="address-line1"
+                                                                        className={`w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.addressLine1
+                                                                            ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10"
+                                                                            : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"
+                                                                        }`}
+                                                                    />
+
+                                                                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                                                                        <svg
+                                                                            className="w-5 h-5"
+                                                                            fill="none"
+                                                                            viewBox="0 0 24 24"
+                                                                            stroke="currentColor"
+                                                                        >
+                                                                            <path
+                                                                                strokeLinecap="round"
+                                                                                strokeLinejoin="round"
+                                                                                strokeWidth={1.5}
+                                                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                                                            />
+                                                                            <path
+                                                                                strokeLinecap="round"
+                                                                                strokeLinejoin="round"
+                                                                                strokeWidth={1.5}
+                                                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                                            />
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                                {errors.addressLine1 && (
+                                                                    <p className="mt-2 text-xs font-semibold text-red-600">
+                                                                        {
+                                                                            errors.addressLine1
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2">
+                                                                <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
+                                                                    Address line 2 <span className="font-normal text-slate-400 ml-1 opacity-70">(Optional)</span>
+                                                                </label>
                                                                 <input
-                                                                    ref={addressRef}
-                                                                    name="address"
-                                                                    placeholder="House number/name, street, town and postcode"
+                                                                    ref={addressLine2Ref}
+                                                                    name="addressLine2"
+                                                                    placeholder="Apartment, building, or area"
                                                                     value={
-                                                                        formData.address
+                                                                        formData.addressLine2
                                                                     }
                                                                     onChange={
                                                                         handleInputChange
                                                                     }
-                                                                    autoComplete="street-address"
-                                                                    className={`w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.address
+                                                                    autoComplete="address-line2"
+                                                                    className={`w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.addressLine2
                                                                             ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10"
                                                                             : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"
                                                                         }`}
                                                                 />
-
-                                                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                                                                    <svg
-                                                                        className="w-5 h-5"
-                                                                        fill="none"
-                                                                        viewBox="0 0 24 24"
-                                                                        stroke="currentColor"
-                                                                    >
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={1.5}
-                                                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                                                        />
-                                                                        <path
-                                                                            strokeLinecap="round"
-                                                                            strokeLinejoin="round"
-                                                                            strokeWidth={1.5}
-                                                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                                                        />
-                                                                    </svg>
-                                                                </div>
+                                                                {errors.addressLine2 && (
+                                                                    <p className="mt-2 text-xs font-semibold text-red-600">
+                                                                        {
+                                                                            errors.addressLine2
+                                                                        }
+                                                                    </p>
+                                                                )}
                                                             </div>
 
-                                                            {errors.address && (
-                                                                <p className="mt-2 text-xs font-semibold text-red-600">
-                                                                    {
-                                                                        errors.address
+                                                            <div className="relative transition-all duration-300 focus-within:-translate-y-1">
+                                                                <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
+                                                                    Town / city
+                                                                </label>
+                                                                <input
+                                                                    ref={cityRef}
+                                                                    name="city"
+                                                                    placeholder="e.g. Leeds"
+                                                                    value={
+                                                                        formData.city
                                                                     }
-                                                                </p>
-                                                            )}
-                                                            <p className="mt-2 text-xs text-slate-500">
-                                                                Please enter your full installation address manually.
-                                                            </p>
+                                                                    onChange={
+                                                                        handleInputChange
+                                                                    }
+                                                                    autoComplete="address-level2"
+                                                                    className={`w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.city
+                                                                            ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10"
+                                                                            : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"
+                                                                        }`}
+                                                                />
+                                                                {errors.city && (
+                                                                    <p className="mt-2 text-xs font-semibold text-red-600">
+                                                                        {
+                                                                            errors.city
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="relative transition-all duration-300 focus-within:-translate-y-1">
+                                                                <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
+                                                                    County <span className="font-normal text-slate-400 ml-1 opacity-70">(Optional)</span>
+                                                                </label>
+                                                                <input
+                                                                    ref={countyRef}
+                                                                    name="county"
+                                                                    placeholder="e.g. West Yorkshire"
+                                                                    value={
+                                                                        formData.county
+                                                                    }
+                                                                    onChange={
+                                                                        handleInputChange
+                                                                    }
+                                                                    autoComplete="address-level1"
+                                                                    className={`w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.county
+                                                                            ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10"
+                                                                            : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"
+                                                                        }`}
+                                                                />
+                                                                {errors.county && (
+                                                                    <p className="mt-2 text-xs font-semibold text-red-600">
+                                                                        {
+                                                                            errors.county
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="relative transition-all duration-300 focus-within:-translate-y-1 md:max-w-sm">
+                                                                <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
+                                                                    Postcode
+                                                                </label>
+                                                                <input
+                                                                    ref={postcodeRef}
+                                                                    name="postcode"
+                                                                    placeholder="e.g. LS1 1AA"
+                                                                    value={
+                                                                        formData.postcode
+                                                                    }
+                                                                    onChange={
+                                                                        handleInputChange
+                                                                    }
+                                                                    autoComplete="postal-code"
+                                                                    className={`w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold uppercase text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.postcode
+                                                                            ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10"
+                                                                            : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"
+                                                                        }`}
+                                                                />
+                                                                {errors.postcode && (
+                                                                    <p className="mt-2 text-xs font-semibold text-red-600">
+                                                                        {
+                                                                            errors.postcode
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
                                                         </div>
+
+                                                        <p className="-mt-1 text-xs text-slate-500">
+                                                            Checkout is restricted to LS, WF, HG and BD postcodes only.
+                                                        </p>
 
                                                         <div className="relative transition-all duration-300 focus-within:-translate-y-1">
                                                             <label className="mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1">
@@ -1875,20 +2197,16 @@ export default function InstallPage({ booking }) {
                                             <button
                                                 type="button"
                                                 onClick={handlePayAndBook}
-                                                disabled={
-                                                    !isFormValid ||
-                                                    processing ||
-                                                    (paymentClientSecret &&
-                                                        !acceptedTerms)
-                                                }
+                                                disabled={processing}
                                                 aria-busy={processing}
                                                 className={[
                                                     "w-full py-4 text-sm font-bold rounded-xl uppercase tracking-wide border transition-all flex items-center justify-center gap-2",
                                                     processing
                                                         ? "bg-gray-400 border-gray-400 cursor-not-allowed text-white"
-                                                        : isFormValid
-                                                            ? "bg-primary border-primary text-white hover:opacity-95"
-                                                            : "bg-slate-200 border-slate-200 text-slate-500 cursor-not-allowed",
+                                                        : paymentClientSecret &&
+                                                            !acceptedTerms
+                                                          ? "bg-primary border-primary text-white opacity-70 cursor-not-allowed"
+                                                          : "bg-primary border-primary text-white hover:opacity-95",
                                                 ].join(" ")}
                                             >
                                                 {processing ? (
@@ -1971,19 +2289,15 @@ export default function InstallPage({ booking }) {
                     <button
                         type="button"
                         onClick={handlePayAndBook}
-                        disabled={
-                            !isFormValid ||
-                            processing ||
-                            (paymentClientSecret && !acceptedTerms)
-                        }
+                        disabled={processing}
                         aria-busy={processing}
                         className={[
                             "rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
                             processing
                                 ? "bg-gray-400 text-white cursor-not-allowed"
-                                : isFormValid
-                                ? "bg-primary text-white"
-                                : "bg-slate-200 text-slate-500 cursor-not-allowed",
+                                : paymentClientSecret && !acceptedTerms
+                                  ? "bg-primary text-white opacity-70 cursor-not-allowed"
+                                  : "bg-primary text-white",
                         ].join(" ")}
                     >
                         {processing
