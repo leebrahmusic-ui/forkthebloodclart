@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: dark)">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>MD Gas Leeds</title>
 
     <link rel="icon" type="image/png" href="/favicon.png">
 

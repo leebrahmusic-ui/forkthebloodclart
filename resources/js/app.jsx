@@ -20,8 +20,7 @@ router.on("navigate", () => {
     pushPageView();
 });
 
-const appName =
-    import.meta.env.VITE_APP_NAME || document.title || "MD GAS SERVICES";
+const appName = "MD Gas Leeds";
 
 function syncBodyThemeFromPage(page) {
     const component = page?.component || "";
