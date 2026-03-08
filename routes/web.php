@@ -82,11 +82,11 @@ Route::prefix('book')->name('book.')->group(function () {
         // Route::inertia('/', 'ComingSoon/ComingSoon', [
         //     'pageTitle' => 'Coming Soon',
         // ])->name('quote.new');
-        Route::get('/', [BookController::class, 'index'])->name('quote.new');
+        Route::get('/', [BookController::class, 'index'])->name('quote.index');
         //Route::get('/new-boiler', [BookController::class, 'index'])->name('quote.new');
     }
     else{
-        Route::get('/', [BookController::class, 'index'])->name('quote.new');
+        Route::get('/', [BookController::class, 'index'])->name('quote.index');
     }
 
     Route::get('/quote', [BookController::class, 'quote'])->name('quote');
