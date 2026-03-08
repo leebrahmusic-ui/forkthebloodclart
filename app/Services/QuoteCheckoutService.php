@@ -52,6 +52,22 @@ class QuoteCheckoutService
         if (empty($apptData['date']) || empty($apptData['time'])) {
             throw ValidationException::withMessages(['visit_time' => ['Visit date and time are required.']]);
         }
+            if ($serviceType === 'new_boiler_quote') {
+                $postcode = (string) ($customerData['postcode'] ?? '');
+
+                if ($postcode === '') {
+                    throw ValidationException::withMessages(['customer.postcode' => ['Postcode is required.']]);
+                }
+                if (!$this->isValidUkPostcode($postcode) || !$this->isAllowedServicePostcode($postcode)) {
+                    throw ValidationException::withMessages(['customer.postcode' => ['Please enter a valid LS, WF, HG, or BD postcode.']]);
+                }
+                if (empty($customerData['address_line1'])) {
+                    throw ValidationException::withMessages(['customer.address_line1' => ['Address line 1 is required.']]);
+                }
+                if (empty($customerData['city'])) {
+                    throw ValidationException::withMessages(['customer.city' => ['Town or city is required.']]);
+                }
+            }
 
         if ($baseAmount <= 0) {
             throw ValidationException::withMessages([
@@ -71,6 +87,11 @@ class QuoteCheckoutService
                     'full_name' => $customerData['full_name'] ?? 'Customer',
                     'phone' => $customerData['phone'] ?? null,
                     'postcode' => $customerData['postcode'] ?? null,
+                    'address_line1' => $customerData['address_line1'] ?? null,
+                    'address_line2' => $customerData['address_line2'] ?? null,
+                    'city' => $customerData['city'] ?? null,
+                    'county' => $customerData['county'] ?? null,
+                    'country' => $customerData['country'] ?? 'United Kingdom',
                     'address_full' => $customerData['address_full'] ?? null,
                 ]
             );
@@ -219,7 +240,7 @@ class QuoteCheckoutService
                 'status' => 'initiated',
             ]);
 
-            if ($paymentElement && in_array($serviceType, ['boiler_service', 'new_boiler_quote'], true)) {
+            if ($paymentElement && in_array($serviceType, ['boiler_service', 'boiler_repair', 'new_boiler_quote'], true)) {
                 $checkout = $this->createStripePaymentElementIntent($booking, $tx);
             } else {
                 $checkout = $this->createStripeCheckout(
@@ -246,6 +267,28 @@ class QuoteCheckoutService
             ];
         });
     }
+
+        private function isValidUkPostcode(string $postcode): bool
+        {
+            return (bool) preg_match(
+                '/^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i',
+                $postcode
+            );
+        }
+
+        private function isAllowedServicePostcode(string $postcode): bool
+        {
+            $normalized = strtoupper(str_replace(' ', '', $postcode));
+            $outcode = strlen($normalized) > 3 ? substr($normalized, 0, -3) : $normalized;
+
+            foreach (['LS', 'WF', 'HG', 'BD'] as $prefix) {
+                if (str_starts_with($outcode, $prefix)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
     public function previewCouponPricing(array $payload): array
     {
