@@ -38,6 +38,7 @@ export default function Stepper({
 }) {
     const [index, setIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const answersRef = useRef({});
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownTriggerRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -58,6 +59,10 @@ export default function Stepper({
     // useEffect(() => {
     //     console.log("ANSWERS UPDATED:", answers);
     // }, [answers]);
+
+    useEffect(() => {
+        answersRef.current = answers;
+    }, [answers]);
 
     // different type of login
 
@@ -171,7 +176,7 @@ export default function Stepper({
 
                 if (currentIndex >= 0) {
                     if (currentIndex >= nextVisibleSteps.length - 1) {
-                        handleCompletion();
+                        handleCompletion(updated);
                     } else {
                         setIndex(currentIndex + 1);
                     }
@@ -238,16 +243,16 @@ export default function Stepper({
         }));
     }
 
-    const handleCompletion = () => {
+    const handleCompletion = (submittedAnswers = answersRef.current) => {
         if (serviceKey?.key === "boiler_service") {
-            router.post(route("book.quote.service.checkout"), answers, {
+            router.post(route("book.quote.service.checkout"), submittedAnswers, {
                 preserveScroll: true,
             });
             return;
         }
 
         if (serviceKey?.key === "boiler_repair") {
-            router.post(route("book.quote.repair.checkout"), answers, {
+            router.post(route("book.quote.repair.checkout"), submittedAnswers, {
                 preserveScroll: true,
             });
             return;

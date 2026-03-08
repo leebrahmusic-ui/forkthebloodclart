@@ -294,12 +294,13 @@ export const SERVICE_QUESTIONS = {
                 text: `A smart thermostat allows you to control your heating remotely via iOS or Android, set schedules, and improve efficiency.
 
 You can also keep your current thermostat at no extra cost.
-• Standard wireless thermostat (included)
+• Standard wireless thermostat (free & included)
 `,
             },
             options: [
                 {
                     label: "Basic",
+                    priceNote: "Free (Included)",
                     image: "/images/stepper/STANDARD_room_thermostat-removebg-preview.png",
 
                 },

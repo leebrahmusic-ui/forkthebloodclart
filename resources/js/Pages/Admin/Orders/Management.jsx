@@ -753,6 +753,30 @@ export default function Management() {
                                                                 </span>
                                                             </div>
                                                             <div>
+                                                                <span className="text-slate-500">Street:</span>{" "}
+                                                                <span className="font-semibold text-slate-900">
+                                                                    {b.customer?.address_line1 || "—"}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-slate-500">Address line 2:</span>{" "}
+                                                                <span className="font-semibold text-slate-900">
+                                                                    {b.customer?.address_line2 || "—"}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-slate-500">Town / City:</span>{" "}
+                                                                <span className="font-semibold text-slate-900">
+                                                                    {b.customer?.city || "—"}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-slate-500">County:</span>{" "}
+                                                                <span className="font-semibold text-slate-900">
+                                                                    {b.customer?.county || "—"}
+                                                                </span>
+                                                            </div>
+                                                            <div>
                                                                 <span className="text-slate-500">Postcode:</span>{" "}
                                                                 <span className="font-semibold text-slate-900">
                                                                     {b.customer?.postcode || "—"}

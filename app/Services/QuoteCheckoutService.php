@@ -52,7 +52,7 @@ class QuoteCheckoutService
         if (empty($apptData['date']) || empty($apptData['time'])) {
             throw ValidationException::withMessages(['visit_time' => ['Visit date and time are required.']]);
         }
-            if ($serviceType === 'new_boiler_quote') {
+            if (in_array($serviceType, ['new_boiler_quote', 'boiler_service', 'boiler_repair'], true)) {
                 $postcode = (string) ($customerData['postcode'] ?? '');
 
                 if ($postcode === '') {
@@ -61,11 +61,13 @@ class QuoteCheckoutService
                 if (!$this->isValidUkPostcode($postcode) || !$this->isAllowedServicePostcode($postcode)) {
                     throw ValidationException::withMessages(['customer.postcode' => ['Please enter a valid LS, WF, HG, or BD postcode.']]);
                 }
-                if (empty($customerData['address_line1'])) {
-                    throw ValidationException::withMessages(['customer.address_line1' => ['Address line 1 is required.']]);
-                }
-                if (empty($customerData['city'])) {
-                    throw ValidationException::withMessages(['customer.city' => ['Town or city is required.']]);
+                if ($serviceType === 'new_boiler_quote') {
+                    if (empty($customerData['address_line1'])) {
+                        throw ValidationException::withMessages(['customer.address_line1' => ['Address line 1 is required.']]);
+                    }
+                    if (empty($customerData['city'])) {
+                        throw ValidationException::withMessages(['customer.city' => ['Town or city is required.']]);
+                    }
                 }
             }
 
@@ -200,11 +202,12 @@ class QuoteCheckoutService
 
             // dd($answers);
             if ($hasQuestions) {
-                // reject unknown answer keys (optional but recommended)
+                // Keep all answers for admin visibility.
+                // Only reject orphan *_extraText keys when their base key is missing.
                 foreach ($answers as $k => $_) {
-                    if (!$questions->has($k)) {
-                        // allow *_extraText if master exists for that key too
-                        if (!$questions->has($k)) {
+                    if (str_ends_with($k, '_extraText')) {
+                        $baseKey = substr($k, 0, -10);
+                        if (!$questions->has($baseKey) && !array_key_exists($baseKey, $answers)) {
                             throw ValidationException::withMessages(["answers.$k" => ["Invalid question key."]]);
                         }
                     }

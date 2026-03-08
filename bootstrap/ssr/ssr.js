@@ -2516,6 +2516,26 @@ function Management() {
                       /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-900", children: b.customer?.phone || "—" })
                     ] }),
                     /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx("span", { className: "text-slate-500", children: "Street:" }),
+                      " ",
+                      /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-900", children: b.customer?.address_line1 || "—" })
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx("span", { className: "text-slate-500", children: "Address line 2:" }),
+                      " ",
+                      /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-900", children: b.customer?.address_line2 || "—" })
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx("span", { className: "text-slate-500", children: "Town / City:" }),
+                      " ",
+                      /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-900", children: b.customer?.city || "—" })
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsx("span", { className: "text-slate-500", children: "County:" }),
+                      " ",
+                      /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-900", children: b.customer?.county || "—" })
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx("span", { className: "text-slate-500", children: "Postcode:" }),
                       " ",
                       /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-900", children: b.customer?.postcode || "—" })
@@ -4441,39 +4461,39 @@ function GoogleReview({ theme = "light" }) {
     ] }) })
   ] }) }) }) });
 }
-const UK_POSTCODE_RE = /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
-const ALLOWED_OUTCODES = ["LS", "BD", "WF", "HG"];
-function normalizeUkPostcode(input) {
+const UK_POSTCODE_RE$3 = /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
+const ALLOWED_OUTCODES$3 = ["LS", "BD", "WF", "HG"];
+function normalizeUkPostcode$3(input) {
   const raw = String(input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (raw.length <= 3) return raw;
   return `${raw.slice(0, -3)} ${raw.slice(-3)}`.trim();
 }
 function isValidUkPostcode(value) {
   const v = String(value || "").trim().toUpperCase();
-  return UK_POSTCODE_RE.test(v);
+  return UK_POSTCODE_RE$3.test(v);
 }
-function getOutcode(value) {
+function getOutcode$3(value) {
   const v = String(value || "").trim().toUpperCase();
   if (!v) return "";
   if (v.includes(" ")) return v.split(" ")[0];
   if (v.length > 3) return v.slice(0, -3);
   return v;
 }
-function isAllowedOutcode(value) {
-  const outcode = getOutcode(value);
-  return ALLOWED_OUTCODES.some((prefix) => outcode.startsWith(prefix));
+function isAllowedOutcode$3(value) {
+  const outcode = getOutcode$3(value);
+  return ALLOWED_OUTCODES$3.some((prefix) => outcode.startsWith(prefix));
 }
 function Home$1() {
   const [postcode, setPostcode] = useState("");
   const [touched, setTouched] = useState(false);
   const { title } = usePage().props;
-  const normalized = useMemo(() => normalizeUkPostcode(postcode), [postcode]);
+  const normalized = useMemo(() => normalizeUkPostcode$3(postcode), [postcode]);
   const validFormat = useMemo(
     () => isValidUkPostcode(normalized),
     [normalized]
   );
   const allowedArea = useMemo(
-    () => isAllowedOutcode(normalized),
+    () => isAllowedOutcode$3(normalized),
     [normalized]
   );
   const valid = validFormat && allowedArea;
@@ -5235,9 +5255,27 @@ function BlueQuoteSkin({ children }) {
     children
   ] });
 }
+const UK_POSTCODE_RE$2 = /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
+const ALLOWED_OUTCODES$2 = ["LS", "WF", "HG", "BD"];
+function normalizeUkPostcode$2(input) {
+  const raw = String(input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (raw.length <= 3) return raw;
+  return `${raw.slice(0, -3)} ${raw.slice(-3)}`.trim();
+}
+function getOutcode$2(value) {
+  const normalized = normalizeUkPostcode$2(value);
+  if (!normalized) return "";
+  return normalized.includes(" ") ? normalized.split(" ")[0] : normalized.length > 3 ? normalized.slice(0, -3) : normalized;
+}
+function isAllowedOutcode$2(value) {
+  const outcode = getOutcode$2(value);
+  return ALLOWED_OUTCODES$2.some((prefix) => outcode.startsWith(prefix));
+}
+function buildAddressFull(parts = []) {
+  return parts.map((value) => String(value || "").trim()).filter(Boolean).join(", ");
+}
 function InstallPage({ booking }) {
   const { symbol, title, stripePublishableKey } = usePage().props;
-  console.log("Postcode ", booking);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState(null);
   const [showAllIncludes, setShowAllIncludes] = useState(false);
@@ -5253,11 +5291,16 @@ function InstallPage({ booking }) {
     lastName: "",
     email: "",
     phone: "",
-    address: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    county: "",
+    postcode: "",
     notes: ""
   });
   const [errors, setErrors] = useState({});
   const [processing, setProcessing] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [paymentClientSecret, setPaymentClientSecret] = useState(null);
   const [paymentBookingId, setPaymentBookingId] = useState(null);
   const [paymentTxId, setPaymentTxId] = useState(null);
@@ -5363,7 +5406,11 @@ function InstallPage({ booking }) {
   const lastNameRef = useRef(null);
   const emailRef = useRef(null);
   const phoneRef = useRef(null);
-  const addressRef = useRef(null);
+  const addressLine1Ref = useRef(null);
+  const addressLine2Ref = useRef(null);
+  const cityRef = useRef(null);
+  const countyRef = useRef(null);
+  const postcodeRef = useRef(null);
   const termsRef = useRef(null);
   const includes = Array.isArray(booking?.includes) ? booking.includes : [];
   const visibleIncludes = showAllIncludes ? includes : includes.slice(0, 3);
@@ -5399,9 +5446,28 @@ function InstallPage({ booking }) {
     }
     return 0;
   }, [couponApplied]);
+  const quotePostcode = useMemo(() => {
+    const candidates = [
+      booking?.answers?.inputs?.postcode,
+      booking?.answers?.answers?.raw?.details?.postcode,
+      booking?.answers?.answers?.raw?.postcode
+    ];
+    return candidates.find(
+      (value) => typeof value === "string" && value.trim().length > 0
+    )?.trim() || "";
+  }, [booking]);
+  useEffect(() => {
+    if (!quotePostcode) return;
+    setFormData((prev) => {
+      if (String(prev.postcode || "").trim()) return prev;
+      return {
+        ...prev,
+        postcode: normalizeUkPostcode$2(quotePostcode)
+      };
+    });
+  }, [quotePostcode]);
   const formatMoney = (amount) => `${symbol} ${Number(amount || 0).toFixed(2)}`;
   const visibleAddOns = booking?.answers?.addOns;
-  console.log("Add Ons", visibleAddOns);
   const addOns = visibleAddOns?.items || [];
   const trvItem = addOns.find((x) => x.key === "trv");
   const flueType = visibleAddOns?.derived?.flueType || "horizontal";
@@ -5426,6 +5492,35 @@ function InstallPage({ booking }) {
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     if (typeof el.focus === "function") el.focus();
   };
+  const syncFormDataFromRefs = () => {
+    const nextValues = {
+      title: titleRef.current?.value ?? formData.title,
+      firstName: firstNameRef.current?.value ?? formData.firstName,
+      lastName: lastNameRef.current?.value ?? formData.lastName,
+      email: emailRef.current?.value ?? formData.email,
+      phone: phoneRef.current?.value ?? formData.phone,
+      addressLine1: addressLine1Ref.current?.value ?? formData.addressLine1,
+      addressLine2: addressLine2Ref.current?.value ?? formData.addressLine2,
+      city: cityRef.current?.value ?? formData.city,
+      county: countyRef.current?.value ?? formData.county,
+      postcode: normalizeUkPostcode$2(
+        postcodeRef.current?.value ?? formData.postcode
+      )
+    };
+    const hasChanges = Object.entries(nextValues).some(
+      ([key, value]) => value !== formData[key]
+    );
+    if (hasChanges) {
+      setFormData((prev) => ({
+        ...prev,
+        ...nextValues
+      }));
+    }
+    return {
+      ...formData,
+      ...nextValues
+    };
+  };
   const clearError = (key) => {
     setErrors((prev) => {
       if (!prev[key]) return prev;
@@ -5434,29 +5529,39 @@ function InstallPage({ booking }) {
       return copy;
     });
   };
-  const validateAll = () => {
+  const validateAll = (source = formData) => {
     const next = {};
     if (!selectedDate)
       next.appointment = "Please select an installation date.";
     else if (!selectedTime)
       next.appointment = "Please select an installation time.";
-    if (!formData.title) next.title = "Please select a title.";
-    if (!formData.firstName?.trim())
+    if (!source.title) next.title = "Please select a title.";
+    if (!source.firstName?.trim())
       next.firstName = "First name is required.";
-    if (!formData.lastName?.trim())
+    if (!source.lastName?.trim())
       next.lastName = "Last name is required.";
-    const email = (formData.email || "").trim();
+    const email = (source.email || "").trim();
     if (!email) next.email = "Email is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       next.email = "Please enter a valid email address.";
-    const phone = (formData.phone || "").trim();
+    const phone = (source.phone || "").trim();
     if (!phone) next.phone = "Phone number is required.";
     else {
       const digits = phone.replace(/[^\d]/g, "");
       if (digits.length < 10)
         next.phone = "Please enter a valid phone number.";
     }
-    if (!formData.address?.trim()) next.address = "Address is required.";
+    if (!source.addressLine1?.trim())
+      next.addressLine1 = "Address line 1 is required.";
+    if (!source.city?.trim()) next.city = "Town or city is required.";
+    const formattedPostcode = normalizeUkPostcode$2(source.postcode);
+    if (!formattedPostcode) {
+      next.postcode = "Postcode is required.";
+    } else if (!UK_POSTCODE_RE$2.test(formattedPostcode)) {
+      next.postcode = "Please enter a valid UK postcode.";
+    } else if (!isAllowedOutcode$2(formattedPostcode)) {
+      next.postcode = "Checkout is restricted to LS, WF, HG and BD postcodes only.";
+    }
     return next;
   };
   const fieldOrder = useMemo(
@@ -5467,7 +5572,11 @@ function InstallPage({ booking }) {
       { key: "lastName", ref: lastNameRef },
       { key: "email", ref: emailRef },
       { key: "phone", ref: phoneRef },
-      { key: "address", ref: addressRef }
+      { key: "addressLine1", ref: addressLine1Ref },
+      { key: "addressLine2", ref: addressLine2Ref },
+      { key: "city", ref: cityRef },
+      { key: "county", ref: countyRef },
+      { key: "postcode", ref: postcodeRef }
     ],
     []
   );
@@ -5510,10 +5619,25 @@ function InstallPage({ booking }) {
       stripeRef.current = null;
     };
   }, [paymentClientSecret, stripePromise]);
-  const isFormValid = useMemo(() => {
+  useMemo(() => {
     const e = validateAll();
     return Object.keys(e).length === 0;
   }, [formData, selectedDate, selectedTime]);
+  useEffect(() => {
+    if (!hasAttemptedSubmit) return;
+    const nextErrors = validateAll();
+    setErrors((prev) => {
+      const prevKeys = Object.keys(prev);
+      const nextKeys = Object.keys(nextErrors);
+      if (prevKeys.length === nextKeys.length) {
+        const isUnchanged = prevKeys.every(
+          (key) => prev[key] === nextErrors[key]
+        );
+        if (isUnchanged) return prev;
+      }
+      return nextErrors;
+    });
+  }, [hasAttemptedSubmit, formData, selectedDate, selectedTime]);
   useMemo(() => {
     if (!selectedDate || !selectedTime) return "";
     if (!formData.title?.trim()) return "";
@@ -5521,7 +5645,12 @@ function InstallPage({ booking }) {
     if (!formData.lastName?.trim()) return "";
     if (!formData.email?.trim()) return "";
     if (!formData.phone?.trim()) return "";
-    if (!formData.address?.trim()) return "";
+    if (!formData.addressLine1?.trim()) return "";
+    if (!formData.city?.trim()) return "";
+    const formattedPostcode = normalizeUkPostcode$2(formData.postcode);
+    if (!formattedPostcode) return "";
+    if (!UK_POSTCODE_RE$2.test(formattedPostcode)) return "";
+    if (!isAllowedOutcode$2(formattedPostcode)) return "";
     return [
       selectedDate,
       selectedTime,
@@ -5530,12 +5659,19 @@ function InstallPage({ booking }) {
       formData.lastName,
       formData.email,
       formData.phone,
-      formData.address
+      formData.addressLine1,
+      formData.addressLine2,
+      formData.city,
+      formData.county,
+      formattedPostcode
     ].map((v) => String(v || "").trim()).join("|");
   }, [selectedDate, selectedTime, formData]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((s) => ({ ...s, [name]: value }));
+    setFormData((s) => ({
+      ...s,
+      [name]: name === "postcode" ? normalizeUkPostcode$2(value) : value
+    }));
     clearError(name);
   };
   const handleAppointmentChange = ({ date, time }) => {
@@ -5572,7 +5708,12 @@ function InstallPage({ booking }) {
       if (key === "customer.last_name") return "lastName";
       if (key === "customer.email") return "email";
       if (key === "customer.phone") return "phone";
-      if (key === "customer.address") return "address";
+      if (key === "customer.address") return "addressLine1";
+      if (key === "customer.address_line1") return "addressLine1";
+      if (key === "customer.address_line2") return "addressLine2";
+      if (key === "customer.city") return "city";
+      if (key === "customer.county") return "county";
+      if (key === "customer.postcode") return "postcode";
       return null;
     };
     const next = {};
@@ -5589,9 +5730,11 @@ function InstallPage({ booking }) {
     }
   };
   const initialisePaymentElement = async ({ showValidationToast = false } = {}) => {
-    const nextErrors = validateAll();
+    const syncedFormData = syncFormDataFromRefs();
+    const nextErrors = validateAll(syncedFormData);
     if (Object.keys(nextErrors).length > 0) {
       if (showValidationToast) {
+        setHasAttemptedSubmit(true);
         setErrors(nextErrors);
         const firstInvalid = fieldOrder.find((f) => nextErrors[f.key]);
         if (firstInvalid) scrollToRef(firstInvalid.ref);
@@ -5622,6 +5765,19 @@ function InstallPage({ booking }) {
     }
     const answers = booking?.answers?.answers?.raw;
     const addOns2 = booking?.answers?.addOns;
+    const customerName = [
+      syncedFormData.title,
+      syncedFormData.firstName,
+      syncedFormData.lastName
+    ].map((value) => String(value || "").trim()).filter(Boolean).join(" ");
+    const formattedPostcode = normalizeUkPostcode$2(syncedFormData.postcode);
+    const addressFull = buildAddressFull([
+      syncedFormData.addressLine1,
+      syncedFormData.addressLine2,
+      syncedFormData.city,
+      syncedFormData.county,
+      formattedPostcode || quotePostcode
+    ]);
     const payload = {
       // booking data
       ...answers,
@@ -5635,12 +5791,17 @@ function InstallPage({ booking }) {
       },
       // customer form
       customer_details: {
-        full_name: `${formData.title} ${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        phone: formData.phone,
-        postcode: "SW22NN",
-        address: formData.address,
-        notes: formData.notes
+        full_name: customerName,
+        email: syncedFormData.email,
+        phone: syncedFormData.phone,
+        postcode: formattedPostcode || quotePostcode,
+        address_line1: syncedFormData.addressLine1,
+        address_line2: syncedFormData.addressLine2,
+        city: syncedFormData.city,
+        county: syncedFormData.county,
+        country: "United Kingdom",
+        address_full: addressFull,
+        notes: syncedFormData.notes
       },
       product: productDetails
     };
@@ -5684,16 +5845,23 @@ function InstallPage({ booking }) {
       const status = err?.response?.status;
       if (status === 422) {
         const backendErrors = err?.response?.data?.errors;
+        const firstBackendError = Object.values(backendErrors || {}).flat().find(Boolean);
         const couponMsg = backendErrors?.coupon_code?.[0];
         if (couponMsg) {
           setCouponError(couponMsg);
           setCouponApplied(null);
+        }
+        if (firstBackendError) {
+          setPaymentError(String(firstBackendError));
         }
         if (showValidationToast) {
           showValidationErrors(backendErrors);
           hydrateInlineErrorsFromBackend(backendErrors);
         }
       } else if (status >= 500) {
+        setPaymentError(
+          "Payment service is temporarily unavailable. Please try again shortly."
+        );
         toast.error(
           "Payment service is temporarily unavailable. Please try again shortly.",
           {
@@ -5702,6 +5870,9 @@ function InstallPage({ booking }) {
           }
         );
       } else if (err?.code === "ECONNABORTED") {
+        setPaymentError(
+          "Request timed out. Please check your connection and try again."
+        );
         toast.error(
           "Request timed out. Please check your connection and try again.",
           {
@@ -5711,6 +5882,7 @@ function InstallPage({ booking }) {
         );
       } else if (showValidationToast) {
         const message = err?.response?.data?.message || err?.message || "Unable to initiate payment. Please try again.";
+        setPaymentError(message);
         toast.error(message, {
           duration: 5e3,
           position: "top-center"
@@ -5722,10 +5894,7 @@ function InstallPage({ booking }) {
   };
   const handlePayAndBook = async () => {
     if (processing) return;
-    if (!paymentClientSecret) {
-      await initialisePaymentElement({ showValidationToast: true });
-      return;
-    }
+    setHasAttemptedSubmit(true);
     if (!acceptedTerms) {
       setTermsError(
         "Please confirm you agree to the Terms & Conditions before continuing."
@@ -5735,6 +5904,10 @@ function InstallPage({ booking }) {
         position: "top-center"
       });
       scrollToRef(termsRef);
+      return;
+    }
+    if (!paymentClientSecret) {
+      await initialisePaymentElement({ showValidationToast: true });
       return;
     }
     setPaymentError("");
@@ -6210,55 +6383,131 @@ function InstallPage({ booking }) {
                 /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow pt-1.5", children: [
                   /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "Where are we installing?" }),
                   /* @__PURE__ */ jsxs("div", { className: "space-y-5", children: [
-                    /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                      /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Property Address" }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative group/input", children: [
+                    /* @__PURE__ */ jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2", children: [
+                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Address line 1" }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative group/input", children: [
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: addressLine1Ref,
+                              name: "addressLine1",
+                              placeholder: "House number/name and street",
+                              value: formData.addressLine1,
+                              onChange: handleInputChange,
+                              autoComplete: "address-line1",
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.addressLine1 ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsxs(
+                            "svg",
+                            {
+                              className: "w-5 h-5",
+                              fill: "none",
+                              viewBox: "0 0 24 24",
+                              stroke: "currentColor",
+                              children: [
+                                /* @__PURE__ */ jsx(
+                                  "path",
+                                  {
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                    strokeWidth: 1.5,
+                                    d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                  }
+                                ),
+                                /* @__PURE__ */ jsx(
+                                  "path",
+                                  {
+                                    strokeLinecap: "round",
+                                    strokeLinejoin: "round",
+                                    strokeWidth: 1.5,
+                                    d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                  }
+                                )
+                              ]
+                            }
+                          ) })
+                        ] }),
+                        errors.addressLine1 && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.addressLine1 })
+                      ] }),
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2", children: [
+                        /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
+                          "Address line 2 ",
+                          /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
+                        ] }),
                         /* @__PURE__ */ jsx(
                           "input",
                           {
-                            ref: addressRef,
-                            name: "address",
-                            placeholder: "House number/name, street, town and postcode",
-                            value: formData.address,
+                            ref: addressLine2Ref,
+                            name: "addressLine2",
+                            placeholder: "Apartment, building, or area",
+                            value: formData.addressLine2,
                             onChange: handleInputChange,
-                            autoComplete: "street-address",
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.address ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            autoComplete: "address-line2",
+                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.addressLine2 ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
                           }
                         ),
-                        /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsxs(
-                          "svg",
-                          {
-                            className: "w-5 h-5",
-                            fill: "none",
-                            viewBox: "0 0 24 24",
-                            stroke: "currentColor",
-                            children: [
-                              /* @__PURE__ */ jsx(
-                                "path",
-                                {
-                                  strokeLinecap: "round",
-                                  strokeLinejoin: "round",
-                                  strokeWidth: 1.5,
-                                  d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                }
-                              ),
-                              /* @__PURE__ */ jsx(
-                                "path",
-                                {
-                                  strokeLinecap: "round",
-                                  strokeLinejoin: "round",
-                                  strokeWidth: 1.5,
-                                  d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                }
-                              )
-                            ]
-                          }
-                        ) })
+                        errors.addressLine2 && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.addressLine2 })
                       ] }),
-                      errors.address && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.address }),
-                      /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs text-slate-500", children: "Please enter your full installation address manually." })
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Town / city" }),
+                        /* @__PURE__ */ jsx(
+                          "input",
+                          {
+                            ref: cityRef,
+                            name: "city",
+                            placeholder: "e.g. Leeds",
+                            value: formData.city,
+                            onChange: handleInputChange,
+                            autoComplete: "address-level2",
+                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.city ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                          }
+                        ),
+                        errors.city && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.city })
+                      ] }),
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                        /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
+                          "County ",
+                          /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
+                        ] }),
+                        /* @__PURE__ */ jsx(
+                          "input",
+                          {
+                            ref: countyRef,
+                            name: "county",
+                            placeholder: "e.g. West Yorkshire",
+                            value: formData.county,
+                            onChange: handleInputChange,
+                            autoComplete: "address-level1",
+                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.county ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                          }
+                        ),
+                        errors.county && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.county })
+                      ] }),
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:max-w-sm", children: [
+                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Postcode" }),
+                        /* @__PURE__ */ jsx(
+                          "input",
+                          {
+                            ref: postcodeRef,
+                            name: "postcode",
+                            placeholder: "e.g. LS1 1AA",
+                            value: formData.postcode,
+                            onChange: handleInputChange,
+                            autoComplete: "postal-code",
+                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold uppercase text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.postcode ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                          }
+                        ),
+                        errors.postcode && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.postcode })
+                      ] })
                     ] }),
+                    /* @__PURE__ */ jsx("p", { className: "-mt-1 text-xs text-slate-500", children: "Checkout is restricted to LS, WF, HG and BD postcodes only." }),
                     /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
                       /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
                         "Access & parking notes",
@@ -6627,11 +6876,11 @@ function InstallPage({ booking }) {
                   {
                     type: "button",
                     onClick: handlePayAndBook,
-                    disabled: !isFormValid || processing || paymentClientSecret && !acceptedTerms,
+                    disabled: processing,
                     "aria-busy": processing,
                     className: [
                       "w-full py-4 text-sm font-bold rounded-xl uppercase tracking-wide border transition-all flex items-center justify-center gap-2",
-                      processing ? "bg-gray-400 border-gray-400 cursor-not-allowed text-white" : isFormValid ? "bg-primary border-primary text-white hover:opacity-95" : "bg-slate-200 border-slate-200 text-slate-500 cursor-not-allowed"
+                      processing ? "bg-gray-400 border-gray-400 cursor-not-allowed text-white" : paymentClientSecret && !acceptedTerms ? "bg-primary border-primary text-white opacity-70 cursor-not-allowed" : "bg-primary border-primary text-white hover:opacity-95"
                     ].join(" "),
                     children: processing ? /* @__PURE__ */ jsxs(Fragment, { children: [
                       /* @__PURE__ */ jsx(FiLoader, { className: "animate-spin" }),
@@ -6690,11 +6939,11 @@ function InstallPage({ booking }) {
           {
             type: "button",
             onClick: handlePayAndBook,
-            disabled: !isFormValid || processing || paymentClientSecret && !acceptedTerms,
+            disabled: processing,
             "aria-busy": processing,
             className: [
               "rounded-xl px-4 py-2.5 text-sm font-semibold transition-all",
-              processing ? "bg-gray-400 text-white cursor-not-allowed" : isFormValid ? "bg-primary text-white" : "bg-slate-200 text-slate-500 cursor-not-allowed"
+              processing ? "bg-gray-400 text-white cursor-not-allowed" : paymentClientSecret && !acceptedTerms ? "bg-primary text-white opacity-70 cursor-not-allowed" : "bg-primary text-white"
             ].join(" "),
             children: processing ? "Processing…" : paymentClientSecret ? "Confirm payment" : "Secure payment"
           }
@@ -7288,12 +7537,13 @@ const SERVICE_QUESTIONS = {
         text: `A smart thermostat allows you to control your heating remotely via iOS or Android, set schedules, and improve efficiency.
 
 You can also keep your current thermostat at no extra cost.
-• Standard wireless thermostat (included)
+• Standard wireless thermostat (free & included)
 `
       },
       options: [
         {
           label: "Basic",
+          priceNote: "Free (Included)",
           image: "/images/stepper/STANDARD_room_thermostat-removebg-preview.png"
         },
         {
@@ -7873,6 +8123,7 @@ function Stepper({
 }) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const answersRef = useRef({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownTriggerRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -7883,6 +8134,9 @@ function Stepper({
   const [mouse, setMouse] = useState({ x: 50, y: 50 });
   const lastAutoAdvanceRef = useRef(null);
   const skipAutoAdvanceRef = useRef(false);
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
   const visibleSteps = useMemo(() => {
     return steps.filter((step) => {
       if (!step.showIf) return true;
@@ -7957,7 +8211,7 @@ function Stepper({
         );
         if (currentIndex >= 0) {
           if (currentIndex >= nextVisibleSteps.length - 1) {
-            handleCompletion();
+            handleCompletion(updated);
           } else {
             setIndex(currentIndex + 1);
           }
@@ -8010,15 +8264,15 @@ function Stepper({
       }
     }));
   }
-  const handleCompletion = () => {
+  const handleCompletion = (submittedAnswers = answersRef.current) => {
     if (serviceKey?.key === "boiler_service") {
-      router.post(route("book.quote.service.checkout"), answers, {
+      router.post(route("book.quote.service.checkout"), submittedAnswers, {
         preserveScroll: true
       });
       return;
     }
     if (serviceKey?.key === "boiler_repair") {
-      router.post(route("book.quote.repair.checkout"), answers, {
+      router.post(route("book.quote.repair.checkout"), submittedAnswers, {
         preserveScroll: true
       });
       return;
@@ -10190,8 +10444,24 @@ const __vite_glob_0_21 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: QuotePage
 }, Symbol.toStringTag, { value: "Module" }));
+const UK_POSTCODE_RE$1 = /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
+const ALLOWED_OUTCODES$1 = ["LS", "WF", "HG", "BD"];
+function normalizeUkPostcode$1(input) {
+  const raw = String(input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (raw.length <= 3) return raw;
+  return `${raw.slice(0, -3)} ${raw.slice(-3)}`.trim();
+}
+function getOutcode$1(value) {
+  const normalized = normalizeUkPostcode$1(value);
+  if (!normalized) return "";
+  return normalized.includes(" ") ? normalized.split(" ")[0] : normalized.length > 3 ? normalized.slice(0, -3) : normalized;
+}
+function isAllowedOutcode$1(value) {
+  const outcode = getOutcode$1(value);
+  return ALLOWED_OUTCODES$1.some((prefix) => outcode.startsWith(prefix));
+}
 function RepairCheckout() {
-  const { answers, basePrice, symbol, title } = usePage().props;
+  const { answers, basePrice, symbol, title, stripePublishableKey } = usePage().props;
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState(null);
   const [formData, setFormData] = useState({
@@ -10206,9 +10476,20 @@ function RepairCheckout() {
   });
   const [errors, setErrors] = useState({});
   const [processing, setProcessing] = useState(false);
+  const [paymentClientSecret, setPaymentClientSecret] = useState(null);
+  const [paymentBookingId, setPaymentBookingId] = useState(null);
+  const [paymentTxId, setPaymentTxId] = useState(null);
+  const [paymentReturnUrl, setPaymentReturnUrl] = useState(null);
+  const [paymentError, setPaymentError] = useState("");
   const [openPetTooltip, setOpenPetTooltip] = useState(false);
   const mounted = useRef(true);
   const prefilled = useRef(false);
+  const paymentElementContainerRef = useRef(null);
+  const paymentSectionRef = useRef(null);
+  const stripeRef = useRef(null);
+  const elementsRef = useRef(null);
+  const paymentElementRef = useRef(null);
+  const lastAutoInitKeyRef = useRef("");
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -10278,6 +10559,45 @@ function RepairCheckout() {
     ],
     []
   );
+  const stripePromise = useMemo(() => {
+    if (!stripePublishableKey) return null;
+    return loadStripe(stripePublishableKey);
+  }, [stripePublishableKey]);
+  useEffect(() => {
+    if (!paymentClientSecret || !paymentElementContainerRef.current || !stripePromise)
+      return;
+    let disposed = false;
+    (async () => {
+      try {
+        const stripe = await stripePromise;
+        if (!stripe || disposed) return;
+        const elements = stripe.elements({
+          clientSecret: paymentClientSecret,
+          appearance: { theme: "stripe" }
+        });
+        const paymentElement = elements.create("payment", {
+          layout: "tabs"
+        });
+        paymentElement.mount(paymentElementContainerRef.current);
+        stripeRef.current = stripe;
+        elementsRef.current = elements;
+        paymentElementRef.current = paymentElement;
+        setPaymentError("");
+      } catch (error) {
+        const msg = "Unable to load secure payment form. Please try again, or refresh this page.";
+        toast.error(msg);
+        setPaymentError(msg);
+        setPaymentClientSecret(null);
+      }
+    })();
+    return () => {
+      disposed = true;
+      paymentElementRef.current?.destroy?.();
+      paymentElementRef.current = null;
+      elementsRef.current = null;
+      stripeRef.current = null;
+    };
+  }, [paymentClientSecret, stripePromise]);
   const clearError = (key) => {
     setErrors((prev) => {
       if (!prev[key]) return prev;
@@ -10304,10 +10624,41 @@ function RepairCheckout() {
       if (digits.length < 10)
         next.phone = "Please enter a valid phone number.";
     }
-    if (!formData.postcode?.trim()) next.postcode = "Postcode is required.";
+    const formattedPostcode = normalizeUkPostcode$1(formData.postcode);
+    if (!formattedPostcode) {
+      next.postcode = "Postcode is required.";
+    } else if (!UK_POSTCODE_RE$1.test(formattedPostcode)) {
+      next.postcode = "Please enter a valid UK postcode.";
+    } else if (!isAllowedOutcode$1(formattedPostcode)) {
+      next.postcode = "Checkout is restricted to LS, WF, HG and BD postcodes only.";
+    }
     if (!formData.address?.trim()) next.address = "Address is required.";
     return next;
   };
+  const checkoutReadyKey = useMemo(() => {
+    if (!selectedDate || !selectedTime) return "";
+    if (!formData.title?.trim()) return "";
+    if (!formData.firstName?.trim()) return "";
+    if (!formData.lastName?.trim()) return "";
+    if (!formData.email?.trim()) return "";
+    if (!formData.phone?.trim()) return "";
+    const formattedPostcode = normalizeUkPostcode$1(formData.postcode);
+    if (!formattedPostcode) return "";
+    if (!UK_POSTCODE_RE$1.test(formattedPostcode)) return "";
+    if (!isAllowedOutcode$1(formattedPostcode)) return "";
+    if (!formData.address?.trim()) return "";
+    return [
+      selectedDate,
+      selectedTime,
+      formData.title,
+      formData.firstName,
+      formData.lastName,
+      formData.email,
+      formData.phone,
+      formattedPostcode,
+      formData.address
+    ].map((v) => String(v || "").trim()).join("|");
+  }, [selectedDate, selectedTime, formData]);
   const scrollToRef = (ref) => {
     const el = ref?.current;
     if (!el) return;
@@ -10328,7 +10679,10 @@ function RepairCheckout() {
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((s) => ({ ...s, [name]: value }));
+    setFormData((s) => ({
+      ...s,
+      [name]: name === "postcode" ? normalizeUkPostcode$1(value) : value
+    }));
     clearError(name);
   };
   const handleAppointmentChange = ({ date, time }) => {
@@ -10336,25 +10690,32 @@ function RepairCheckout() {
     setSelectedTime(time);
     clearError("appointment");
   };
-  const handlePayAndBook = async () => {
-    if (processing) return;
+  const initialisePaymentElement = async ({ showValidationToast = false } = {}) => {
     const nextErrors = validateAll();
     if (Object.keys(nextErrors).length) {
-      setErrors(nextErrors);
-      const first = fieldOrder.find((f) => nextErrors[f.key]);
-      if (first) scrollToRef(first.ref);
-      return;
+      if (showValidationToast) {
+        setErrors(nextErrors);
+        setPaymentError("Please complete the highlighted fields first.");
+        const first = fieldOrder.find((f) => nextErrors[f.key]);
+        if (first) scrollToRef(first.ref);
+        toast.error("Please complete the required details first.");
+      }
+      return false;
     }
-    setProcessing(true);
+    setPaymentError("");
     const customerName = `${formData.title} ${formData.firstName} ${formData.lastName}`.trim();
     const payload = {
       ...answers,
       customer_details: {
-        name: customerName,
+        full_name: customerName,
+        title: formData.title,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         postcode: formData.postcode,
-        address: formData.address
+        address: formData.address,
+        notes: formData.notes
       },
       visit_time: {
         datetime: {
@@ -10370,18 +10731,105 @@ function RepairCheckout() {
       addOns: {}
     };
     try {
+      setProcessing(true);
       const res = await axios.post(
         "/quote/checkout",
         {
           service: SERVICES_KEY_VALUE.BOILER_REPAIR,
           form: payload,
-          amount: basePrice
+          amount: basePrice,
+          payment_element: true
         },
         { timeout: 15e3 }
       );
-      const checkoutUrl = res?.data?.data?.checkout_url;
-      if (!checkoutUrl) throw new Error("Checkout URL missing from response.");
-      window.location.assign(checkoutUrl);
+      const checkoutClientSecret = res?.data?.data?.checkout_client_secret;
+      const checkoutMode = res?.data?.data?.checkout_mode;
+      if (checkoutMode === "payment_element" && checkoutClientSecret && stripePublishableKey) {
+        setPaymentClientSecret(checkoutClientSecret);
+        setPaymentBookingId(res?.data?.data?.booking_id || null);
+        setPaymentTxId(res?.data?.data?.transaction_id || null);
+        setPaymentReturnUrl(res?.data?.data?.return_url || null);
+        setProcessing(false);
+        return true;
+      }
+      throw new Error("Unable to initialise secure payment form.");
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 422) {
+        if (showValidationToast) showValidationErrors(err?.response?.data?.errors);
+      } else if (status >= 500) {
+        toast.error("Payment service is temporarily unavailable. Please try again shortly.", {
+          duration: 5e3,
+          position: "top-center"
+        });
+      } else if (err?.code === "ECONNABORTED") {
+        toast.error("Request timed out. Please check your connection and try again.", {
+          duration: 5e3,
+          position: "top-center"
+        });
+      } else if (showValidationToast) {
+        const message = err?.response?.data?.message || err?.message || "Unable to initiate payment. Please try again.";
+        toast.error(message, { duration: 5e3, position: "top-center" });
+      }
+      if (mounted.current) setProcessing(false);
+      return false;
+    }
+  };
+  useEffect(() => {
+    if (!checkoutReadyKey || paymentClientSecret || processing) return;
+    if (lastAutoInitKeyRef.current === checkoutReadyKey) return;
+    lastAutoInitKeyRef.current = checkoutReadyKey;
+    const timer = setTimeout(() => {
+      initialisePaymentElement({ showValidationToast: false });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [checkoutReadyKey, paymentClientSecret, processing]);
+  const handlePayAndBook = async () => {
+    if (processing) return;
+    if (!paymentClientSecret) {
+      await initialisePaymentElement({ showValidationToast: true });
+      return;
+    }
+    setPaymentError("");
+    try {
+      setProcessing(true);
+      if (!stripeRef.current || !elementsRef.current) {
+        throw new Error("Payment form is still loading. Please try again.");
+      }
+      const { error, paymentIntent } = await stripeRef.current.confirmPayment(
+        {
+          elements: elementsRef.current,
+          confirmParams: {
+            return_url: paymentReturnUrl || `${window.location.origin}/checkout/success-intent?booking=${paymentBookingId}&tx=${paymentTxId}`
+          },
+          redirect: "if_required"
+        }
+      );
+      if (error) {
+        setPaymentError(
+          error.message || "Payment could not be confirmed. Please check your details and try again."
+        );
+        toast.error(error.message || "Payment failed.");
+        setProcessing(false);
+        return;
+      }
+      if (paymentIntent?.status === "succeeded") {
+        const confirmRes = await axios.post(
+          "/quote/checkout/confirm-intent",
+          {
+            booking_id: paymentBookingId,
+            tx_id: paymentTxId,
+            payment_intent_id: paymentIntent.id
+          },
+          { timeout: 15e3 }
+        );
+        const redirectUrl = confirmRes?.data?.data?.redirect_url;
+        if (redirectUrl) {
+          window.location.assign(redirectUrl);
+          return;
+        }
+      }
+      setProcessing(false);
     } catch (err) {
       const status = err?.response?.status;
       if (status === 422) {
@@ -10665,10 +11113,10 @@ function RepairCheckout() {
                     className: `w-full rounded-2xl py-4 font-semibold flex items-center justify-center gap-2 transition ${processing ? "bg-white/20 cursor-not-allowed" : "bg-white text-emerald-700 hover:bg-emerald-50"}`,
                     children: processing ? /* @__PURE__ */ jsxs(Fragment, { children: [
                       /* @__PURE__ */ jsx(FiLoader, { className: "animate-spin" }),
-                      "Processing..."
+                      "Processing…"
                     ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
                       /* @__PURE__ */ jsx(FiCreditCard, {}),
-                      "Pay & Book Repair"
+                      paymentClientSecret ? "Confirm & Book Repair" : "Continue to secure payment"
                     ] })
                   }
                 ),
@@ -10707,7 +11155,16 @@ function RepairCheckout() {
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsx("p", { className: "text-xs text-emerald-50/90 text-center mt-3", children: "Card payments are encrypted via Stripe. Approved parts or extra labour are billed separately per our Terms & Conditions." })
+                paymentClientSecret && /* @__PURE__ */ jsx(
+                  "div",
+                  {
+                    ref: paymentSectionRef,
+                    className: "mt-4 rounded-2xl bg-white p-3",
+                    children: /* @__PURE__ */ jsx("div", { ref: paymentElementContainerRef })
+                  }
+                ),
+                /* @__PURE__ */ jsx("p", { className: "text-xs text-emerald-50/90 text-center mt-3", children: "Card payments are encrypted via Stripe. Approved parts or extra labour are billed separately per our Terms & Conditions." }),
+                paymentError && /* @__PURE__ */ jsx("p", { className: "text-xs text-amber-100 text-center mt-2 font-semibold", children: paymentError })
               ] })
             ] })
           ] })
@@ -10969,6 +11426,22 @@ const __vite_glob_0_23 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: RepairQuote
 }, Symbol.toStringTag, { value: "Module" }));
+const UK_POSTCODE_RE = /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
+const ALLOWED_OUTCODES = ["LS", "WF", "HG", "BD"];
+function normalizeUkPostcode(input) {
+  const raw = String(input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (raw.length <= 3) return raw;
+  return `${raw.slice(0, -3)} ${raw.slice(-3)}`.trim();
+}
+function getOutcode(value) {
+  const normalized = normalizeUkPostcode(value);
+  if (!normalized) return "";
+  return normalized.includes(" ") ? normalized.split(" ")[0] : normalized.length > 3 ? normalized.slice(0, -3) : normalized;
+}
+function isAllowedOutcode(value) {
+  const outcode = getOutcode(value);
+  return ALLOWED_OUTCODES.some((prefix) => outcode.startsWith(prefix));
+}
 function ServiceCheckout() {
   const { answers, basePrice, symbol, title, stripePublishableKey } = usePage().props;
   const [selectedDate, setSelectedDate] = useState("");
@@ -11110,7 +11583,14 @@ function ServiceCheckout() {
       if (digits.length < 10)
         next.phone = "Please enter a valid phone number.";
     }
-    if (!formData.postcode?.trim()) next.postcode = "Postcode is required.";
+    const formattedPostcode = normalizeUkPostcode(formData.postcode);
+    if (!formattedPostcode) {
+      next.postcode = "Postcode is required.";
+    } else if (!UK_POSTCODE_RE.test(formattedPostcode)) {
+      next.postcode = "Please enter a valid UK postcode.";
+    } else if (!isAllowedOutcode(formattedPostcode)) {
+      next.postcode = "Checkout is restricted to LS, WF, HG and BD postcodes only.";
+    }
     if (!formData.address?.trim()) next.address = "Address is required.";
     return next;
   };
@@ -11121,7 +11601,10 @@ function ServiceCheckout() {
     if (!formData.lastName?.trim()) return "";
     if (!formData.email?.trim()) return "";
     if (!formData.phone?.trim()) return "";
-    if (!formData.postcode?.trim()) return "";
+    const formattedPostcode = normalizeUkPostcode(formData.postcode);
+    if (!formattedPostcode) return "";
+    if (!UK_POSTCODE_RE.test(formattedPostcode)) return "";
+    if (!isAllowedOutcode(formattedPostcode)) return "";
     if (!formData.address?.trim()) return "";
     return [
       selectedDate,
@@ -11131,7 +11614,7 @@ function ServiceCheckout() {
       formData.lastName,
       formData.email,
       formData.phone,
-      formData.postcode,
+      formattedPostcode,
       formData.address
     ].map((v) => String(v || "").trim()).join("|");
   }, [selectedDate, selectedTime, formData]);
@@ -11155,7 +11638,10 @@ function ServiceCheckout() {
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((s) => ({ ...s, [name]: value }));
+    setFormData((s) => ({
+      ...s,
+      [name]: name === "postcode" ? normalizeUkPostcode(value) : value
+    }));
     clearError(name);
   };
   const handleAppointmentChange = ({ date, time }) => {
@@ -11180,11 +11666,15 @@ function ServiceCheckout() {
     const payload = {
       ...answers,
       customer_details: {
-        name: customerName,
+        full_name: customerName,
+        title: formData.title,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         postcode: formData.postcode,
-        address: formData.address
+        address: formData.address,
+        notes: formData.notes
       },
       visit_time: {
         datetime: {

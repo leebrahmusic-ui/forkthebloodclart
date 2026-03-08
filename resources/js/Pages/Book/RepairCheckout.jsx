@@ -10,6 +10,37 @@ import { FiCreditCard, FiLoader, FiCheck, FiShield, FiCalendar, FiMapPin, FiInfo
 import { SERVICES_KEY_VALUE } from "@/Components/extra/ServicesKeyValue";
 import { loadStripe } from "@stripe/stripe-js";
 
+const UK_POSTCODE_RE =
+    /^(GIR\s?0AA|(?:(?:[A-PR-UWYZ][0-9]{1,2})|(?:[A-PR-UWYZ][A-HK-Y][0-9]{1,2})|(?:[A-PR-UWYZ][0-9][A-HJKPSTUW])|(?:[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?[0-9][ABD-HJLNP-UW-Z]{2})$/i;
+
+const ALLOWED_OUTCODES = ["LS", "WF", "HG", "BD"];
+
+function normalizeUkPostcode(input) {
+    const raw = String(input || "")
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
+
+    if (raw.length <= 3) return raw;
+
+    return `${raw.slice(0, -3)} ${raw.slice(-3)}`.trim();
+}
+
+function getOutcode(value) {
+    const normalized = normalizeUkPostcode(value);
+    if (!normalized) return "";
+
+    return normalized.includes(" ")
+        ? normalized.split(" ")[0]
+        : normalized.length > 3
+            ? normalized.slice(0, -3)
+            : normalized;
+}
+
+function isAllowedOutcode(value) {
+    const outcode = getOutcode(value);
+    return ALLOWED_OUTCODES.some((prefix) => outcode.startsWith(prefix));
+}
+
 export default function RepairCheckout() {
     const { answers, basePrice, symbol, title, stripePublishableKey } = usePage().props;
 
@@ -211,7 +242,14 @@ export default function RepairCheckout() {
                 next.phone = "Please enter a valid phone number.";
         }
 
-        if (!formData.postcode?.trim()) next.postcode = "Postcode is required.";
+        const formattedPostcode = normalizeUkPostcode(formData.postcode);
+        if (!formattedPostcode) {
+            next.postcode = "Postcode is required.";
+        } else if (!UK_POSTCODE_RE.test(formattedPostcode)) {
+            next.postcode = "Please enter a valid UK postcode.";
+        } else if (!isAllowedOutcode(formattedPostcode)) {
+            next.postcode = "Checkout is restricted to LS, WF, HG and BD postcodes only.";
+        }
         if (!formData.address?.trim()) next.address = "Address is required.";
 
         return next;
@@ -224,7 +262,10 @@ export default function RepairCheckout() {
         if (!formData.lastName?.trim()) return "";
         if (!formData.email?.trim()) return "";
         if (!formData.phone?.trim()) return "";
-        if (!formData.postcode?.trim()) return "";
+        const formattedPostcode = normalizeUkPostcode(formData.postcode);
+        if (!formattedPostcode) return "";
+        if (!UK_POSTCODE_RE.test(formattedPostcode)) return "";
+        if (!isAllowedOutcode(formattedPostcode)) return "";
         if (!formData.address?.trim()) return "";
 
         return [
@@ -235,7 +276,7 @@ export default function RepairCheckout() {
             formData.lastName,
             formData.email,
             formData.phone,
-            formData.postcode,
+            formattedPostcode,
             formData.address,
         ]
             .map((v) => String(v || "").trim())
@@ -267,7 +308,10 @@ export default function RepairCheckout() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((s) => ({ ...s, [name]: value }));
+        setFormData((s) => ({
+            ...s,
+            [name]: name === "postcode" ? normalizeUkPostcode(value) : value,
+        }));
         clearError(name);
     };
 
@@ -297,11 +341,15 @@ export default function RepairCheckout() {
         const payload = {
             ...answers,
             customer_details: {
-                name: customerName,
+                full_name: customerName,
+                title: formData.title,
+                first_name: formData.firstName,
+                last_name: formData.lastName,
                 email: formData.email,
                 phone: formData.phone,
                 postcode: formData.postcode,
                 address: formData.address,
+                notes: formData.notes,
             },
             visit_time: {
                 datetime: {
