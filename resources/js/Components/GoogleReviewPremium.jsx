@@ -244,7 +244,6 @@ export function GoogleReview({ theme = "light" }) {
                                 </div>
 
                                 <div className="mt-6 flex items-center gap-2">
-                                    <span className="text-lg leading-none text-amber-500">★</span>
                                     <span className="text-sm font-semibold tracking-[0.18em] text-amber-500">
                                         {renderStars(activeReview.rating)}
                                     </span>
