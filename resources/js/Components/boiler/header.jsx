@@ -2,27 +2,34 @@ import { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { AiOutlineWhatsApp } from "react-icons/ai";
+import { HELP_ADVICE_MEGA_CARDS } from "@/data/helpAdviceLinks";
 
 // Content for each tab's mega section
 const MEGA_SECTIONS = {
     services: [
         {
-            title: "Boiler installation",
+            title: "New boiler quote",
             description:
-                "Fixed-price installs by engineers across Leeds & Surrounding.",
-            href: "/#services",
+                "Start your fixed-price new boiler quote in a few quick steps.",
+            href: "/book/quote/new",
         },
         {
-            title: "Boiler repair & servicing",
+            title: "Boiler servicing",
             description:
-                "Fast repairs and servicing with clear, upfront pricing.",
-            href: "/#services",
+                "Book an annual boiler service with clear local pricing.",
+            href: "/book/quote/service",
         },
         {
-            title: "Gas safety certificates",
+            title: "Boiler repairs",
             description:
-                "Landlord and homeowner safety checks by qualified engineers.",
-            href: "/#services",
+                "Report your fault and book a repair visit from a local engineer.",
+            href: "/book/quote/repair",
+        },
+        {
+            title: "Powerflush",
+            description:
+                "Get a powerflush quote to improve system performance.",
+            href: "/book/quote/powerflush",
         },
     ],
     about: [
@@ -65,11 +72,13 @@ const MEGA_SECTIONS = {
             href: "/#contact",
         },
     ],
+    advice: HELP_ADVICE_MEGA_CARDS,
 };
 
 // Pills in the centre of the header
 const NAV_ITEMS = [
     { id: "services", label: "Services" },
+    { id: "advice", label: "Help & Advice" },
     { id: "about", label: "About" },
     { id: "contact", label: "Contact" },
 ];
@@ -184,7 +193,7 @@ export default function Header({
                         {/* absolute is relative to the .relative wrapper above */}
                         <div className="absolute left-1/2 top-0 z-30 w-full max-w-3xl -translate-x-1/2 px-4 pb-6 sm:px-6 lg:px-8">
                             <div className="mt-2 rounded-3xl bg-white shadow-xl">
-                                <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-3 md:p-8 !pt-20">
+                                <div className={`grid grid-cols-1 gap-6 p-6 md:p-8 !pt-20 ${openMenu === "services" ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
                                     {currentCards.map((card) => (
                                         <Link
                                             key={card.title}
@@ -231,6 +240,13 @@ export default function Header({
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 About
+                            </Link>
+                            <Link
+                                href="/advice"
+                                className="rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Help & Advice
                             </Link>
                             <Link
                                 href="/#contact"

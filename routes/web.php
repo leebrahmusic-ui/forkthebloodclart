@@ -68,6 +68,7 @@ Route::get('/sitemap.xml', function () use ($xmlEscape, $absoluteUrl, $sitemapRe
 Route::get('/sitemap-pages.xml', function () use ($xmlEscape, $absoluteUrl, $sitemapResponse) {
     $paths = [
         '/',
+        '/advice',
         '/about',
         '/privacy-policy',
         '/terms-conditions',
@@ -230,6 +231,19 @@ Route::inertia('/privacy-policy', 'PrivacyPolicyPage', [
 Route::inertia('/terms-conditions', 'TermsConditionsPage', [
     'pageTitle' => 'Terms & Conditions',
 ])->name('terms.conditions');
+
+Route::get('/advice', function () use ($readAdviceSlugs) {
+    $slugs = collect($readAdviceSlugs())
+        ->map(static fn ($slug) => trim((string) $slug))
+        ->filter(static fn ($slug) => $slug !== '')
+        ->unique()
+        ->values();
+
+    return Inertia::render('Seo/AdviceIndexPage', [
+        'adviceSlugs' => $slugs,
+        'adviceCount' => $slugs->count(),
+    ]);
+})->name('seo.advice.index');
 
 Route::inertia('/advice/boiler-problems', 'Seo/BoilerProblemsHubPage', [
     'pageTitle' => 'Boiler Problems Advice Leeds',

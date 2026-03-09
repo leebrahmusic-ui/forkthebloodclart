@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react";
-import { Phone, MapPin, CheckCircle, Shield, Clock } from "lucide-react";
+import { Phone, MapPin } from "lucide-react";
+import { HELP_ADVICE_GROUPS } from "@/data/helpAdviceLinks";
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
@@ -73,22 +74,50 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row">
+                <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center">
                     <div>
                         <p>© {currentYear} MD Gas Leeds. All rights reserved.</p>
                         <p className="mt-1">VAT No: 511 0588 26</p>
                     </div>
-                    <div className="flex gap-6">
-                        <Link href="/about" className="hover:text-slate-700">
-                            About Us
-                        </Link>
-                        <Link href="/privacy-policy" className="hover:text-slate-700">
-                            Privacy Policy
-                        </Link>
-                        <Link href="/terms-conditions" className="hover:text-slate-700">
-                            Terms & Conditions
-                        </Link>
-                    </div>
+
+                    <details className="group">
+                        <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-400 hover:bg-slate-50">
+                            Help &amp; Advice
+                            <span className="text-xs text-slate-500 transition group-open:rotate-180">▾</span>
+                        </summary>
+                        <div className="mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:min-w-[640px] sm:p-5">
+                            <div className="grid gap-5 sm:grid-cols-3">
+                                {HELP_ADVICE_GROUPS.map((group) => (
+                                    <div key={group.title}>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                            {group.title}
+                                        </p>
+                                        <ul className="mt-2 space-y-1.5">
+                                            {group.links.map((item) => (
+                                                <li key={item.href}>
+                                                    <Link href={item.href} className="text-sm text-slate-700 hover:text-slate-900">
+                                                        {item.label}
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-6 text-sm text-slate-500">
+                    <Link href="/about" className="hover:text-slate-700">
+                        About Us
+                    </Link>
+                    <Link href="/privacy-policy" className="hover:text-slate-700">
+                        Privacy Policy
+                    </Link>
+                    <Link href="/terms-conditions" className="hover:text-slate-700">
+                        Terms & Conditions
+                    </Link>
                 </div>
             </div>
         </footer>
