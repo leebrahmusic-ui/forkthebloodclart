@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const renderStars = (rating = 0) => {
     const safe = Math.max(0, Math.min(5, Number(rating) || 0));
-    return "★".repeat(Math.round(safe)) + "☆".repeat(5 - Math.round(safe));
+    return "★".repeat(Math.round(safe)) + "·".repeat(5 - Math.round(safe));
 };
 
 const truncate = (text = "", max = 220) => {
