@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 
 const renderStars = (rating = 0) => {
     const safe = Math.max(0, Math.min(5, Number(rating) || 0));
-    return "★".repeat(Math.round(safe)) + "·".repeat(5 - Math.round(safe));
+    const rounded = Math.round(safe);
+
+    return (
+        <span className="inline-flex items-center gap-0.5" aria-hidden>
+            {Array.from({ length: 5 }).map((_, index) => (
+                <span key={index} className={index < rounded ? "text-amber-400" : "text-amber-200"}>★</span>
+            ))}
+        </span>
+    );
 };
 
 const truncate = (text = "", max = 320) => {
