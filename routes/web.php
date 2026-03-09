@@ -20,6 +20,109 @@ use App\Http\Controllers\GoogleReviewController;
 use Illuminate\Support\Str;
 
 
+$xmlEscape = static fn (string $value): string => htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+
+$absoluteUrl = static function (string $path): string {
+    $base = rtrim(config('app.url') ?: url('/'), '/');
+    $normalizedPath = '/' . ltrim($path, '/');
+    return $base . $normalizedPath;
+};
+
+$sitemapResponse = static function (string $xml) {
+    return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
+};
+
+$readAdviceSlugs = static function (): array {
+    $file = resource_path('data/advice-slugs.json');
+    if (!is_file($file)) {
+        return [];
+    }
+
+    $decoded = json_decode(file_get_contents($file), true);
+    if (!is_array($decoded) || !isset($decoded['slugs']) || !is_array($decoded['slugs'])) {
+        return [];
+    }
+
+    return array_values(array_filter($decoded['slugs'], static fn ($slug) => is_string($slug) && $slug !== ''));
+};
+
+Route::get('/sitemap.xml', function () use ($xmlEscape, $absoluteUrl, $sitemapResponse) {
+    $items = [
+        $absoluteUrl('/sitemap-pages.xml'),
+        $absoluteUrl('/sitemap-advice.xml'),
+    ];
+
+    $lastmod = now()->toAtomString();
+    $body = collect($items)
+        ->map(static fn ($loc) => "  <sitemap>\n    <loc>{$xmlEscape($loc)}</loc>\n    <lastmod>{$lastmod}</lastmod>\n  </sitemap>")
+        ->implode("\n");
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+        . '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n"
+        . $body
+        . "\n</sitemapindex>\n";
+
+    return $sitemapResponse($xml);
+})->name('sitemap.index');
+
+Route::get('/sitemap-pages.xml', function () use ($xmlEscape, $absoluteUrl, $sitemapResponse) {
+    $paths = [
+        '/',
+        '/about',
+        '/privacy-policy',
+        '/terms-conditions',
+        '/book/quote/new',
+        '/book/quote/repair',
+        '/book/quote/service',
+        '/book/quote/powerflush',
+        '/advice/boiler-problems',
+        '/advice/ideal-boiler-making-a-noise',
+        '/advice/boiler-pressure-keeps-increasing',
+        '/advice/boiler-pressure-keeps-dropping',
+        '/advice/ideal-boiler-help',
+        '/advice/ideal-boiler-fault-codes',
+        '/advice/vaillant-boiler-help',
+        '/advice/vaillant-boiler-fault-codes',
+        '/advice/worcester-boiler-help',
+        '/advice/worcester-boiler-fault-codes',
+    ];
+
+    $lastmod = now()->toAtomString();
+    $body = collect($paths)
+        ->unique()
+        ->values()
+        ->map(static fn ($path) => "  <url>\n    <loc>{$xmlEscape($absoluteUrl($path))}</loc>\n    <lastmod>{$lastmod}</lastmod>\n  </url>")
+        ->implode("\n");
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n"
+        . $body
+        . "\n</urlset>\n";
+
+    return $sitemapResponse($xml);
+})->name('sitemap.pages');
+
+Route::get('/sitemap-advice.xml', function () use ($xmlEscape, $absoluteUrl, $sitemapResponse, $readAdviceSlugs) {
+    $slugs = collect($readAdviceSlugs())
+        ->map(static fn ($slug) => trim($slug))
+        ->filter(static fn ($slug) => $slug !== '')
+        ->unique()
+        ->values();
+
+    $lastmod = now()->toAtomString();
+    $body = $slugs
+        ->map(static fn ($slug) => "  <url>\n    <loc>{$xmlEscape($absoluteUrl('/advice/' . $slug))}</loc>\n    <lastmod>{$lastmod}</lastmod>\n  </url>")
+        ->implode("\n");
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n"
+        . $body
+        . "\n</urlset>\n";
+
+    return $sitemapResponse($xml);
+})->name('sitemap.advice');
+
+
 Route::get('/health', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
