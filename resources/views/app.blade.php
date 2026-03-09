@@ -30,7 +30,7 @@
             } catch (e) {}
         })();
     </script>
-    @php($gtmId = env('VITE_GTM_ID'))
+    @php($gtmId = 'GTM-MWWXBWFC')
 
     @if ($gtmId)
         <!-- Google Tag Manager -->
@@ -48,7 +48,7 @@
                 j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
                 f.parentNode.insertBefore(j, f);
-            })(window, document, 'script', 'dataLayer', '{{ $gtmId }}');
+            })(window, document, 'script', 'dataLayer', 'GTM-MWWXBWFC');
         </script>
         <!-- End Google Tag Manager -->
     @endif
@@ -65,12 +65,12 @@
     @inertia
 </body>
 
-@php($gtmId = env('VITE_GTM_ID'))
+@php($gtmId = 'GTM-MWWXBWFC')
 
 @if ($gtmId)
     <!-- Google Tag Manager (noscript) -->
     <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0"
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWWXBWFC" height="0" width="0"
             style="display:none;visibility:hidden"></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
