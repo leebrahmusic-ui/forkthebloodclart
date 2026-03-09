@@ -13279,14 +13279,14 @@ function QuoteResultsPage({ answers }) {
   const updateActiveCardFromScroll = () => {
     const container = mobileCarouselRef.current;
     if (!container) return;
-    const cards = Array.from(
+    const cards2 = Array.from(
       container.querySelectorAll("[data-card-index]")
     );
-    if (!cards.length) return;
+    if (!cards2.length) return;
     const containerCenter = container.scrollLeft + container.clientWidth / 2;
     let nearestIndex = 0;
     let smallestDistance = Number.POSITIVE_INFINITY;
-    cards.forEach((card, idx) => {
+    cards2.forEach((card, idx) => {
       const cardCenter = card.offsetLeft + card.clientWidth / 2;
       const distance = Math.abs(containerCenter - cardCenter);
       if (distance < smallestDistance) {
@@ -15904,6 +15904,1416 @@ const __vite_glob_0_36 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: Quotation
 }, Symbol.toStringTag, { value: "Module" }));
+function NewBoilerQuoteCta() {
+  return /* @__PURE__ */ jsx("section", { className: "mt-10 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-blue-900/20", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between", children: [
+    /* @__PURE__ */ jsxs("div", { children: [
+      /* @__PURE__ */ jsx("p", { className: "inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide text-blue-100 ring-1 ring-white/20", children: "FAST QUOTE" }),
+      /* @__PURE__ */ jsx("h2", { className: "mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight", children: "Get a new boiler quote in 60 secs from £1395 (24kw)" }),
+      /* @__PURE__ */ jsx("p", { className: "mt-2 text-blue-100", children: "Instant online price, no pressure, and clear options." })
+    ] }),
+    /* @__PURE__ */ jsx(
+      "a",
+      {
+        href: "/book/quote/new",
+        className: "inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-900/30 transition hover:scale-[1.02] hover:bg-red-700",
+        children: "Get New Boiler Quote"
+      }
+    )
+  ] }) });
+}
+const generatedBrands = ["Ideal", "Vaillant", "Worcester"];
+const generatedIssueLibrary = [
+  "boiler-losing-pressure",
+  "boiler-pressure-too-high",
+  "boiler-ignition-lockout",
+  "boiler-fan-fault",
+  "boiler-kettling-noise",
+  "boiler-ticking-noise",
+  "boiler-no-hot-water",
+  "radiators-not-heating",
+  "boiler-resetting",
+  "boiler-short-cycling",
+  "frozen-condensate-pipe",
+  "thermostat-not-responding",
+  "pilot-or-flame-sensing-fault",
+  "boiler-leak-near-case",
+  "hot-water-temperature-fluctuating",
+  "boiler-overheating-warning",
+  "boiler-pressure-drops-overnight",
+  "boiler-pressure-rises-when-hot",
+  "boiler-noisy-pump-symptoms",
+  "boiler-stops-during-hot-water",
+  "boiler-cycles-every-few-minutes",
+  "boiler-lockout-in-cold-weather",
+  "one-radiator-not-heating",
+  "all-radiators-lukewarm",
+  "zone-valve-not-switching",
+  "programmer-not-following-schedule",
+  "heating-not-reaching-setpoint",
+  "prv-discharge-pipe-dripping",
+  "boiler-condensate-backup",
+  "boiler-magnetic-filter-sludge-signs"
+];
+const brandFaultCodes = {
+  ideal: ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f9", "l2", "l5", "c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "0"],
+  vaillant: ["f22", "f23", "f24", "f25", "f26", "f27", "f28", "f29", "f32", "f49", "f54", "f61", "f62", "f64", "f65", "f67", "f68", "f70", "f71", "f72", "f73", "f74", "f75", "f76", "f77", "f83"],
+  worcester: ["ea", "c6", "c7", "a1", "e9", "d1", "d5", "227", "229", "232", "233", "286", "295", "296", "297", "298", "1017", "1021"]
+};
+const brandModels = {
+  ideal: ["logic-combi", "logic-plus", "logic-max", "vogue-max", "independent-c", "esprit-eco", "mexi-he", "icos", "mini-c24", "isar-he", "exclusive-2", "instinct-combi"],
+  vaillant: ["ecotec-pro", "ecotec-plus", "ecotec-exclusive", "ecofit-pure", "turbomax", "atmomax", "ecotec-plus-825", "ecotec-plus-832", "ecotec-plus-837", "ecotec-pro-28", "ecotec-pro-30", "ecotec-plus-630"],
+  worcester: ["greenstar-25i", "greenstar-30i", "greenstar-4000", "greenstar-8000", "greenstar-cdi", "greenstar-ri", "greenstar-heatslave", "greenstar-junior", "greenstar-si", "greenstar-cdi-classic", "greenstar-compact", "greenstar-system"]
+};
+const homeScenarios = [
+  "new-boiler-making-noise",
+  "boiler-after-power-cut",
+  "boiler-after-radiator-bleed",
+  "boiler-after-repressurising",
+  "heating-upstairs-not-downstairs",
+  "heating-downstairs-not-upstairs",
+  "morning-heating-slow-to-start",
+  "hot-water-runs-cold-then-hot",
+  "boiler-lockout-in-cold-weather",
+  "boiler-overheating-warning",
+  "boiler-whistling-when-firing",
+  "boiler-humming-at-night",
+  "pipe-banging-when-heating-on",
+  "radiator-cold-at-bottom",
+  "radiator-cold-at-top",
+  "one-radiator-not-heating",
+  "all-radiators-lukewarm",
+  "zone-valve-not-switching",
+  "programmer-not-following-schedule",
+  "boiler-pressure-rises-when-hot",
+  "boiler-pressure-drops-overnight",
+  "prv-discharge-pipe-dripping",
+  "boiler-condensate-backup",
+  "boiler-relight-after-gas-work",
+  "boiler-noisy-pump-symptoms",
+  "boiler-flame-failure-intermittent",
+  "boiler-stops-during-hot-water",
+  "heating-turns-off-before-temperature",
+  "boiler-needs-frequent-top-up",
+  "boiler-magnetic-filter-sludge-signs",
+  "thermostatic-radiator-valve-stuck",
+  "heating-pump-running-constantly",
+  "boiler-after-system-flush",
+  "new-thermostat-not-controlling-boiler",
+  "boiler-cycles-every-few-minutes",
+  "boiler-loses-hot-water-at-peak-time",
+  "hot-water-delay-at-taps",
+  "boiler-freezes-in-loft-pipework",
+  "boiler-noise-after-service",
+  "boiler-fault-after-long-idle-period",
+  "heating-not-reaching-setpoint",
+  "boiler-restarts-when-windy",
+  "boiler-safety-lockout-explained",
+  "boiler-neutraliser-or-condensate-issues",
+  "gas-boiler-annual-checklist"
+];
+const leedsAreas = ["city-centre", "headingley", "chapeltown", "roundhay", "meanwood", "armley", "burley", "horsforth", "guiseley", "otley", "morley", "beeston", "crossgates", "garforth", "rothwell", "pudsey", "farsley", "york-road", "kirkstall", "seacroft", "harehills", "hyde-park", "adel", "alwoodley", "churwell", "east-end-park", "halton", "hunslet", "middleton", "oakwood", "whinmoor", "woodlesford", "yeadon", "pool-in-wharfedale", "shadwell", "wetherby"];
+const titleCase$1 = (value) => value.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+const buildGeneratedArticle = (slug, title, context, category = "general") => ({
+  slug,
+  title,
+  excerpt: `${context} Causes, safe checks, warning signs, and when to book service or repair.`,
+  summary: `This guide covers ${context.toLowerCase()} for Leeds homeowners, including symptom pattern checks, escalation thresholds, and what a professional diagnosis typically includes.`,
+  causes: [
+    "Normal wear in circulation, ignition, sensing, or control components",
+    "Pressure or flow instability across the wider heating system",
+    "Setup, controls, or system condition issues that need engineer diagnosis"
+  ],
+  checks: [
+    "Record exactly when the fault appears (startup, hot water, heating demand, or weather change)",
+    "Check system pressure and control settings safely without removing boiler casing",
+    "If the issue repeats, book service or repair rather than repeatedly resetting"
+  ],
+  dangerSigns: [
+    "Recurring lockout codes after reset",
+    "Rapid pressure swings or repeated discharge pipe dripping",
+    "Persistent combustion/noise symptoms with reduced heating reliability"
+  ],
+  whatNotToDo: [
+    "Do not remove the boiler case or attempt internal gas appliance work",
+    "Do not rely on repeated resets as a long-term fix",
+    "Do not keep topping up pressure repeatedly without diagnosis"
+  ],
+  diagnosisPath: [
+    "Engineer confirms symptom pattern and appliance fault history",
+    "System pressure, circulation, sensors, and controls are tested in sequence",
+    "Root cause is confirmed and a targeted service/repair plan is provided"
+  ],
+  serviceVsRepair: "If the boiler is still operating but inconsistent, service-first is often efficient for full-condition checks. If the fault is persistent and obvious, repair-first can be faster.",
+  prevention: [
+    "Keep annual servicing consistent",
+    "Act early on pressure/noise changes",
+    "Maintain inhibitor/water quality and address circulation issues promptly"
+  ],
+  category,
+  faqs: [
+    {
+      q: "Can this clear on its own?",
+      a: "Intermittent symptoms can appear to clear, but recurring patterns usually indicate an underlying issue that should be diagnosed."
+    },
+    {
+      q: "Should I book service or repair first?",
+      a: "Service-first gives full-condition context; repair-first is suitable when the same fault keeps returning."
+    },
+    {
+      q: "Is this safe for DIY internal repair?",
+      a: "No. Gas appliance diagnostics and internal repairs should be completed by a qualified Gas Safe engineer."
+    }
+  ]
+});
+const articles = [];
+const pushArticle = (article) => {
+  if (!articles.some((existing) => existing.slug === article.slug)) {
+    articles.push(article);
+  }
+};
+generatedBrands.forEach((brand) => {
+  const brandKey = brand.toLowerCase();
+  generatedIssueLibrary.forEach((issue) => {
+    pushArticle(
+      buildGeneratedArticle(
+        `guide-${brandKey}-${issue}`,
+        `${brand} ${titleCase$1(issue)}: Causes, Checks and Next Steps`,
+        `${brand} ${titleCase$1(issue)}`,
+        "brand-issue"
+      )
+    );
+  });
+  brandModels[brandKey].forEach((model) => {
+    ["boiler-losing-pressure", "boiler-no-hot-water", "boiler-resetting", "boiler-fan-fault", "boiler-kettling-noise", "thermostat-not-responding", "boiler-short-cycling"].forEach((issue) => {
+      pushArticle(
+        buildGeneratedArticle(
+          `guide-${brandKey}-${model}-${issue}`,
+          `${brand} ${titleCase$1(model)} ${titleCase$1(issue)} Guide`,
+          `${brand} ${titleCase$1(model)} ${titleCase$1(issue)}`,
+          "model-issue"
+        )
+      );
+    });
+  });
+  brandFaultCodes[brandKey].forEach((code) => {
+    pushArticle(
+      buildGeneratedArticle(
+        `guide-${brandKey}-fault-code-${code}`,
+        `${brand} Fault Code ${code.toUpperCase()}: Meaning and Next Steps`,
+        `${brand} fault code ${code.toUpperCase()}`,
+        "fault-code"
+      )
+    );
+    ["reset-guide", "causes", "when-to-call-engineer"].forEach((angle) => {
+      pushArticle(
+        buildGeneratedArticle(
+          `guide-${brandKey}-fault-code-${code}-${angle}`,
+          `${brand} Fault Code ${code.toUpperCase()} ${titleCase$1(angle)} Guide`,
+          `${brand} fault code ${code.toUpperCase()} ${titleCase$1(angle)}`,
+          "fault-code-support"
+        )
+      );
+    });
+  });
+});
+homeScenarios.forEach((scenario) => {
+  pushArticle(
+    buildGeneratedArticle(
+      `guide-home-${scenario}`,
+      `${titleCase$1(scenario)}: Boiler Advice Guide`,
+      titleCase$1(scenario),
+      "home-scenario"
+    )
+  );
+});
+leedsAreas.forEach((area) => {
+  ["boiler-service-advice", "boiler-repair-advice", "boiler-fault-guide"].forEach((intent) => {
+    pushArticle(
+      buildGeneratedArticle(
+        `guide-leeds-${area}-${intent}`,
+        `Leeds ${titleCase$1(area)} ${titleCase$1(intent)}: What to Check First`,
+        `Leeds ${titleCase$1(area)} ${titleCase$1(intent)}`,
+        "location-intent"
+      )
+    );
+  });
+});
+const generatedAdviceArticles = articles;
+const baseAdviceArticles = [
+  {
+    slug: "boiler-losing-pressure",
+    title: "Boiler Losing Pressure: Causes and Next Steps",
+    excerpt: "If pressure keeps dropping, small leaks, valve issues, or internal boiler faults are common causes.",
+    summary: "A sealed heating system should hold pressure fairly steadily. If you repeatedly top up your boiler, there is usually an underlying fault that needs identifying.",
+    causes: [
+      "Small leaks on radiator valves, joints, or hidden pipework",
+      "Pressure relief valve (PRV) passing water",
+      "Internal boiler component or expansion vessel issues"
+    ],
+    checks: [
+      "Check visible radiator valves and pipe joints for moisture",
+      "Look for discharge pipe drips outside",
+      "Note pressure cold vs after heating cycle"
+    ],
+    faqs: [
+      {
+        q: "Can I keep topping up pressure?",
+        a: "Topping up repeatedly is a temporary workaround and can hide a worsening fault."
+      },
+      {
+        q: "Should I book service or repair?",
+        a: "A service may resolve some issues and can identify whether repair is required. You can also book repair directly."
+      }
+    ]
+  },
+  {
+    slug: "boiler-pressure-too-high",
+    title: "Boiler Pressure Too High: Why It Happens",
+    excerpt: "Over-pressurisation often points to a filling loop, expansion vessel, or pressure-control issue.",
+    summary: "When pressure climbs well above normal, your system is under extra stress. This should be investigated before it causes repeated lockouts or valve discharge.",
+    causes: [
+      "Filling loop not fully closed",
+      "Expansion vessel charge loss",
+      "Pressure relief or control component fault"
+    ],
+    checks: [
+      "Confirm filling loop valves are fully closed",
+      "Check gauge readings with heating off and on",
+      "Watch for discharge pipe dripping"
+    ],
+    faqs: [
+      {
+        q: "Is high pressure dangerous?",
+        a: "It can strain parts and trigger protective shutdowns. Repeated high pressure should be diagnosed."
+      },
+      {
+        q: "Will a service help?",
+        a: "A service may resolve performance-related issues and helps identify whether a targeted repair is needed."
+      }
+    ]
+  },
+  {
+    slug: "vaillant-f75-error-code",
+    title: "Vaillant F75 Error Code: Common Causes",
+    excerpt: "F75 usually means no detectable pressure change when the pump starts.",
+    summary: "Vaillant F75 is commonly linked with pressure sensing, pump operation, or low circulation. It often needs engineer-level diagnosis.",
+    causes: [
+      "Faulty or blocked pressure sensor",
+      "Pump performance issue",
+      "System leak or low circulation"
+    ],
+    checks: [
+      "Check system pressure on gauge",
+      "Listen for pump start behaviour",
+      "Look for visible leaks"
+    ],
+    faqs: [
+      { q: "Can I just reset it?", a: "A reset may temporarily clear the lockout, but recurring F75 needs root-cause diagnosis." },
+      { q: "Best booking route?", a: "Book a service first for full checks, or book repair directly if you want fault-first handling." }
+    ]
+  },
+  {
+    slug: "vaillant-f72-error-code",
+    title: "Vaillant F72 Error Code: Sensor Mismatch Guide",
+    excerpt: "F72 commonly indicates flow/return thermistor mismatch or circulation-related sensor issues.",
+    summary: "This fault is often caused by NTC sensor reading differences, poor flow through the heat exchanger, or wiring/sensor issues.",
+    causes: [
+      "Flow and return NTC sensor discrepancy",
+      "Poor circulation through heat exchanger",
+      "Wiring or connector faults"
+    ],
+    checks: [
+      "Check whether code returns after reset",
+      "Monitor heating stability and hot water behaviour",
+      "Book diagnostics if lockout recurs"
+    ],
+    faqs: [
+      { q: "Is this DIY-fixable?", a: "Not safely in most cases. Sensor and electrical checks should be carried out by a Gas Safe engineer." },
+      { q: "Service or repair?", a: "Service can help identify underlying causes; repair is appropriate if fault is already clear." }
+    ]
+  },
+  {
+    slug: "ideal-f2-error-code",
+    title: "Ideal F2 Error Code: Flame Loss Explained",
+    excerpt: "F2 usually indicates flame loss or ignition lockout on Ideal boilers.",
+    summary: "Ideal F2 can be linked to combustion, airflow, gas supply, fan, or control faults. Recurring lockout should be assessed professionally.",
+    causes: [
+      "Ignition/flame sensing fault",
+      "Fan or flue airflow problem",
+      "Gas supply or gas valve issue"
+    ],
+    checks: [
+      "Check if other gas appliances are operating normally",
+      "Look for repeated lockout pattern",
+      "Avoid repeated unsafe DIY resets"
+    ],
+    faqs: [
+      { q: "Can a service fix F2?", a: "A service may resolve related performance issues and identify if a specific repair is required." },
+      { q: "When to book repair directly?", a: "If F2 is persistent and heating is unreliable, repair booking is often the fastest route." }
+    ]
+  },
+  {
+    slug: "worcester-ea-fault-code",
+    title: "Worcester EA Fault Code: What It Usually Means",
+    excerpt: "EA typically points to ignition/flame detection problems.",
+    summary: "Worcester EA is commonly associated with failed ignition or unstable flame detection. A proper combustion and controls check is recommended.",
+    causes: [
+      "Ignition or flame sensing issue",
+      "Gas supply consistency problem",
+      "Combustion airflow fault"
+    ],
+    checks: [
+      "Check if code is persistent after reset",
+      "Note if issue occurs only on hot water or heating",
+      "Arrange professional diagnosis if recurring"
+    ],
+    faqs: [
+      { q: "Is EA serious?", a: "It is a lockout condition and should be diagnosed promptly if it returns." },
+      { q: "Service or repair booking?", a: "Both are valid: service for full condition checks, repair for direct fault handling." }
+    ]
+  },
+  {
+    slug: "boiler-ticking-noise",
+    title: "Boiler Ticking Noise: Normal or Fault?",
+    excerpt: "Ticking can be normal expansion, but can also indicate loose parts, trapped air, or scaling.",
+    summary: "Some ticking is harmless pipe expansion. Persistent or worsening noise, especially with poor heating, should be checked.",
+    causes: [
+      "Pipe expansion/contraction",
+      "Trapped air in radiators or pipework",
+      "Loose components or limescale-related flow noise"
+    ],
+    checks: [
+      "Check if noise only happens at startup",
+      "Bleed radiators where needed",
+      "Track pressure and heating performance together"
+    ],
+    faqs: [
+      { q: "When is ticking a warning sign?", a: "If noise is louder, continuous, or paired with heating faults or pressure instability." },
+      { q: "What should I book?", a: "Book a service first in most cases; book repair directly if fault symptoms are clear and persistent." }
+    ]
+  },
+  {
+    slug: "boiler-kettling-noise",
+    title: "Boiler Kettling Noise: Why It Happens",
+    excerpt: "Kettling often sounds like a whistling kettle and is linked with heat exchanger scaling or poor flow.",
+    summary: "Kettling usually indicates restricted flow and local overheating in the heat exchanger. This can reduce efficiency and stress components.",
+    causes: [
+      "Limescale buildup in heat exchanger",
+      "Poor circulation through system",
+      "Debris/sludge restriction"
+    ],
+    checks: [
+      "Check system pressure and flow consistency",
+      "Note if noise increases under heat demand",
+      "Book service to assess water quality and circulation"
+    ],
+    faqs: [
+      { q: "Can inhibitor help?", a: "Inhibitor helps prevention, but existing restriction may still need professional treatment." },
+      { q: "Is repair always needed?", a: "Not always. A service may resolve some causes and identify whether repair is required." }
+    ]
+  },
+  {
+    slug: "boiler-fan-not-working",
+    title: "Boiler Fan Not Working: Signs and Action",
+    excerpt: "Fan faults can trigger lockouts due to unsafe combustion airflow conditions.",
+    summary: "The fan is safety-critical for combustion airflow. If it fails, the boiler often locks out to prevent unsafe operation.",
+    causes: [
+      "Fan motor wear/failure",
+      "Air pressure proving issue",
+      "Control board or wiring fault"
+    ],
+    checks: [
+      "Check for repeated fault codes and lockouts",
+      "Do not run repeated unsafe resets",
+      "Arrange Gas Safe diagnosis promptly"
+    ],
+    faqs: [
+      { q: "Can I keep using boiler with fan fault?", a: "No. Persistent fan-related lockouts should be professionally assessed." },
+      { q: "Service vs repair?", a: "Repair is often appropriate for clear fan faults, though service can still provide full condition checks." }
+    ]
+  },
+  {
+    slug: "boiler-no-hot-water",
+    title: "Boiler Working But No Hot Water",
+    excerpt: "If heating works but hot water fails, diverter, plate exchanger, sensor or controls may be involved.",
+    summary: "No hot water with partial boiler function often points to domestic hot water pathway faults rather than total appliance failure.",
+    causes: [
+      "Diverter valve issue",
+      "Plate heat exchanger restriction",
+      "Sensor or control fault"
+    ],
+    checks: [
+      "Test heating and hot water separately",
+      "Note any fault code on display",
+      "Book service or repair based on urgency"
+    ],
+    faqs: [
+      { q: "Could pressure be related?", a: "Yes, low pressure can affect operation on some systems." },
+      { q: "Best first booking?", a: "Service may identify broader issues; repair is suitable for urgent fault-first resolution." }
+    ]
+  },
+  {
+    slug: "radiators-not-heating-up",
+    title: "Radiators Not Heating Up Properly",
+    excerpt: "Cold radiators can be caused by airlocks, balancing issues, low pressure, or circulation faults.",
+    summary: "Uneven or cold radiators are usually a circulation issue in the wider system, not always the boiler core itself.",
+    causes: [
+      "Air trapped in radiators",
+      "System balancing issues",
+      "Low pressure or pump circulation problems"
+    ],
+    checks: [
+      "Bleed affected radiators",
+      "Check pressure after bleeding",
+      "Compare heat output across rooms"
+    ],
+    faqs: [
+      { q: "Do I need a boiler repair for one cold radiator?", a: "Not always. System balancing or venting may be enough." },
+      { q: "When to escalate?", a: "If multiple radiators remain cold after basic checks, book a service or repair visit." }
+    ]
+  },
+  {
+    slug: "boiler-overflow-pipe-leaking",
+    title: "Boiler Overflow / Discharge Pipe Leaking",
+    excerpt: "A leaking discharge pipe often means pressure relief is activating due to overpressure or valve issues.",
+    summary: "Water from the discharge pipe is a useful fault clue. It can indicate pressure control faults or a PRV that no longer seals correctly.",
+    causes: [
+      "Over-pressurised heating system",
+      "Pressure relief valve not reseating",
+      "Expansion vessel fault causing pressure spikes"
+    ],
+    checks: [
+      "Track when dripping occurs (heating on/off)",
+      "Monitor gauge behaviour",
+      "Avoid repeated top-up cycles without diagnosis"
+    ],
+    faqs: [
+      { q: "Is this an emergency?", a: "Not always, but persistent discharge should be checked quickly to avoid further faults." },
+      { q: "Service first?", a: "Service may identify and sometimes resolve cause; repair may still be required." }
+    ]
+  },
+  {
+    slug: "expansion-vessel-fault",
+    title: "Expansion Vessel Fault Symptoms",
+    excerpt: "Pressure swings and discharge pipe leaks are common signs of an expansion vessel issue.",
+    summary: "A failing expansion vessel can cause unstable pressure, frequent top-ups, and stress on safety components.",
+    causes: [
+      "Loss of vessel charge",
+      "Internal diaphragm failure",
+      "Long-term pressure cycling wear"
+    ],
+    checks: [
+      "Observe pressure rise during heating",
+      "Check for discharge pipe activity",
+      "Arrange professional vessel assessment"
+    ],
+    faqs: [
+      { q: "Can inhibitor fix this?", a: "No. This is usually a mechanical pressure-management fault." },
+      { q: "Service or repair?", a: "Service can identify the issue; repair is required if vessel or related parts fail." }
+    ]
+  },
+  {
+    slug: "filling-loop-left-open",
+    title: "Filling Loop Left Open: Pressure Problems",
+    excerpt: "An open filling loop can cause gradual over-pressurisation and repeated discharge.",
+    summary: "If system pressure keeps climbing unexpectedly, check filling loop valves first. Small valve seepage can mimic deeper faults.",
+    causes: [
+      "Valves not fully closed",
+      "Valve seat wear allowing seepage",
+      "Incorrect repressurisation process"
+    ],
+    checks: [
+      "Confirm both loop valves are fully shut",
+      "Recheck pressure trend over 24 hours",
+      "Book service if pressure still rises"
+    ],
+    faqs: [
+      { q: "Could this damage the boiler?", a: "Persistent overpressure can stress components and trigger safety discharge." },
+      { q: "Should I book repair immediately?", a: "If pressure remains unstable after loop checks, repair booking is sensible." }
+    ]
+  },
+  {
+    slug: "frozen-condensate-pipe",
+    title: "Frozen Condensate Pipe: Boiler Not Firing",
+    excerpt: "In cold weather, frozen condensate can cause lockouts and no-heat symptoms.",
+    summary: "A frozen condensate line can stop normal boiler operation, especially during winter cold spells.",
+    causes: [
+      "External condensate run freezing",
+      "Insufficient insulation on pipework",
+      "Poor route/fall for condensate line"
+    ],
+    checks: [
+      "Inspect external condensate section",
+      "Look for lockout code recurrence",
+      "Book service for route/insulation improvement advice"
+    ],
+    faqs: [
+      { q: "Will this keep happening?", a: "It can recur if pipe routing and insulation are not improved." },
+      { q: "Service or repair?", a: "Service can address setup/prevention; repair may be needed if component damage occurred." }
+    ]
+  },
+  {
+    slug: "boiler-ignition-lockout",
+    title: "Boiler Ignition Lockout: What to Do",
+    excerpt: "Ignition lockout means the boiler failed to light safely and has shut down for protection.",
+    summary: "Lockouts are protective. If the issue keeps returning after reset, there is usually an ignition, gas, airflow, or control fault.",
+    causes: [
+      "Ignition electrode/flame sensing issue",
+      "Gas supply inconsistency",
+      "Fan/airflow proving fault"
+    ],
+    checks: [
+      "Note exact code and pattern",
+      "Check if other gas appliances are normal",
+      "Book service or repair for full diagnosis"
+    ],
+    faqs: [
+      { q: "Can I keep resetting?", a: "Repeated resets without diagnosis are not recommended." },
+      { q: "Best booking path?", a: "Service for broad checks; repair for direct fault-first approach." }
+    ]
+  },
+  {
+    slug: "boiler-keeps-needing-reset",
+    title: "Boiler Keeps Needing Reset",
+    excerpt: "Frequent resets indicate unresolved underlying faults, not a permanent fix.",
+    summary: "A healthy boiler should not require regular manual resets. Recurrence points to a persistent safety or control issue.",
+    causes: [
+      "Intermittent sensor or wiring faults",
+      "Combustion or ignition instability",
+      "Pressure or circulation issues"
+    ],
+    checks: [
+      "Track how often reset is needed",
+      "Record displayed fault code",
+      "Arrange professional investigation"
+    ],
+    faqs: [
+      { q: "Does reset mean fixed?", a: "Usually temporary only when the fault condition returns." },
+      { q: "Service or repair?", a: "Either can work; service may identify broader condition while repair targets immediate fault." }
+    ]
+  },
+  {
+    slug: "boiler-short-cycling",
+    title: "Boiler Short Cycling: Causes and Fixes",
+    excerpt: "Short cycling means the boiler turns on and off too frequently.",
+    summary: "Frequent cycling can reduce efficiency and increase wear. Common causes include flow issues, controls setup, and sensor faults.",
+    causes: [
+      "Restricted system flow",
+      "Thermostat/control setup mismatch",
+      "Sensor feedback inconsistencies"
+    ],
+    checks: [
+      "Observe burner run-time pattern",
+      "Check radiator heat distribution",
+      "Book service to assess setup and system health"
+    ],
+    faqs: [
+      { q: "Can this increase bills?", a: "Yes, short cycling often reduces efficiency and increases component wear." },
+      { q: "Is repair always needed?", a: "Not always. Service and controls optimisation may improve behaviour." }
+    ]
+  },
+  {
+    slug: "air-in-heating-system",
+    title: "Air in Heating System: Symptoms and Action",
+    excerpt: "Airlocks can cause gurgling, cold spots, weak circulation and unstable pressure readings.",
+    summary: "Trapped air disrupts flow and can mimic boiler faults. Correct venting and system setup checks are important.",
+    causes: [
+      "Recent radiator bleeding without proper top-up",
+      "Minor leaks allowing air ingress",
+      "Poor system venting"
+    ],
+    checks: [
+      "Bleed radiators in sequence",
+      "Recheck system pressure afterward",
+      "Monitor for recurring air symptoms"
+    ],
+    faqs: [
+      { q: "Will bleeding fix everything?", a: "It can help, but recurring air suggests an underlying issue needing diagnosis." },
+      { q: "Service useful here?", a: "Yes, service can review full system condition and identify root causes." }
+    ]
+  },
+  {
+    slug: "boiler-service-vs-repair",
+    title: "Boiler Service vs Boiler Repair: Which One to Book?",
+    excerpt: "Service is preventative/condition-focused, repair is fault-focused. Both can be valid first steps.",
+    summary: "If your boiler still runs but behaves inconsistently, service is often a strong first option. If there is a clear persistent fault or lockout, repair-first can be faster.",
+    causes: [
+      "Service booking suits broad checks and maintenance",
+      "Repair booking suits known fault symptoms",
+      "Hybrid approach often works best: service findings followed by repair if required"
+    ],
+    checks: [
+      "List your main symptom and frequency",
+      "Check for any fault code",
+      "Choose service-first or repair-first based on urgency"
+    ],
+    faqs: [
+      { q: "Will a service always fix faults?", a: "No. A service may resolve some issues and can identify repair requirements." },
+      { q: "Can I skip service and book repair?", a: "Yes, direct repair booking is available if you prefer." }
+    ]
+  },
+  {
+    slug: "how-often-service-boiler",
+    title: "How Often Should You Service a Boiler?",
+    excerpt: "Annual servicing is the standard recommendation for safety, reliability and warranty support.",
+    summary: "Regular servicing helps keep performance stable, catches wear early, and supports safer operation over time.",
+    causes: [
+      "Combustion and safety checks drift over time",
+      "System debris and minor faults can build gradually",
+      "Warranty and reliability benefits from routine maintenance"
+    ],
+    checks: [
+      "Book annual service reminders",
+      "Track pressure/noise trends between visits",
+      "Act early on recurring symptoms"
+    ],
+    faqs: [
+      { q: "Can I service less often?", a: "Long gaps increase risk of avoidable faults and reduced efficiency." },
+      { q: "What if fault appears before service date?", a: "Book a repair visit or service sooner depending on severity." }
+    ]
+  },
+  {
+    slug: "leeds-boiler-service-guide",
+    title: "Boiler Service in Leeds: What to Expect",
+    excerpt: "What happens during a local boiler service and when it should become a repair visit.",
+    summary: "A professional service reviews combustion safety, pressure behaviour, controls, and overall system condition.",
+    causes: [
+      "Annual safety/performance checks",
+      "Early detection of wear and pressure issues",
+      "Clear recommendation on whether repair is needed"
+    ],
+    checks: [
+      "Have fault notes/codes ready for engineer",
+      "Confirm access to boiler and controls",
+      "Discuss symptoms in order of priority"
+    ],
+    faqs: [
+      { q: "Can service become repair on same journey?", a: "Sometimes, depending on fault, parts, and appointment scope." },
+      { q: "Why service if I can book repair?", a: "Service offers full-condition context that can prevent repeat issues." }
+    ]
+  },
+  {
+    slug: "leeds-boiler-repair-guide",
+    title: "Boiler Repair in Leeds: Fault-First Booking Guide",
+    excerpt: "Repair visits are fault-focused and suitable for persistent lockouts or clear failures.",
+    summary: "If you have a recurring fault code, no hot water, or repeated resets, repair-first booking is often appropriate.",
+    causes: [
+      "Persistent lockout/fault codes",
+      "Loss of heating or hot water",
+      "Recurring pressure or circulation failure"
+    ],
+    checks: [
+      "Capture fault code and timing",
+      "Note recent pressure/noise changes",
+      "Provide model details if available"
+    ],
+    faqs: [
+      { q: "Does repair include full service?", a: "Repair appointments are fault-focused and do not automatically include a full service." },
+      { q: "Can I book service instead?", a: "Yes. Service can still be chosen first if you want full-condition checks." }
+    ]
+  },
+  {
+    slug: "vaillant-fan-fault",
+    title: "Vaillant Fan Fault Symptoms",
+    excerpt: "Fan and airflow proving faults can trigger lockouts and unstable combustion behaviour.",
+    summary: "If a Vaillant boiler reports fan-related faults or repeatedly fails to light, airflow and fan operation should be professionally checked.",
+    causes: [
+      "Fan speed/proving anomaly",
+      "Air pressure switch/proving chain issue",
+      "Flue path resistance or control fault"
+    ],
+    checks: [
+      "Track code recurrence",
+      "Avoid repeated unsafe reset loops",
+      "Book Gas Safe diagnosis"
+    ],
+    faqs: [
+      { q: "Can weather affect this?", a: "External conditions can influence flue performance in some cases." },
+      { q: "Service or repair?", a: "Repair-first is common for clear fan faults; service can still help evaluate whole system condition." }
+    ]
+  },
+  {
+    slug: "ideal-low-water-pressure",
+    title: "Ideal Low Water Pressure Faults",
+    excerpt: "Low pressure on Ideal systems often shows as reduced performance or lockout codes.",
+    summary: "Persistent low pressure should be investigated rather than repeatedly topped up.",
+    causes: [
+      "External system leaks",
+      "PRV or expansion vessel issues",
+      "Internal boiler pressure-management faults"
+    ],
+    checks: [
+      "Check gauge below normal range",
+      "Inspect visible joints and valves",
+      "Book service/repair if recurrence continues"
+    ],
+    faqs: [
+      { q: "Is one top-up okay?", a: "Occasional top-up can happen, but frequent top-ups indicate a fault." },
+      { q: "Best first booking?", a: "Service-first is common; repair-first is valid for persistent hard faults." }
+    ]
+  },
+  {
+    slug: "worcester-c6-c7-faults",
+    title: "Worcester C6 / C7 Faults Explained",
+    excerpt: "C6/C7 usually relate to fan speed/proving or fan control behaviour.",
+    summary: "These faults are typically linked to airflow safety checks and fan response. They should be diagnosed professionally.",
+    causes: [
+      "Fan speed below expected range",
+      "Fan control feedback issue",
+      "Airflow proving chain anomaly"
+    ],
+    checks: [
+      "Capture exact code and timing",
+      "Check recurrence after reset",
+      "Arrange engineer assessment"
+    ],
+    faqs: [
+      { q: "Can I ignore intermittent C6/C7?", a: "Intermittent safety faults can become persistent and should be checked." },
+      { q: "Service or repair?", a: "Repair-first is usually suitable for code-specific faults." }
+    ]
+  },
+  {
+    slug: "boiler-pressure-guide-1-to-1-5-bar",
+    title: "Boiler Pressure Guide: Why 1 to 1.5 Bar Matters",
+    excerpt: "Most sealed domestic systems operate best around 1 to 1.5 bar when cold.",
+    summary: "Keeping pressure in the normal cold range supports stable circulation and fewer nuisance lockouts.",
+    causes: [
+      "Pressure below range can reduce circulation",
+      "Pressure above range can stress safety components",
+      "Frequent fluctuations suggest underlying faults"
+    ],
+    checks: [
+      "Read gauge when system is cold",
+      "Compare with reading when heating is active",
+      "Investigate repeated deviations"
+    ],
+    faqs: [
+      { q: "Is slight movement normal?", a: "Yes. Minor changes between cold and hot operation are expected." },
+      { q: "When should I book?", a: "Book if pressure repeatedly drops below or rises above normal range." }
+    ]
+  }
+];
+const TARGET_TOTAL_ADVICE_PAGES = 461;
+const mergedAdviceArticles = [...baseAdviceArticles, ...generatedAdviceArticles];
+const adviceArticles = mergedAdviceArticles.slice(0, TARGET_TOTAL_ADVICE_PAGES);
+const adviceBySlug = Object.fromEntries(
+  adviceArticles.map((article) => [article.slug, article])
+);
+const titleCase = (value = "") => value.split("-").filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+const extractFaultCode = (slug = "") => {
+  const match = slug.match(/fault-code-([a-z0-9]+)/i);
+  return match ? match[1].toUpperCase() : null;
+};
+const profileForSlug = (slug = "", article = {}) => {
+  const isResetGuide = slug.includes("reset-guide");
+  const isFaultCodeGuide = slug.includes("fault-code");
+  const code = extractFaultCode(slug);
+  const subject = article?.title || titleCase(slug.replace(/^guide-/, ""));
+  const resetSteps = [
+    "Wait 3 to 5 minutes after lockout so components cool and controls stabilise.",
+    "Check system pressure is in your normal range and confirm gas/electrical supply is available.",
+    "Use the manufacturer reset procedure once only (button or menu depending on model).",
+    "Run hot water or heating demand and observe whether the fault returns.",
+    "If the same code returns, stop resetting repeatedly and book an engineer diagnosis."
+  ];
+  if (isResetGuide || isFaultCodeGuide) {
+    return {
+      heading: code ? `How to safely handle ${code} before booking` : "How to safely handle this fault before booking",
+      steps: resetSteps,
+      legalLead: "Resetting is only a temporary user action. Internal diagnostics, combustion checks, gas train work, and component replacement are engineer-only tasks."
+    };
+  }
+  return {
+    heading: `Step-by-step checks for ${subject}`,
+    steps: [
+      "Confirm the exact symptom pattern (startup only, hot-water demand, heating demand, or constant).",
+      "Check pressure and controls safely without removing casing or touching internal components.",
+      "Look for external clues like discharge pipe dripping, uneven radiator heat, or recurring lockout codes.",
+      "Book service for full-condition diagnosis, or repair-first if the same hard fault is repeating."
+    ],
+    legalLead: "Homeowner checks should stay external and non-invasive. Internal gas appliance work is restricted by law."
+  };
+};
+function AdviceArticlePage() {
+  const { props } = usePage();
+  const slug = props?.articleSlug;
+  const article = adviceBySlug[slug];
+  const profile = profileForSlug(slug, article);
+  if (!article) {
+    return /* @__PURE__ */ jsxs(Fragment, { children: [
+      /* @__PURE__ */ jsx(Head, { title: "Boiler Advice" }),
+      /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+        /* @__PURE__ */ jsx(Header, { title: "Boiler Advice" }),
+        /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-3xl font-extrabold", children: "Advice page not found" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700", children: "This advice page is not available. Browse all guides below." }),
+          /* @__PURE__ */ jsx(Link, { href: "/advice/boiler-problems", className: "inline-flex mt-6 rounded-lg bg-primary px-5 py-3 text-white font-semibold", children: "View Boiler Advice Hub" })
+        ] }),
+        /* @__PURE__ */ jsx(Footer, {})
+      ] })
+    ] });
+  }
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: article.title }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: article.title }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsxs("article", { className: "max-w-4xl", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: article.title }),
+          /* @__PURE__ */ jsx("p", { className: "mt-4 text-lg text-gray-600", children: article.excerpt }),
+          /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+            /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "What this usually means" }),
+            /* @__PURE__ */ jsx("p", { className: "mt-3 text-gray-700 leading-7", children: article.summary })
+          ] }),
+          /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-gray-200 p-6", children: [
+            /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Common causes" }),
+            /* @__PURE__ */ jsx("ul", { className: "mt-3 list-disc pl-5 space-y-2 text-gray-700", children: article.causes.map((item) => /* @__PURE__ */ jsx("li", { children: item }, item)) })
+          ] }),
+          /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-gray-200 p-6", children: [
+            /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Checks you can do safely" }),
+            /* @__PURE__ */ jsx("ul", { className: "mt-3 list-disc pl-5 space-y-2 text-gray-700", children: article.checks.map((item) => /* @__PURE__ */ jsx("li", { children: item }, item)) })
+          ] }),
+          /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-gray-200 p-6", children: [
+            /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: profile.heading }),
+            /* @__PURE__ */ jsx("ol", { className: "mt-3 list-decimal pl-5 space-y-2 text-gray-700", children: profile.steps.map((step) => /* @__PURE__ */ jsx("li", { children: step }, step)) })
+          ] }),
+          /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsx("div", { className: "inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-100", children: /* @__PURE__ */ jsxs(
+                "svg",
+                {
+                  className: "h-6 w-6 animate-spin text-red-600",
+                  viewBox: "0 0 24 24",
+                  fill: "none",
+                  xmlns: "http://www.w3.org/2000/svg",
+                  "aria-hidden": "true",
+                  children: [
+                    /* @__PURE__ */ jsx("circle", { cx: "12", cy: "12", r: "9", stroke: "currentColor", strokeWidth: "2", opacity: "0.35" }),
+                    /* @__PURE__ */ jsx("path", { d: "M12 7V13", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round" }),
+                    /* @__PURE__ */ jsx("circle", { cx: "12", cy: "16.5", r: "1.25", fill: "currentColor" })
+                  ]
+                }
+              ) }),
+              /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "Legal and safety warning" })
+            ] }),
+            /* @__PURE__ */ jsxs("p", { className: "mt-3 text-blue-900 leading-7", children: [
+              profile.legalLead,
+              " Under the Gas Safety (Installation and Use) Regulations 1998 (Regulation 3), gas work must be carried out by a Gas Safe registered engineer. Illegal gas work can lead to prosecution, substantial fines, and potential imprisonment. If fault codes persist, stop DIY attempts and book a qualified engineer."
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+            /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "Book service or repair" }),
+            /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900 leading-7", children: "Book a boiler service first if you want full-condition checks. A service may resolve some issues and also help identify whether a repair is needed. If you prefer, you can book a repair directly." }),
+            /* @__PURE__ */ jsxs("div", { className: "mt-5 flex flex-wrap gap-3", children: [
+              /* @__PURE__ */ jsx(
+                "a",
+                {
+                  href: "/book/quote/service",
+                  className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700",
+                  children: "Book a Boiler Service"
+                }
+              ),
+              /* @__PURE__ */ jsx(
+                "a",
+                {
+                  href: "/book/quote/repair",
+                  className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50",
+                  children: "Book a Boiler Repair"
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsx(NewBoilerQuoteCta, {}),
+          /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-gray-200 p-6", children: [
+            /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Frequently asked questions" }),
+            /* @__PURE__ */ jsx("div", { className: "mt-4 space-y-4", children: article.faqs.map((faq) => /* @__PURE__ */ jsxs("div", { children: [
+              /* @__PURE__ */ jsx("h3", { className: "font-semibold text-gray-900", children: faq.q }),
+              /* @__PURE__ */ jsx("p", { className: "mt-1 text-gray-700", children: faq.a })
+            ] }, faq.q)) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-12", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "More boiler help" }),
+          /* @__PURE__ */ jsx("div", { className: "mt-4 grid gap-3 sm:grid-cols-2", children: adviceArticles.filter((x) => x.slug !== article.slug).slice(0, 8).map((item) => /* @__PURE__ */ jsxs(
+            Link,
+            {
+              href: `/advice/${item.slug}`,
+              className: "rounded-lg border border-gray-200 p-4 hover:shadow-sm",
+              children: [
+                /* @__PURE__ */ jsx("p", { className: "font-semibold text-gray-900", children: item.title }),
+                /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm text-gray-600", children: item.excerpt })
+              ]
+            },
+            item.slug
+          )) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_37 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: AdviceArticlePage
+}, Symbol.toStringTag, { value: "Module" }));
+function BoilerPressureDroppingPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Boiler Pressure Keeps Dropping" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Boiler Pressure Keeps Dropping" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Boiler pressure keeps dropping: common causes" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "Repeated pressure loss usually points to a small system leak, radiator bleed loss, PRV issues, or an internal boiler component problem." }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "What you can check" }),
+          /* @__PURE__ */ jsxs("ul", { className: "mt-4 list-disc pl-5 space-y-2 text-gray-700", children: [
+            /* @__PURE__ */ jsx("li", { children: "Inspect visible radiator valves and pipe joints." }),
+            /* @__PURE__ */ jsx("li", { children: "Check if pressure drops after bleeding radiators." }),
+            /* @__PURE__ */ jsx("li", { children: "Monitor if drops happen overnight when system is cold." })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "When to book" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900", children: "If you are topping up pressure repeatedly, book a boiler service first. A full service may resolve some issues and also help identify whether you need a repair. If you prefer, you can book a repair directly." })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/boiler-problems", className: "inline-flex rounded-lg border border-gray-300 px-5 py-3 text-gray-700 font-semibold", children: "More boiler problem guides" })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_38 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: BoilerPressureDroppingPage
+}, Symbol.toStringTag, { value: "Module" }));
+function BoilerPressureIncreasingPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Boiler Pressure Keeps Increasing" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Boiler Pressure Keeps Increasing" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Boiler pressure keeps increasing: what it means" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "If pressure rises above normal and you need to keep releasing water, likely causes include a faulty filling loop, expansion vessel charge issue, or internal valve faults." }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Quick checks" }),
+          /* @__PURE__ */ jsxs("ul", { className: "mt-4 list-disc pl-5 space-y-2 text-gray-700", children: [
+            /* @__PURE__ */ jsx("li", { children: "Ensure the filling loop is fully closed." }),
+            /* @__PURE__ */ jsx("li", { children: "Note pressure when cold vs when heating is on." }),
+            /* @__PURE__ */ jsx("li", { children: "Look for any discharge pipe dripping outside." })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "Next best step" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900", children: "Book a boiler service first. A full service may resolve some issues and also help identify whether you need a repair. If you prefer, you can book a repair directly." })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/boiler-problems", className: "inline-flex rounded-lg border border-gray-300 px-5 py-3 text-gray-700 font-semibold", children: "More boiler problem guides" })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_39 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: BoilerPressureIncreasingPage
+}, Symbol.toStringTag, { value: "Module" }));
+const cards = [
+  {
+    title: "Ideal boiler making a noise",
+    description: "Banging, whistling, humming, or vibrating noises often indicate scale build-up, pump issues, or trapped air.",
+    href: "/advice/ideal-boiler-making-a-noise"
+  },
+  {
+    title: "Boiler pressure keeps increasing",
+    description: "Rising pressure can indicate a faulty filling loop, expansion vessel problem, or internal leak path.",
+    href: "/advice/boiler-pressure-keeps-increasing"
+  },
+  {
+    title: "Boiler pressure keeps dropping",
+    description: "Pressure loss is commonly caused by small leaks, bleeding radiators, or component faults.",
+    href: "/advice/boiler-pressure-keeps-dropping"
+  }
+];
+function BoilerProblemsHubPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Boiler Problems Advice Leeds" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Boiler Problems Advice" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsxs("section", { className: "text-center max-w-3xl mx-auto", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Boiler problem guides for Leeds homeowners" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-4 text-lg text-gray-600", children: "Quick fault guides for common symptoms. If the issue remains, book a boiler service first, then a repair visit if required." })
+        ] }),
+        /* @__PURE__ */ jsx("section", { className: "grid gap-6 md:grid-cols-3 mt-12", children: cards.map((card) => /* @__PURE__ */ jsxs(
+          "article",
+          {
+            className: "rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition",
+            children: [
+              /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-gray-900", children: card.title }),
+              /* @__PURE__ */ jsx("p", { className: "mt-3 text-gray-600 text-sm leading-6", children: card.description }),
+              /* @__PURE__ */ jsx(
+                "a",
+                {
+                  href: card.href,
+                  className: "inline-flex mt-6 text-primary font-semibold hover:underline",
+                  children: "Read guide →"
+                }
+              )
+            ]
+          },
+          card.href
+        )) }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-14 rounded-2xl bg-gray-50 border border-gray-200 p-6 sm:p-8", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Need an engineer now?" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-gray-600", children: "If your heating or hot water is unreliable, book a service to diagnose system condition. If a fault is confirmed, book a repair appointment." }),
+          /* @__PURE__ */ jsxs("div", { className: "mt-6 flex flex-wrap gap-3", children: [
+            /* @__PURE__ */ jsx(
+              "a",
+              {
+                href: "/book/quote/service",
+                className: "inline-flex items-center rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700",
+                children: "Book a Boiler Service"
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              "a",
+              {
+                href: "/book/quote/repair",
+                className: "inline-flex items-center rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50",
+                children: "Book a Boiler Repair"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_40 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: BoilerProblemsHubPage
+}, Symbol.toStringTag, { value: "Module" }));
+function IdealBoilerHelpPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Ideal Boiler Problems & Fault Codes" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Ideal Boiler Help" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Ideal boiler problems in Leeds: what they usually mean" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "If your Ideal boiler is noisy, losing pressure, or showing a fault code, the issue is often not user-fixable. We focus on safe diagnosis first, then the right repair." }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 grid gap-4 md:grid-cols-2", children: [
+          /* @__PURE__ */ jsxs("a", { href: "/advice/ideal-boiler-making-a-noise", className: "rounded-xl border border-gray-200 p-5 hover:shadow-sm", children: [
+            /* @__PURE__ */ jsx("h2", { className: "font-bold text-xl", children: "Ideal boiler making a noise" }),
+            /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm text-gray-600", children: "Ticking, kettling, vibrating and fan/pump sounds." })
+          ] }),
+          /* @__PURE__ */ jsxs("a", { href: "/advice/boiler-pressure-keeps-dropping", className: "rounded-xl border border-gray-200 p-5 hover:shadow-sm", children: [
+            /* @__PURE__ */ jsx("h2", { className: "font-bold text-xl", children: "Pressure keeps dropping" }),
+            /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm text-gray-600", children: "If no external leaks are visible, the fault is often internal." })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Ideal fault codes" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-gray-700", children: "We have a dedicated lookup with likely causes and next-step advice for common Ideal codes." }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/ideal-boiler-fault-codes", className: "inline-flex mt-4 rounded-lg bg-primary px-5 py-3 text-white font-semibold", children: "View Ideal Fault Code Guide" })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "Service or repair?" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900", children: "If your boiler still heats but behaves inconsistently, a full service can restore performance and may resolve minor issues. If a component fault is identified, repair is then targeted and efficient." }),
+          /* @__PURE__ */ jsxs("div", { className: "mt-5 flex flex-wrap gap-3", children: [
+            /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+            /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_41 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: IdealBoilerHelpPage
+}, Symbol.toStringTag, { value: "Module" }));
+function IdealBoilerNoisePage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Ideal Boiler Making a Noise" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Ideal Boiler Making a Noise" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Why is my Ideal boiler making a noise?" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "Common noises include banging, kettling, humming, and vibrating. Causes can include limescale in the heat exchanger, trapped air, poor circulation, or pump and fan wear." }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Safe checks first" }),
+          /* @__PURE__ */ jsxs("ul", { className: "mt-4 list-disc pl-5 space-y-2 text-gray-700", children: [
+            /* @__PURE__ */ jsx("li", { children: "Check system pressure is in the normal range." }),
+            /* @__PURE__ */ jsx("li", { children: "Bleed noisy radiators if air is trapped." }),
+            /* @__PURE__ */ jsx("li", { children: "Confirm boiler settings are not maxed unnecessarily." }),
+            /* @__PURE__ */ jsx("li", { children: "Listen for repeat pattern (startup only or constant)." })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-6 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "When to call an engineer" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900", children: "If noise is getting louder, heating performance drops, or pressure swings, book a boiler service. A full service may resolve some issues and also help identify whether a repair is needed. If you prefer, you can book a repair directly." })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/boiler-problems", className: "inline-flex rounded-lg border border-gray-300 px-5 py-3 text-gray-700 font-semibold", children: "More boiler problem guides" })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_42 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: IdealBoilerNoisePage
+}, Symbol.toStringTag, { value: "Module" }));
+const codes$2 = [
+  ["F1", "Low system pressure", "Check pressure and system for leaks. Internal issue likely if recurring."],
+  ["F2", "Flame loss / ignition lockout", "Possible gas valve, fan, flue, ignition or gas supply issue."],
+  ["L2", "Ignition lockout", "Repeated failed ignition. Engineer diagnosis required."],
+  ["L5", "Too many resets / lockout", "Control lockout after repeated faults; needs root-cause fix."],
+  ["F3", "Fan fault", "Fan or airflow proving issue."],
+  ["F4", "Flow thermistor fault", "Temperature sensor reading abnormal."],
+  ["F5", "Return thermistor fault", "Return NTC sensor/wiring issue."],
+  ["F6", "Outside sensor fault", "External temperature sensor fault on compatible setups."],
+  ["F7", "Low mains / flame signal fault", "Electrical or combustion signal issue."],
+  ["F9", "Printed circuit board fault", "Control PCB fault likely."],
+  ["FD", "Incorrect setup / code", "Commissioning or control parameter issue."],
+  ["C0-C9", "Status codes", "Operational/status states. Some are normal, some indicate waiting or protection modes."],
+  ["0", "Standby", "No active demand. Usually normal if heating/hot water off."]
+];
+function IdealFaultCodesPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Ideal Boiler Fault Codes" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Ideal Fault Codes" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Ideal boiler fault codes: likely causes and next steps" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "This page covers common Ideal domestic fault and status codes seen across Logic/Vogue-style ranges. Exact meaning can vary by model generation and controller." }),
+        /* @__PURE__ */ jsx("div", { className: "mt-8 overflow-x-auto rounded-xl border border-gray-200", children: /* @__PURE__ */ jsxs("table", { className: "min-w-full text-sm", children: [
+          /* @__PURE__ */ jsx("thead", { className: "bg-gray-50 text-left", children: /* @__PURE__ */ jsxs("tr", { children: [
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "Code" }),
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "Likely meaning" }),
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "What to do" })
+          ] }) }),
+          /* @__PURE__ */ jsx("tbody", { children: codes$2.map(([code, meaning, action]) => /* @__PURE__ */ jsxs("tr", { className: "border-t border-gray-200 align-top", children: [
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 font-bold text-primary whitespace-nowrap", children: code }),
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 text-gray-800", children: meaning }),
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 text-gray-700", children: action })
+          ] }, code)) })
+        ] }) }),
+        /* @__PURE__ */ jsx("p", { className: "mt-6 text-sm text-gray-700", children: "Legal warning: if a fault code returns repeatedly after reset, do not open the case or attempt internal gas/appliance work. Under the Gas Safety (Installation and Use) Regulations 1998 (Regulation 3), gas work must be done by a Gas Safe registered engineer. Illegal gas work can result in prosecution, heavy fines, and potential imprisonment." }),
+        /* @__PURE__ */ jsxs("div", { className: "mt-8 flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/ideal-boiler-help", className: "inline-flex rounded-lg border border-gray-300 px-5 py-3 text-gray-700 font-semibold", children: "Back to Ideal help" })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_43 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: IdealFaultCodesPage
+}, Symbol.toStringTag, { value: "Module" }));
+function VaillantBoilerHelpPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Vaillant Boiler Problems & Fault Codes" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Vaillant Boiler Help" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Vaillant boiler issues and fault code guidance" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "Common Vaillant issues include pressure instability, ignition lockouts, and sensor faults. Codes like F75 and F72 often point to pressure sensing, pump, flow, or thermistor problems that need professional diagnosis." }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Vaillant fault codes" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-gray-700", children: "Use our Vaillant code page for likely causes, urgency, and whether to book service first or go straight to repair." }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/vaillant-boiler-fault-codes", className: "inline-flex mt-4 rounded-lg bg-primary px-5 py-3 text-white font-semibold", children: "View Vaillant Fault Codes" })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "Safe next step" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900", children: "If the code returns after a reset or your heating/hot water is unreliable, book an engineer visit. We can service the appliance and diagnose underlying faults, then carry out repair if required." }),
+          /* @__PURE__ */ jsxs("div", { className: "mt-5 flex flex-wrap gap-3", children: [
+            /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+            /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_44 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: VaillantBoilerHelpPage
+}, Symbol.toStringTag, { value: "Module" }));
+const codes$1 = [
+  ["F.22", "Low water pressure / dry fire protection", "Repressurise if safe. If recurring, check for leak/internal fault."],
+  ["F.23", "Temperature rise too fast (flow/return issue)", "Possible low circulation, pump, or sensor mismatch."],
+  ["F.24", "Rapid temperature rise", "Circulation restriction, pump or heat exchanger issue."],
+  ["F.25", "Flue gas temperature high", "Combustion/flue safety fault. Engineer required."],
+  ["F.26", "Gas valve stepper motor current fault", "Gas valve/electrical control issue."],
+  ["F.27", "Flame signal with gas off", "Ionisation/PCB or gas valve anomaly."],
+  ["F.28", "Ignition failed", "No flame established. Gas supply, ignition or combustion issue."],
+  ["F.29", "Flame lost during operation", "Intermittent combustion failure."],
+  ["F.32", "Fan speed / air pressure fault", "Fan, venturi, air pressure proving or flue-related issue."],
+  ["F.49", "eBUS low voltage/communication", "Controls/electrical communication problem."],
+  ["F.54", "Gas supply interruption", "Supply pressure interruption or valve issue."],
+  ["F.61", "Gas valve control fault", "Gas valve electronics/wiring fault."],
+  ["F.62", "Gas valve delayed close", "Valve/control safety fault."],
+  ["F.64", "Electronics/sensor plausibility fault", "Sensor or PCB processing fault."],
+  ["F.65", "Electronics overheat", "PCB overheating or cooling issue."],
+  ["F.67", "Flame signal plausibility fault", "Combustion sensing inconsistency."],
+  ["F.68", "Unstable flame signal", "Ignition/combustion instability."],
+  ["F.70", "Invalid appliance code", "Configuration/PCB replacement coding issue."],
+  ["F.71", "Flow sensor stuck", "Flow NTC not changing as expected."],
+  ["F.72", "Flow/return NTC mismatch", "Thermistor/wiring/flow-rate related issue."],
+  ["F.73", "Water pressure sensor signal too low", "Pressure sensor/wiring fault."],
+  ["F.74", "Water pressure sensor out of range", "Sensor plausibility issue."],
+  ["F.75", "No pressure change when pump starts", "Commonly pressure sensor, pump, or system leak."],
+  ["F.76", "Primary heat exchanger overheat safety", "Overheat safety lockout."],
+  ["F.77", "Flue gas flap/condensate pump fault (model dependent)", "Auxiliary safety device fault."],
+  ["F.83", "Flow/return sensor temperature no change", "Poor circulation or sensor issue."]
+];
+function VaillantFaultCodesPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Vaillant Boiler Fault Codes" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Vaillant Fault Codes" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Vaillant fault codes explained (F.22 to F.83)" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "Based on widely seen UK Vaillant domestic code families including common faults like F75 and F72. Exact interpretation can vary by model and firmware." }),
+        /* @__PURE__ */ jsx("div", { className: "mt-8 overflow-x-auto rounded-xl border border-gray-200", children: /* @__PURE__ */ jsxs("table", { className: "min-w-full text-sm", children: [
+          /* @__PURE__ */ jsx("thead", { className: "bg-gray-50 text-left", children: /* @__PURE__ */ jsxs("tr", { children: [
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "Code" }),
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "Likely meaning" }),
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "What to do" })
+          ] }) }),
+          /* @__PURE__ */ jsx("tbody", { children: codes$1.map(([code, meaning, action]) => /* @__PURE__ */ jsxs("tr", { className: "border-t border-gray-200 align-top", children: [
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 font-bold text-primary whitespace-nowrap", children: code }),
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 text-gray-800", children: meaning }),
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 text-gray-700", children: action })
+          ] }, code)) })
+        ] }) }),
+        /* @__PURE__ */ jsxs("div", { className: "mt-8 flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/vaillant-boiler-help", className: "inline-flex rounded-lg border border-gray-300 px-5 py-3 text-gray-700 font-semibold", children: "Back to Vaillant help" })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {}),
+        /* @__PURE__ */ jsx("p", { className: "mt-6 text-sm text-gray-700", children: "Legal warning: recurring combustion or lockout faults should not be handled with internal DIY work. Under the Gas Safety (Installation and Use) Regulations 1998 (Regulation 3), gas work must be completed by a Gas Safe registered engineer. Illegal gas work can lead to prosecution, significant fines, and possible imprisonment." })
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_45 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: VaillantFaultCodesPage
+}, Symbol.toStringTag, { value: "Module" }));
+function WorcesterBoilerHelpPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Worcester Boiler Problems & Fault Codes" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Worcester Boiler Help" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Worcester boiler faults: practical homeowner guidance" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "Worcester faults are often shown as EA/C/A or numeric code families depending on model and controller. Many are linked to ignition, fan, sensor, pressure, or circulation issues." }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-gray-200 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-2xl font-bold", children: "Worcester fault codes" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-gray-700", children: "See our Worcester lookup for likely causes and what to do next without risky DIY work." }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/worcester-boiler-fault-codes", className: "inline-flex mt-4 rounded-lg bg-primary px-5 py-3 text-white font-semibold", children: "View Worcester Fault Codes" })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-8 rounded-xl border border-blue-200 bg-blue-50 p-6", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-blue-900", children: "Service first, repair if needed" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-3 text-blue-900", children: "A full service can resolve performance issues and reveal root causes early. If a hard component fault is found, a repair appointment gets the boiler back to reliable operation." }),
+          /* @__PURE__ */ jsxs("div", { className: "mt-5 flex flex-wrap gap-3", children: [
+            /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+            /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_46 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: WorcesterBoilerHelpPage
+}, Symbol.toStringTag, { value: "Module" }));
+const codes = [
+  ["EA", "No flame detected / ignition fault", "Combustion or gas/ignition issue. Common lockout code."],
+  ["C6", "Fan speed too low / fan fault", "Fan, air pressure proving, or flue airflow issue."],
+  ["C7", "Fan continues running unexpectedly", "Fan control or PCB/fan feedback issue."],
+  ["A1", "Pump running dry / circulation issue", "Low flow or pump/circulation problem."],
+  ["E9", "Overheat trip", "Over-temperature safety lockout, often circulation/sensor related."],
+  ["D1", "Flow sensor fault (model dependent)", "Temperature sensor or wiring issue."],
+  ["D5", "Return sensor fault (model dependent)", "Return NTC/wiring fault."],
+  ["227", "Flame not detected after ignition", "Ignition sequence failed."],
+  ["229", "Flame lost during burner operation", "Intermittent combustion issue."],
+  ["232", "Air pressure/fan proving fault", "Fan or pressure proving device issue."],
+  ["233", "No fan speed signal", "Fan hall-sensor/speed feedback fault."],
+  ["295", "Internal electronics/PCB fault", "Control board fault condition."],
+  ["296", "Electronics parameter/plausibility fault", "Control consistency fault."],
+  ["297", "Gas valve control fault", "Gas valve actuation/control issue."],
+  ["298", "Burner control fault", "Combustion control chain issue."],
+  ["286", "Pump speed/control issue", "Pump operation outside expected range."],
+  ["1017", "System pressure too low", "Repressurise and investigate for leaks if recurring."],
+  ["1021", "System pressure too high", "Check filling loop and pressure control."]
+];
+function WorcesterFaultCodesPage() {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Worcester Boiler Fault Codes" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Worcester Fault Codes" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Worcester fault codes: EA, C6, C7 and numeric codes" }),
+        /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-700 leading-7", children: "Worcester displays differ by appliance generation (alphanumeric and numeric styles). Use this guide as a practical first interpretation before booking diagnosis." }),
+        /* @__PURE__ */ jsx("div", { className: "mt-8 overflow-x-auto rounded-xl border border-gray-200", children: /* @__PURE__ */ jsxs("table", { className: "min-w-full text-sm", children: [
+          /* @__PURE__ */ jsx("thead", { className: "bg-gray-50 text-left", children: /* @__PURE__ */ jsxs("tr", { children: [
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "Code" }),
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "Likely meaning" }),
+            /* @__PURE__ */ jsx("th", { className: "px-4 py-3 font-semibold", children: "What to do" })
+          ] }) }),
+          /* @__PURE__ */ jsx("tbody", { children: codes.map(([code, meaning, action]) => /* @__PURE__ */ jsxs("tr", { className: "border-t border-gray-200 align-top", children: [
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 font-bold text-primary whitespace-nowrap", children: code }),
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 text-gray-800", children: meaning }),
+            /* @__PURE__ */ jsx("td", { className: "px-4 py-3 text-gray-700", children: action })
+          ] }, code)) })
+        ] }) }),
+        /* @__PURE__ */ jsx("p", { className: "mt-6 text-sm text-gray-700", children: "Note: exact code wording varies by model (e.g. Greenstar generations). Legal warning: internal gas appliance work must be carried out by a Gas Safe registered engineer under the Gas Safety (Installation and Use) Regulations 1998 (Regulation 3). Illegal gas work can lead to prosecution, large fines, and possible imprisonment." }),
+        /* @__PURE__ */ jsxs("div", { className: "mt-8 flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/service", className: "inline-flex rounded-lg bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700", children: "Book a Boiler Service" }),
+          /* @__PURE__ */ jsx("a", { href: "/book/quote/repair", className: "inline-flex rounded-lg border border-red-600 bg-white px-5 py-3 text-red-700 font-semibold hover:bg-red-50", children: "Book a Boiler Repair" }),
+          /* @__PURE__ */ jsx("a", { href: "/advice/worcester-boiler-help", className: "inline-flex rounded-lg border border-gray-300 px-5 py-3 text-gray-700 font-semibold", children: "Back to Worcester help" })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_47 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: WorcesterFaultCodesPage
+}, Symbol.toStringTag, { value: "Module" }));
 const SECTIONS = [
   { id: "agreement", title: "1. Agreement to Terms" },
   { id: "services", title: "2. Services" },
@@ -16168,7 +17578,7 @@ const TermsSection = ({
   ),
   /* @__PURE__ */ jsx("div", { className: "space-y-4 text-base text-gray-700 leading-relaxed", children })
 ] });
-const __vite_glob_0_37 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_48 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: TermsConditionsPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -16557,7 +17967,7 @@ function Welcome({ auth, laravelVersion, phpVersion }) {
     ] })
   ] });
 }
-const __vite_glob_0_38 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_49 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: Welcome
 }, Symbol.toStringTag, { value: "Module" }));
@@ -16566,7 +17976,7 @@ createServer(
     page,
     render: renderToString,
     resolve: (name) => {
-      const pages = /* @__PURE__ */ Object.assign({ "./Pages/About/AboutPage.jsx": __vite_glob_0_0, "./Pages/Admin/BasePrice.jsx": __vite_glob_0_1, "./Pages/Admin/BoilerCatalog.jsx": __vite_glob_0_2, "./Pages/Admin/CheckoutCoupons.jsx": __vite_glob_0_3, "./Pages/Admin/Orders/Management.jsx": __vite_glob_0_4, "./Pages/Admin/PricingOverrides.jsx": __vite_glob_0_5, "./Pages/Admin/RadiatorPrice.jsx": __vite_glob_0_6, "./Pages/Admin/Scheduling.jsx": __vite_glob_0_7, "./Pages/Auth/ConfirmPassword.jsx": __vite_glob_0_8, "./Pages/Auth/ForgotPassword.jsx": __vite_glob_0_9, "./Pages/Auth/Login.jsx": __vite_glob_0_10, "./Pages/Auth/Register.jsx": __vite_glob_0_11, "./Pages/Auth/ResetPassword.jsx": __vite_glob_0_12, "./Pages/Auth/VerifyEmail.jsx": __vite_glob_0_13, "./Pages/Book/Home.jsx": __vite_glob_0_14, "./Pages/Book/InstallPage.jsx": __vite_glob_0_15, "./Pages/Book/NewBoilerPage.jsx": __vite_glob_0_16, "./Pages/Book/Payment/Cancelled.jsx": __vite_glob_0_17, "./Pages/Book/Payment/Confirmed.jsx": __vite_glob_0_18, "./Pages/Book/Payment/Failed.jsx": __vite_glob_0_19, "./Pages/Book/PowerFlushPage.jsx": __vite_glob_0_20, "./Pages/Book/QuotePage.jsx": __vite_glob_0_21, "./Pages/Book/RepairCheckout.jsx": __vite_glob_0_22, "./Pages/Book/RepairPage.jsx": __vite_glob_0_23, "./Pages/Book/ServiceCheckout.jsx": __vite_glob_0_24, "./Pages/Book/ServicePage.jsx": __vite_glob_0_25, "./Pages/Book/ServiceResults.jsx": __vite_glob_0_26, "./Pages/ComingSoon/ComingSoon.jsx": __vite_glob_0_27, "./Pages/Dashboard.jsx": __vite_glob_0_28, "./Pages/Home.jsx": __vite_glob_0_29, "./Pages/OrderSummary/OrderSummary.jsx": __vite_glob_0_30, "./Pages/PrivacyPolicyPage.jsx": __vite_glob_0_31, "./Pages/Profile/Edit.jsx": __vite_glob_0_32, "./Pages/Profile/Partials/DeleteUserForm.jsx": __vite_glob_0_33, "./Pages/Profile/Partials/UpdatePasswordForm.jsx": __vite_glob_0_34, "./Pages/Profile/Partials/UpdateProfileInformationForm.jsx": __vite_glob_0_35, "./Pages/Quotation.jsx": __vite_glob_0_36, "./Pages/TermsConditionsPage.jsx": __vite_glob_0_37, "./Pages/Welcome.jsx": __vite_glob_0_38 });
+      const pages = /* @__PURE__ */ Object.assign({ "./Pages/About/AboutPage.jsx": __vite_glob_0_0, "./Pages/Admin/BasePrice.jsx": __vite_glob_0_1, "./Pages/Admin/BoilerCatalog.jsx": __vite_glob_0_2, "./Pages/Admin/CheckoutCoupons.jsx": __vite_glob_0_3, "./Pages/Admin/Orders/Management.jsx": __vite_glob_0_4, "./Pages/Admin/PricingOverrides.jsx": __vite_glob_0_5, "./Pages/Admin/RadiatorPrice.jsx": __vite_glob_0_6, "./Pages/Admin/Scheduling.jsx": __vite_glob_0_7, "./Pages/Auth/ConfirmPassword.jsx": __vite_glob_0_8, "./Pages/Auth/ForgotPassword.jsx": __vite_glob_0_9, "./Pages/Auth/Login.jsx": __vite_glob_0_10, "./Pages/Auth/Register.jsx": __vite_glob_0_11, "./Pages/Auth/ResetPassword.jsx": __vite_glob_0_12, "./Pages/Auth/VerifyEmail.jsx": __vite_glob_0_13, "./Pages/Book/Home.jsx": __vite_glob_0_14, "./Pages/Book/InstallPage.jsx": __vite_glob_0_15, "./Pages/Book/NewBoilerPage.jsx": __vite_glob_0_16, "./Pages/Book/Payment/Cancelled.jsx": __vite_glob_0_17, "./Pages/Book/Payment/Confirmed.jsx": __vite_glob_0_18, "./Pages/Book/Payment/Failed.jsx": __vite_glob_0_19, "./Pages/Book/PowerFlushPage.jsx": __vite_glob_0_20, "./Pages/Book/QuotePage.jsx": __vite_glob_0_21, "./Pages/Book/RepairCheckout.jsx": __vite_glob_0_22, "./Pages/Book/RepairPage.jsx": __vite_glob_0_23, "./Pages/Book/ServiceCheckout.jsx": __vite_glob_0_24, "./Pages/Book/ServicePage.jsx": __vite_glob_0_25, "./Pages/Book/ServiceResults.jsx": __vite_glob_0_26, "./Pages/ComingSoon/ComingSoon.jsx": __vite_glob_0_27, "./Pages/Dashboard.jsx": __vite_glob_0_28, "./Pages/Home.jsx": __vite_glob_0_29, "./Pages/OrderSummary/OrderSummary.jsx": __vite_glob_0_30, "./Pages/PrivacyPolicyPage.jsx": __vite_glob_0_31, "./Pages/Profile/Edit.jsx": __vite_glob_0_32, "./Pages/Profile/Partials/DeleteUserForm.jsx": __vite_glob_0_33, "./Pages/Profile/Partials/UpdatePasswordForm.jsx": __vite_glob_0_34, "./Pages/Profile/Partials/UpdateProfileInformationForm.jsx": __vite_glob_0_35, "./Pages/Quotation.jsx": __vite_glob_0_36, "./Pages/Seo/AdviceArticlePage.jsx": __vite_glob_0_37, "./Pages/Seo/BoilerPressureDroppingPage.jsx": __vite_glob_0_38, "./Pages/Seo/BoilerPressureIncreasingPage.jsx": __vite_glob_0_39, "./Pages/Seo/BoilerProblemsHubPage.jsx": __vite_glob_0_40, "./Pages/Seo/IdealBoilerHelpPage.jsx": __vite_glob_0_41, "./Pages/Seo/IdealBoilerNoisePage.jsx": __vite_glob_0_42, "./Pages/Seo/IdealFaultCodesPage.jsx": __vite_glob_0_43, "./Pages/Seo/VaillantBoilerHelpPage.jsx": __vite_glob_0_44, "./Pages/Seo/VaillantFaultCodesPage.jsx": __vite_glob_0_45, "./Pages/Seo/WorcesterBoilerHelpPage.jsx": __vite_glob_0_46, "./Pages/Seo/WorcesterFaultCodesPage.jsx": __vite_glob_0_47, "./Pages/TermsConditionsPage.jsx": __vite_glob_0_48, "./Pages/Welcome.jsx": __vite_glob_0_49 });
       return pages[`./Pages/${name}.jsx`];
     },
     setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props })

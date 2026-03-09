@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\RadiatorPriceController;
 use App\Http\Controllers\Admin\PricingOverridesController;
 use App\Http\Controllers\Admin\SchedulingController;
 use App\Http\Controllers\GoogleReviewController;
+use Illuminate\Support\Str;
 
 
 Route::get('/health', function () {
@@ -126,6 +127,93 @@ Route::inertia('/privacy-policy', 'PrivacyPolicyPage', [
 Route::inertia('/terms-conditions', 'TermsConditionsPage', [
     'pageTitle' => 'Terms & Conditions',
 ])->name('terms.conditions');
+
+Route::inertia('/advice/boiler-problems', 'Seo/BoilerProblemsHubPage', [
+    'pageTitle' => 'Boiler Problems Advice Leeds',
+])->name('seo.boiler.problems');
+
+Route::inertia('/advice/ideal-boiler-making-a-noise', 'Seo/IdealBoilerNoisePage', [
+    'pageTitle' => 'Ideal Boiler Making a Noise',
+])->name('seo.ideal.boiler.noise');
+
+Route::inertia('/advice/boiler-pressure-keeps-increasing', 'Seo/BoilerPressureIncreasingPage', [
+    'pageTitle' => 'Boiler Pressure Keeps Increasing',
+])->name('seo.boiler.pressure.increasing');
+
+Route::inertia('/advice/boiler-pressure-keeps-dropping', 'Seo/BoilerPressureDroppingPage', [
+    'pageTitle' => 'Boiler Pressure Keeps Dropping',
+])->name('seo.boiler.pressure.dropping');
+
+
+$seoAdviceArticles = [
+    'boiler-losing-pressure' => 'Boiler Losing Pressure: Causes and Next Steps',
+    'boiler-pressure-too-high' => 'Boiler Pressure Too High: Why It Happens',
+    'vaillant-f75-error-code' => 'Vaillant F75 Error Code: Common Causes',
+    'vaillant-f72-error-code' => 'Vaillant F72 Error Code: Sensor Mismatch Guide',
+    'ideal-f2-error-code' => 'Ideal F2 Error Code: Flame Loss Explained',
+    'worcester-ea-fault-code' => 'Worcester EA Fault Code: What It Usually Means',
+    'boiler-ticking-noise' => 'Boiler Ticking Noise: Normal or Fault?',
+    'boiler-kettling-noise' => 'Boiler Kettling Noise: Why It Happens',
+    'boiler-fan-not-working' => 'Boiler Fan Not Working: Signs and Action',
+    'boiler-no-hot-water' => 'Boiler Working But No Hot Water',
+    'radiators-not-heating-up' => 'Radiators Not Heating Up Properly',
+    'boiler-overflow-pipe-leaking' => 'Boiler Overflow / Discharge Pipe Leaking',
+    'expansion-vessel-fault' => 'Expansion Vessel Fault Symptoms',
+    'filling-loop-left-open' => 'Filling Loop Left Open: Pressure Problems',
+    'frozen-condensate-pipe' => 'Frozen Condensate Pipe: Boiler Not Firing',
+    'boiler-ignition-lockout' => 'Boiler Ignition Lockout: What to Do',
+    'boiler-keeps-needing-reset' => 'Boiler Keeps Needing Reset',
+    'boiler-short-cycling' => 'Boiler Short Cycling: Causes and Fixes',
+    'air-in-heating-system' => 'Air in Heating System: Symptoms and Action',
+    'boiler-service-vs-repair' => 'Boiler Service vs Boiler Repair: Which One to Book?',
+    'how-often-service-boiler' => 'How Often Should You Service a Boiler?',
+    'leeds-boiler-service-guide' => 'Boiler Service in Leeds: What to Expect',
+    'leeds-boiler-repair-guide' => 'Boiler Repair in Leeds: Fault-First Booking Guide',
+    'vaillant-fan-fault' => 'Vaillant Fan Fault Symptoms',
+    'ideal-low-water-pressure' => 'Ideal Low Water Pressure Faults',
+    'worcester-c6-c7-faults' => 'Worcester C6 / C7 Faults Explained',
+    'boiler-pressure-guide-1-to-1-5-bar' => 'Boiler Pressure Guide: Why 1 to 1.5 Bar Matters',
+];
+
+foreach ($seoAdviceArticles as $slug => $title) {
+    Route::inertia("/advice/{$slug}", 'Seo/AdviceArticlePage', [
+        'pageTitle' => $title,
+        'articleSlug' => $slug,
+    ]);
+}
+
+
+Route::inertia('/advice/ideal-boiler-help', 'Seo/IdealBoilerHelpPage', [
+    'pageTitle' => 'Ideal Boiler Problems & Fault Codes',
+])->name('seo.ideal.help');
+
+Route::inertia('/advice/ideal-boiler-fault-codes', 'Seo/IdealFaultCodesPage', [
+    'pageTitle' => 'Ideal Boiler Fault Codes',
+])->name('seo.ideal.codes');
+
+Route::inertia('/advice/vaillant-boiler-help', 'Seo/VaillantBoilerHelpPage', [
+    'pageTitle' => 'Vaillant Boiler Problems & Fault Codes',
+])->name('seo.vaillant.help');
+
+Route::inertia('/advice/vaillant-boiler-fault-codes', 'Seo/VaillantFaultCodesPage', [
+    'pageTitle' => 'Vaillant Boiler Fault Codes',
+])->name('seo.vaillant.codes');
+
+Route::inertia('/advice/worcester-boiler-help', 'Seo/WorcesterBoilerHelpPage', [
+    'pageTitle' => 'Worcester Boiler Problems & Fault Codes',
+])->name('seo.worcester.help');
+
+Route::inertia('/advice/worcester-boiler-fault-codes', 'Seo/WorcesterFaultCodesPage', [
+    'pageTitle' => 'Worcester Boiler Fault Codes',
+])->name('seo.worcester.codes');
+
+
+Route::get('/advice/{slug}', function (string $slug) {
+    return Inertia::render('Seo/AdviceArticlePage', [
+        'pageTitle' => Str::of($slug)->replace('-', ' ')->title()->toString(),
+        'articleSlug' => $slug,
+    ]);
+})->where('slug', '[a-z0-9-]+')->name('seo.advice.article.dynamic');
 
 
 // Route::inertia('/order-success', 'OrderSuccess/OrderSuccess', [
