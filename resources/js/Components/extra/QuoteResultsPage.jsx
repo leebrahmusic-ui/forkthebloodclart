@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     FiInfo,
     FiX,
@@ -14,6 +14,15 @@ import {
 import { AiOutlineQuestion } from "react-icons/ai";
 import { router } from "@inertiajs/react";
 import DetailsQuoteSidebar from "./QuoteResultPage/DetailsQuote";
+
+const SORT_OPTIONS = [
+    { value: "recommended", label: "Recommended" },
+    { value: "price_low", label: "Price: Low to high" },
+    { value: "price_high", label: "Price: High to low" },
+    { value: "warranty_high", label: "Warranty: Longest first" },
+    { value: "kw_low", label: "Output (kW): Low to high" },
+    { value: "brand_az", label: "Brand: A to Z" },
+];
 
 export default function QuoteResultsPage({ answers }) {
     const isCompatibilityDependentItem = (label = "") => {
@@ -52,13 +61,13 @@ export default function QuoteResultsPage({ answers }) {
     const [activeQuote, setActiveQuote] = useState(null);
     const [detailsQuote, setDetailsQuote] = useState(null);
     const [selectedPower, setSelectedPower] = useState("25");
-    const [visibleCount, setVisibleCount] = useState(3);
     const [showInstallTimeInfo, setShowInstallTimeInfo] = useState(false);
     const [showGasSafeInfo, setShowGasSafeInfo] = useState(false);
     const [showNextDayInfo, setShowNextDayInfo] = useState(false);
     const [showWarrantyInfo, setShowWarrantyInfo] = useState(false);
     const [activeCardIndex, setActiveCardIndex] = useState(0);
     const [openCompatibilityTip, setOpenCompatibilityTip] = useState(null);
+    const [sortBy, setSortBy] = useState("recommended");
     const mobileCarouselRef = useRef(null);
 
     const [productDetails, setProductDetails] = useState({});
@@ -158,7 +167,42 @@ export default function QuoteResultsPage({ answers }) {
         return null;
     };
 
-    const visibleProducts = products.slice(0, visibleCount);
+    const sortedProducts = useMemo(() => {
+        if (!Array.isArray(products)) return [];
+        if (sortBy === "recommended") return products;
+
+        const ranked = products.map((p, i) => ({ p, i }));
+
+        ranked.sort((a, b) => {
+            const pa = Number(calculatePrice(a.p) || 0);
+            const pb = Number(calculatePrice(b.p) || 0);
+            const wa = Number(a.p?.warrantyYears || 0);
+            const wb = Number(b.p?.warrantyYears || 0);
+            const ka = Number(a.p?.kw || 0);
+            const kb = Number(b.p?.kw || 0);
+            const ba = String(a.p?.brand || "");
+            const bb = String(b.p?.brand || "");
+
+            if (sortBy === "price_low") return pa - pb || a.i - b.i;
+            if (sortBy === "price_high") return pb - pa || a.i - b.i;
+            if (sortBy === "warranty_high") return wb - wa || a.i - b.i;
+            if (sortBy === "kw_low") return ka - kb || a.i - b.i;
+            if (sortBy === "brand_az") return ba.localeCompare(bb) || a.i - b.i;
+
+            return a.i - b.i;
+        });
+
+        return ranked.map((x) => x.p);
+    }, [products, sortBy]);
+
+    const visibleProducts = sortedProducts;
+
+    useEffect(() => {
+        setActiveCardIndex(0);
+        const container = mobileCarouselRef.current;
+        if (!container) return;
+        container.scrollTo({ left: 0, behavior: "smooth" });
+    }, [sortBy]);
 
     useEffect(() => {
         if (activeCardIndex >= visibleProducts.length) {
@@ -401,6 +445,35 @@ export default function QuoteResultsPage({ answers }) {
 
             {/* QUOTE CARDS GRID */}
             <div className="max-w-7xl mx-auto">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                    <div>
+                        <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                            Packages
+                        </div>
+                        <div className="text-sm font-semibold text-slate-900">
+                            {visibleProducts.length} options available
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-slate-600">Sort by</span>
+                        <div className="relative">
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="appearance-none rounded-full border border-slate-300 bg-white py-2 pl-3 pr-9 text-xs font-semibold text-slate-800 shadow-sm hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            >
+                                {SORT_OPTIONS.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <FiChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                        </div>
+                    </div>
+                </div>
+
                 <div className="mb-4 flex gap-2 overflow-x-auto pb-1 lg:hidden">
                     {visibleProducts.map((product, index) => (
                         <button
@@ -818,33 +891,6 @@ export default function QuoteResultsPage({ answers }) {
                 })}
                 </div>
             </div>
-
-            {products.length > 3 && (
-                <div
-                    className="max-w-7xl mx-auto mt-12 hidden justify-center transition-all duration-300 ease-out lg:flex
-"
-                >
-                    {visibleCount < products.length ? (
-                        <button
-                            onClick={() =>
-                                setVisibleCount((prev) =>
-                                    Math.min(prev + 3, products.length)
-                                )
-                            }
-                            className="px-8 py-3 rounded-xl border border-primary/20 bg-white cursor-pointer text-primary font-semibold hover:bg-primary/5 transition-all shadow"
-                        >
-                            Show more packages
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => setVisibleCount(3)}
-                            className="px-8 py-3 rounded-xl bg-slate-200 cursor-pointer text-dark font-semibold hover:bg-slate-300 transition-all shadow"
-                        >
-                            Show fewer packages
-                        </button>
-                    )}
-                </div>
-            )}
 
             {/* WHAT'S INCLUDED SIDEBAR */}
             {activeQuote && (
