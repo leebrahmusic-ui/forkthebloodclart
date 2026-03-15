@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\PricingOverrideService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 
 class BoilerCatalogController extends Controller
@@ -75,5 +77,28 @@ class BoilerCatalogController extends Controller
         PricingOverrideService::resetToDefault('catalog', 'products');
 
         return back()->with('success', 'Boiler catalogue reset to defaults.');
+    }
+
+    public function uploadImage(Request $request)
+    {
+        $data = $request->validate([
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,avif', 'max:5120'],
+        ]);
+
+        $file = $data['image'];
+
+        $dir = public_path('uploads/boilers');
+        if (!File::exists($dir)) {
+            File::makeDirectory($dir, 0755, true);
+        }
+
+        $name = now()->format('YmdHis') . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $file->move($dir, $name);
+
+        return response()->json([
+            'data' => [
+                'url' => '/uploads/boilers/' . $name,
+            ],
+        ]);
     }
 }

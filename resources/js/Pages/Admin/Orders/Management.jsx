@@ -166,7 +166,6 @@ function normalizePagination(paginated) {
 function Pagination({ paginated }) {
     const { meta, links } = normalizePagination(paginated);
     // if (!meta || !links) return null;
-    console.log("Bookings Data", paginated);
     const current = paginated.current_page || 1;
     const last = paginated.last_page || 1;
 
@@ -266,6 +265,7 @@ export default function Management() {
             {
                 q: fd.get("q") || "",
                 per_page: fd.get("per_page") || 10,
+                status: fd.get("status") || filters?.status || "all",
             },
             { preserveScroll: true, preserveState: true, replace: true }
         );
@@ -489,7 +489,7 @@ export default function Management() {
 
                     {/* Filters */}
                     <form onSubmit={onSearch} className="mb-5 rounded-2xl border bg-white p-4">
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_140px]">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_180px_140px]">
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs font-semibold text-slate-600">
                                     Search
@@ -515,6 +515,23 @@ export default function Management() {
                                     <option value={15}>15 rows</option>
                                     <option value={25}>25 rows</option>
                                     <option value={50}>50 rows</option>
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-semibold text-slate-600">
+                                    Appointment status
+                                </label>
+                                <select
+                                    name="status"
+                                    defaultValue={filters?.status || "all"}
+                                    className="w-full rounded-xl border px-3 py-2.5 text-sm"
+                                >
+                                    <option value="all">All</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
 
@@ -612,8 +629,7 @@ export default function Management() {
                                                             <Spinner className="h-3.5 w-3.5" />
                                                             Saving…
                                                         </span>
-                                                    ) : (
-                                                        ``)}
+                                                    ) : null}
                                                 </div>
 
                                                 <div className="mt-2 grid grid-cols-1 gap-1 text-sm text-slate-600 sm:grid-cols-3">
@@ -672,26 +688,25 @@ export default function Management() {
                                                         </div>
 
                                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                                            {/* Payment */}
-                                                            {/* <div className="flex flex-col gap-1">
-                                <label className="text-xs font-semibold text-slate-600">
-                                  Payment status
-                                </label>
-                                <select
-                                  value={b.payment_status || "pending"}
-                                  className="w-full rounded-xl border px-3 py-2.5 text-sm sm:w-[220px]"
-                                  disabled={isSavingRow}
-                                  onChange={(e) =>
-                                    updateStatus(b.id, "payment_status", e.target.value)
-                                  }
-                                >
-                                  {PAYMENT_OPTIONS.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                      {o.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div> */}
+                                                                                                                        <div className="flex flex-col gap-1">
+                                                                                                                                <label className="text-xs font-semibold text-slate-600">
+                                                                                                                                        Payment status
+                                                                                                                                </label>
+                                                                                                                                <select
+                                                                                                                                        value={b.payment_status || "pending"}
+                                                                                                                                        className="w-full rounded-xl border px-3 py-2.5 text-sm sm:w-[220px]"
+                                                                                                                                        disabled={isSavingRow}
+                                                                                                                                        onChange={(e) =>
+                                                                                                                                                updateStatus(b.id, "payment_status", e.target.value)
+                                                                                                                                        }
+                                                                                                                                >
+                                                                                                                                        {PAYMENT_OPTIONS.map((o) => (
+                                                                                                                                                <option key={o.value} value={o.value}>
+                                                                                                                                                        {o.label}
+                                                                                                                                                </option>
+                                                                                                                                        ))}
+                                                                                                                                </select>
+                                                                                                                        </div>
 
                                                             {/* Appointment */}
                                                             <div className="flex flex-col gap-1">

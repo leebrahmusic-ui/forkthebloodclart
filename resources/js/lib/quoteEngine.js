@@ -301,9 +301,15 @@ function computeAddOns(answers, boilerType, { ADDONS, RULES }) {
 =========================== */
 
 function combiKwMatch(productKw, targetKw) {
-    if (targetKw === 24) return productKw === 24 || productKw === 25;
-    if (targetKw === 30) return productKw === 30;
-    if (targetKw === 35) return productKw === 35 || productKw === 36;
+    const kw = Number(productKw);
+    if (!Number.isFinite(kw)) return false;
+
+    // Allow small ranges so newly added variants (e.g. 26, 32, 34)
+    // still appear in the right target bucket.
+    if (targetKw === 24) return kw >= 22 && kw <= 27;
+    if (targetKw === 30) return kw >= 28 && kw <= 32;
+    if (targetKw === 35) return kw >= 33 && kw <= 38;
+
     return false;
 }
 
@@ -313,7 +319,6 @@ function combiKwMatch(productKw, targetKw) {
 
 export function buildBoilerQuote({ answers, questions = [] }) {
     const { RULES, ADDONS, PRODUCTS } = applyEffectiveConfig();
-    console.log("EFFECTIVE TRV:", ADDONS.TRV.unitPrice, "MAX:", RULES.TRV_MAX_QTY);
     const qMap = questionMap(questions);
 
     const radsBucket = parseRadsBucket(label(answers?.radiators));

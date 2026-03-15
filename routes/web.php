@@ -398,6 +398,7 @@ Route::middleware(['auth']) // add your admin middleware if you have one
         Route::get('/boilers', [BoilerCatalogController::class, 'index'])->name('boilers.index');
         Route::post('/boilers/save', [BoilerCatalogController::class, 'save'])->name('boilers.save');
         Route::post('/boilers/reset', [BoilerCatalogController::class, 'reset'])->name('boilers.reset');
+        Route::post('/boilers/upload-image', [BoilerCatalogController::class, 'uploadImage'])->name('boilers.uploadImage');
 
         Route::get('/coupons', [CheckoutCouponController::class, 'index'])->name('coupons.index');
         Route::post('/coupons', [CheckoutCouponController::class, 'store'])->name('coupons.store');

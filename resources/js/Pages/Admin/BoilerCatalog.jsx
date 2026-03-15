@@ -108,6 +108,16 @@ function labelType(type) {
     return TYPE_OPTIONS.find((x) => x.value === type)?.label || type;
 }
 
+function parseKwList(input = "") {
+    const nums = String(input)
+        .split(",")
+        .map((x) => Number(String(x).trim()))
+        .filter((x) => Number.isFinite(x) && x > 0)
+        .map((x) => Math.round(x));
+
+    return Array.from(new Set(nums));
+}
+
 export default function BoilerCatalog() {
     const { catalogOverride } = usePage().props;
 
@@ -123,6 +133,16 @@ export default function BoilerCatalog() {
     const [query, setQuery] = useState("");
     const [typeFilter, setTypeFilter] = useState("all");
     const [openAdvanced, setOpenAdvanced] = useState({});
+    const [uploading, setUploading] = useState({});
+    const [uploadError, setUploadError] = useState("");
+    const [quickAdd, setQuickAdd] = useState({
+        type: "combi",
+        brand: "",
+        model: "",
+        warrantyYears: 10,
+        priceType: "fixed",
+        kwCsv: "24,30,35",
+    });
 
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -181,6 +201,85 @@ export default function BoilerCatalog() {
         setProducts((prev) => prev.filter((_, i) => i !== idx));
     };
 
+    const addBrandModelVariants = () => {
+        const brand = String(quickAdd.brand || "").trim();
+        const model = String(quickAdd.model || "").trim();
+        const kws = parseKwList(quickAdd.kwCsv);
+
+        if (!brand || !model || kws.length === 0) {
+            window.alert("Please enter brand, model and at least one kW value.");
+            return;
+        }
+
+        const rows = kws.map((kw) =>
+            toEditorRow({
+                id: `${slugify(brand)}_${slugify(model)}_${kw}`,
+                type: quickAdd.type,
+                brand,
+                model,
+                warrantyYears: Number(quickAdd.warrantyYears || 0),
+                kw,
+                priceType: quickAdd.priceType,
+                basePrice: quickAdd.type === "combi" ? null : null,
+                boilerCost: quickAdd.type === "combi" ? null : null,
+                minMargin: quickAdd.type === "combi" ? null : 750,
+                images: [],
+                includes: [],
+                notes: [],
+            })
+        );
+
+        setProducts((prev) => [...rows, ...prev]);
+    };
+
+    const uploadProductImage = async (idx, file) => {
+        if (!file) return;
+
+        setUploadError("");
+        setUploading((prev) => ({ ...prev, [idx]: true }));
+
+        try {
+            const fd = new FormData();
+            fd.append("image", file);
+
+            const token =
+                document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+
+            const response = await fetch(route("admin.boilers.uploadImage"), {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": token,
+                    Accept: "application/json",
+                },
+                body: fd,
+            });
+
+            if (!response.ok) {
+                throw new Error("Image upload failed");
+            }
+
+            const payload = await response.json();
+            const url = payload?.data?.url;
+
+            if (!url) {
+                throw new Error("Upload returned no URL");
+            }
+
+            setProducts((prev) => {
+                const next = [...prev];
+                const row = next[idx];
+                const existing = textToList(row.imagesText);
+                const merged = Array.from(new Set([url, ...existing]));
+                next[idx] = { ...row, imagesText: merged.join("\n") };
+                return next;
+            });
+        } catch (e) {
+            setUploadError("Could not upload image. Please try again.");
+        } finally {
+            setUploading((prev) => ({ ...prev, [idx]: false }));
+        }
+    };
+
     const saveCatalog = () => {
         setSaving(true);
         router.post(
@@ -213,8 +312,80 @@ export default function BoilerCatalog() {
                 <div className="rounded-2xl border border-gray-200 bg-white p-5">
                     <h1 className="text-2xl font-bold text-gray-900">Boiler Catalogue Management</h1>
                     <p className="mt-1 text-sm text-slate-600 leading-relaxed">
-                        Simple mode for day-to-day updates. Boilers are grouped by type and kW below.
+                        Add/edit products by type and kW. kW drives when a boiler appears in quote results.
                     </p>
+
+                    <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                        <div className="text-sm font-semibold text-emerald-900">Quick add brand + model variants</div>
+                        <div className="mt-1 text-xs text-emerald-800">
+                            Create multiple kW versions in one click (example: 24,30,35).
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-6 gap-2">
+                            <select
+                                value={quickAdd.type}
+                                onChange={(e) => setQuickAdd((p) => ({ ...p, type: e.target.value }))}
+                                className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                            >
+                                {TYPE_OPTIONS.map((o) => (
+                                    <option key={o.value} value={o.value}>{o.label}</option>
+                                ))}
+                            </select>
+
+                            <input
+                                value={quickAdd.brand}
+                                onChange={(e) => setQuickAdd((p) => ({ ...p, brand: e.target.value }))}
+                                placeholder="Brand (e.g. Worcester Bosch)"
+                                className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                            />
+
+                            <input
+                                value={quickAdd.model}
+                                onChange={(e) => setQuickAdd((p) => ({ ...p, model: e.target.value }))}
+                                placeholder="Model (e.g. Greenstar 4000)"
+                                className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                            />
+
+                            <input
+                                type="number"
+                                min="0"
+                                value={quickAdd.warrantyYears}
+                                onChange={(e) => setQuickAdd((p) => ({ ...p, warrantyYears: e.target.value }))}
+                                placeholder="Warranty"
+                                className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                            />
+
+                            <select
+                                value={quickAdd.priceType}
+                                onChange={(e) => setQuickAdd((p) => ({ ...p, priceType: e.target.value }))}
+                                className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                            >
+                                {PRICE_TYPE_OPTIONS.map((o) => (
+                                    <option key={o.value} value={o.value}>{o.label}</option>
+                                ))}
+                            </select>
+
+                            <input
+                                value={quickAdd.kwCsv}
+                                onChange={(e) => setQuickAdd((p) => ({ ...p, kwCsv: e.target.value }))}
+                                placeholder="kW list: 24,30,35"
+                                className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                            />
+                        </div>
+
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                onClick={addBrandModelVariants}
+                                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
+                            >
+                                Add brand/model variants
+                            </button>
+                            <div className="text-xs text-emerald-900 self-center">
+                                Combi guidance: typical bands are 24 / 30 / 35(36) kW.
+                            </div>
+                        </div>
+                    </div>
 
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
@@ -269,6 +440,12 @@ export default function BoilerCatalog() {
                             Reset to defaults
                         </button>
                     </div>
+
+                    {uploadError ? (
+                        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                            {uploadError}
+                        </div>
+                    ) : null}
 
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                         <input
@@ -385,16 +562,54 @@ export default function BoilerCatalog() {
                                                             />
                                                         </div>
 
+                                                        <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                                <div className="text-xs font-semibold text-slate-700">Product images</div>
+                                                                <label className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-100">
+                                                                    {uploading[idx] ? "Uploading..." : "Upload image"}
+                                                                    <input
+                                                                        type="file"
+                                                                        accept="image/*"
+                                                                        className="hidden"
+                                                                        disabled={!!uploading[idx]}
+                                                                        onChange={(e) => {
+                                                                            const file = e.target.files?.[0];
+                                                                            uploadProductImage(idx, file);
+                                                                            e.target.value = "";
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                            </div>
+
+                                                            <textarea
+                                                                value={p.imagesText}
+                                                                onChange={(e) => update(idx, "imagesText", e.target.value)}
+                                                                rows={3}
+                                                                placeholder="Image URLs (one per line)"
+                                                                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs"
+                                                            />
+                                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                                {textToList(p.imagesText).slice(0, 4).map((src) => (
+                                                                    <img
+                                                                        key={src}
+                                                                        src={src}
+                                                                        alt="Boiler"
+                                                                        className="h-12 w-12 rounded-md border object-cover bg-white"
+                                                                        loading="lazy"
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+
                                                         {openAdvanced[idx] && (
                                                             <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-3">
-                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                                     <input
                                                                         value={p.id}
                                                                         onChange={(e) => update(idx, "id", e.target.value)}
                                                                         placeholder="ID (leave blank to auto-generate)"
                                                                         className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                                                                     />
-                                                                    <textarea value={p.imagesText} onChange={(e) => update(idx, "imagesText", e.target.value)} rows={4} placeholder="Image URLs (one per line)" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" />
                                                                     <textarea value={p.includesText} onChange={(e) => update(idx, "includesText", e.target.value)} rows={4} placeholder="Includes (one per line)" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" />
                                                                 </div>
                                                                 <textarea value={p.notesText} onChange={(e) => update(idx, "notesText", e.target.value)} rows={3} placeholder="Notes (one per line)" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs" />
