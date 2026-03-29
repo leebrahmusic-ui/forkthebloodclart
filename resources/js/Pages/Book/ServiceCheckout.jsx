@@ -826,7 +826,7 @@ export default function ServiceCheckout() {
                 </div>
 
                 <GoogleReview />
-                <InstagramFeed />
+                <InstagramFeed theme="blue" />
                 </div>
             </BlueQuoteSkin>
         </>

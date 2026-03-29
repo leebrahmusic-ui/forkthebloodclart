@@ -10126,8 +10126,9 @@ function TechnicianButton() {
     }
   );
 }
-function InstagramFeed() {
+function InstagramFeed({ theme = "default" }) {
   const embedRef = useRef(null);
+  const isBlue = theme === "blue";
   useEffect(() => {
     const scriptId = "EmbedSocialHashtagScript";
     const existingScript = document.getElementById(scriptId);
@@ -10149,28 +10150,58 @@ function InstagramFeed() {
       }
     };
   }, []);
-  return /* @__PURE__ */ jsx("section", { className: "py-20 bg-transparent", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: [
-    /* @__PURE__ */ jsx("div", { className: "flex flex-col items-center text-center gap-6", children: /* @__PURE__ */ jsxs("div", { children: [
-      /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600", children: "Recent work" }),
-      /* @__PURE__ */ jsx("h2", { className: "mt-3 text-3xl sm:text-4xl font-semibold text-slate-900", children: "Leeds installs, call-outs & behind-the-scenes" }),
-      /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm sm:text-base text-slate-600", children: "Expect everything from installs to fixes and day‑to‑day updates — all real, all local." })
-    ] }) }),
-    /* @__PURE__ */ jsxs("div", { className: "mt-10 rounded-3xl bg-white/85 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 backdrop-blur-sm", children: [
-      /* @__PURE__ */ jsx("style", { children: `
+  return /* @__PURE__ */ jsx(
+    "section",
+    {
+      className: isBlue ? "py-20 quote-page-bg no-auto-dark-surface" : "py-20 bg-transparent",
+      children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: [
+        /* @__PURE__ */ jsx("div", { className: "flex flex-col items-center text-center gap-6", children: /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx(
+            "p",
+            {
+              className: isBlue ? "text-xs font-semibold uppercase tracking-[0.3em] text-cyan-100" : "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600",
+              children: "Recent work"
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            "h2",
+            {
+              className: isBlue ? "mt-3 text-3xl sm:text-4xl font-semibold text-white" : "mt-3 text-3xl sm:text-4xl font-semibold text-slate-900",
+              children: "Leeds installs, call-outs & behind-the-scenes"
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            "p",
+            {
+              className: isBlue ? "mt-2 text-sm sm:text-base text-cyan-100" : "mt-2 text-sm sm:text-base text-slate-600",
+              children: "Expect everything from installs to fixes and day‑to‑day updates — all real, all local."
+            }
+          )
+        ] }) }),
+        /* @__PURE__ */ jsxs(
+          "div",
+          {
+            className: isBlue ? "mt-10 rounded-3xl border border-white/30 bg-[var(--qb-panel)] p-4 shadow-[0_18px_45px_rgba(0,53,72,0.22)] no-auto-dark-card" : "mt-10 rounded-3xl bg-white/85 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 backdrop-blur-sm",
+            children: [
+              /* @__PURE__ */ jsx("style", { children: `
                         .embedsocial-hashtag .feed-powered-by-es {
                             display: none !important;
                         }
                     ` }),
-      /* @__PURE__ */ jsx(
-        "div",
-        {
-          ref: embedRef,
-          className: "embedsocial-hashtag",
-          "data-ref": "98d397d59cef083016e0312428376fe3ae4f8fe1"
-        }
-      )
-    ] })
-  ] }) });
+              /* @__PURE__ */ jsx(
+                "div",
+                {
+                  ref: embedRef,
+                  className: "embedsocial-hashtag",
+                  "data-ref": "98d397d59cef083016e0312428376fe3ae4f8fe1"
+                }
+              )
+            ]
+          }
+        )
+      ] })
+    }
+  );
 }
 const pageTitle = "Get a Quote";
 const SERVICE_KEYS = {
@@ -12454,7 +12485,7 @@ function ServiceCheckout() {
           ] })
         ] }),
         /* @__PURE__ */ jsx(GoogleReview, {}),
-        /* @__PURE__ */ jsx(InstagramFeed, {})
+        /* @__PURE__ */ jsx(InstagramFeed, { theme: "blue" })
       ] })
     ] })
   ] });

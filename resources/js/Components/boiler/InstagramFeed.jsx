@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from "react";
 
-export function InstagramFeed() {
+export function InstagramFeed({ theme = "default" }) {
     const embedRef = useRef(null);
+    const isBlue = theme === "blue";
 
     useEffect(() => {
         const scriptId = "EmbedSocialHashtagScript";
@@ -29,23 +30,53 @@ export function InstagramFeed() {
     }, []);
 
     return (
-        <section className="py-20 bg-transparent">
+        <section
+            className={
+                isBlue
+                    ? "py-20 quote-page-bg no-auto-dark-surface"
+                    : "py-20 bg-transparent"
+            }
+        >
             <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                 <div className="flex flex-col items-center text-center gap-6">
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600">
+                        <p
+                            className={
+                                isBlue
+                                    ? "text-xs font-semibold uppercase tracking-[0.3em] text-cyan-100"
+                                    : "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600"
+                            }
+                        >
                             Recent work
                         </p>
-                        <h2 className="mt-3 text-3xl sm:text-4xl font-semibold text-slate-900">
+                        <h2
+                            className={
+                                isBlue
+                                    ? "mt-3 text-3xl sm:text-4xl font-semibold text-white"
+                                    : "mt-3 text-3xl sm:text-4xl font-semibold text-slate-900"
+                            }
+                        >
                             Leeds installs, call-outs & behind-the-scenes
                         </h2>
-                        <p className="mt-2 text-sm sm:text-base text-slate-600">
+                        <p
+                            className={
+                                isBlue
+                                    ? "mt-2 text-sm sm:text-base text-cyan-100"
+                                    : "mt-2 text-sm sm:text-base text-slate-600"
+                            }
+                        >
                             Expect everything from installs to fixes and day‑to‑day updates — all real, all local.
                         </p>
                     </div>
                 </div>
 
-                <div className="mt-10 rounded-3xl bg-white/85 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 backdrop-blur-sm">
+                <div
+                    className={
+                        isBlue
+                            ? "mt-10 rounded-3xl border border-white/30 bg-[var(--qb-panel)] p-4 shadow-[0_18px_45px_rgba(0,53,72,0.22)] no-auto-dark-card"
+                            : "mt-10 rounded-3xl bg-white/85 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 backdrop-blur-sm"
+                    }
+                >
                     <style>{`
                         .embedsocial-hashtag .feed-powered-by-es {
                             display: none !important;
