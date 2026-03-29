@@ -29,7 +29,7 @@ export function InstagramFeed() {
     }, []);
 
     return (
-        <section className="bg-white py-20">
+        <section className="py-20 bg-transparent">
             <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                 <div className="flex flex-col items-center text-center gap-6">
                     <div>
@@ -45,7 +45,7 @@ export function InstagramFeed() {
                     </div>
                 </div>
 
-                <div className="mt-10 rounded-3xl bg-white p-4 shadow-sm">
+                <div className="mt-10 rounded-3xl bg-white/85 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 backdrop-blur-sm">
                     <style>{`
                         .embedsocial-hashtag .feed-powered-by-es {
                             display: none !important;

@@ -10149,13 +10149,13 @@ function InstagramFeed() {
       }
     };
   }, []);
-  return /* @__PURE__ */ jsx("section", { className: "bg-white py-20", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: [
+  return /* @__PURE__ */ jsx("section", { className: "py-20 bg-transparent", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: [
     /* @__PURE__ */ jsx("div", { className: "flex flex-col items-center text-center gap-6", children: /* @__PURE__ */ jsxs("div", { children: [
       /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600", children: "Recent work" }),
       /* @__PURE__ */ jsx("h2", { className: "mt-3 text-3xl sm:text-4xl font-semibold text-slate-900", children: "Leeds installs, call-outs & behind-the-scenes" }),
       /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm sm:text-base text-slate-600", children: "Expect everything from installs to fixes and day‑to‑day updates — all real, all local." })
     ] }) }),
-    /* @__PURE__ */ jsxs("div", { className: "mt-10 rounded-3xl bg-white p-4 shadow-sm", children: [
+    /* @__PURE__ */ jsxs("div", { className: "mt-10 rounded-3xl bg-white/85 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 backdrop-blur-sm", children: [
       /* @__PURE__ */ jsx("style", { children: `
                         .embedsocial-hashtag .feed-powered-by-es {
                             display: none !important;
