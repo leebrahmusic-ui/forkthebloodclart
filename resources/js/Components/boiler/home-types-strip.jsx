@@ -96,7 +96,7 @@ export function HomeTypesStrip() {
     return (
         <section className="bg-white py-20">
             {/* FLEX ROW ON DESKTOP — BOTH SIDES EXACT 50% */}
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0 lg:flex lg:items-center lg:gap-16">
+            <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0 lg:flex lg:items-center lg:gap-16">
                 {/* LEFT = 50% WIDTH */}
                 <div className="w-full lg:w-[40%] flex flex-col items-center text-center justify-between gap-10 mb-12 lg:mb-0">
                     <div>
@@ -118,14 +118,14 @@ export function HomeTypesStrip() {
                     <div className="flex items-center justify-center gap-4">
                         <button
                             onClick={handlePrev}
-                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white"
+                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-900 hover:text-white"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </button>
 
                         <button
                             onClick={handleNext}
-                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white"
+                            className="flex h-11 w-11 items-center cursor-pointer justify-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-900 hover:text-white"
                         >
                             <ArrowRight className="h-5 w-5" />
                         </button>
@@ -161,10 +161,10 @@ export function HomeTypesStrip() {
                                         xl:basis-[45%]
                                     "
                                 >
-                                    <div className="flex h-full relative flex-col items-center text-center justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                                    <div className="flex h-full relative flex-col items-center text-center justify-between rounded-3xl bg-white p-6 sm:p-8 shadow-sm">
                                         <div>
                                             {/* Top-right badge */}
-                                            <div className="absolute top-4 right-4 z-50 w-12 text-center h-12 inline-flex items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[8px] font-medium text-emerald-700 leading-2.5">
+                                            <div className="absolute top-4 right-4 z-50 w-12 text-center h-12 inline-flex items-center justify-center rounded-full bg-emerald-50 px-3 py-1 text-[8px] font-medium text-emerald-700 leading-2.5">
                                                 {type.tag}
                                             </div>
 

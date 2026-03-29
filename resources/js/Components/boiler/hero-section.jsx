@@ -24,7 +24,7 @@ export function HeroSection() {
                     <div className="grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="space-y-6 text-center flex flex-col items-center">
                             <h2 className="text-4xl sm:text-[40px] lg:text-[52px] font-semibold tracking-tight text-slate-900">
-                                <span className="uppercase">Boiler, heating & gas services in Leeds & Surrounding</span>
+                                <span className="font-sans normal-case tracking-[-0.015em]">Boiler, heating & gas services in Leeds & Surrounding</span>
                                 <span className="mt-3 block text-xl sm:text-2xl font-medium text-slate-600">
                                     Booking slots are available seven days a week for installations, servicing and repairs.
                                 </span>
@@ -41,7 +41,7 @@ export function HeroSection() {
                                 <button
                                     type="button"
                                     onClick={scrollToServices}
-                                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                                    className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                                 >
                                     See services below
                                 </button>
@@ -53,7 +53,7 @@ export function HeroSection() {
 
                         </div>
 
-                        <div className="relative overflow-hidden rounded-[24px] border border-slate-200/70 bg-white no-auto-dark-card p-4 sm:p-5 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
+                        <div className="relative overflow-hidden rounded-[24px] bg-white no-auto-dark-card p-4 sm:p-5 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
                             <div className="pointer-events-none absolute -right-16 -top-16 h-32 w-32 rounded-full bg-emerald-200/40 blur-2xl" />
                             <div className="flex flex-col items-center gap-2 text-center">
                                 <img
@@ -71,9 +71,9 @@ export function HeroSection() {
                                 </div>
                             </div>
 
-                            <div className="mt-3 rounded-2xl border border-emerald-200/70 bg-emerald-50/70 no-auto-dark-card px-3 py-2">
+                            <div className="mt-3 rounded-2xl bg-emerald-50/70 no-auto-dark-card px-3 py-2">
                                 <div className="flex flex-col items-center gap-1">
-                                    <span className="text-sm font-semibold text-slate-900">Order before 3pm</span>
+                                    <span className="text-sm font-semibold text-slate-900">Order before 4pm</span>
                                     <span className="text-xs font-semibold text-emerald-700">Next‑day installs available</span>
                                 </div>
                                 <div className="mt-2 text-xs text-slate-600">
@@ -83,14 +83,14 @@ export function HeroSection() {
 
                             <div className="mt-3 grid gap-2">
                                 <div className="grid gap-2 sm:grid-cols-2">
-                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5">
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5">
                                         <ShieldCheck className="h-5 w-5 text-emerald-600" />
                                         <div>
                                             <div className="text-sm font-semibold text-slate-900">Fully insured workmanship</div>
                                             <div className="text-xs text-slate-500">Public liability & workmanship protection on every job.</div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5">
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5">
                                         <BadgeCheck className="h-5 w-5 text-emerald-600" />
                                         <div>
                                             <div className="text-sm font-semibold text-slate-900">Approved brand installer</div>
@@ -106,14 +106,14 @@ export function HeroSection() {
                                     </div>
                                 </div>
                                 <div className="grid gap-2 sm:grid-cols-2">
-                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5">
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5">
                                         <Clock4 className="h-5 w-5 text-emerald-600" />
                                         <div>
                                             <div className="text-sm font-semibold text-slate-900">Fast booking</div>
                                             <div className="text-xs text-slate-500">Slots for this week with real‑time availability.</div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5">
+                                    <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5">
                                         <PhoneCall className="h-5 w-5 text-emerald-600" />
                                         <div>
                                             <div className="text-sm font-semibold text-slate-900">Engineer support</div>

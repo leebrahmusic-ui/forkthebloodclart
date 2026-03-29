@@ -96,7 +96,7 @@ export function HeroServices() {
     return (
         <div className="space-y-6">
             {featuredService && (
-                <Card className="group relative flex flex-col overflow-hidden rounded-[28px] border border-emerald-200 bg-white p-7 text-center shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
+                <Card className="group relative flex flex-col overflow-hidden rounded-[28px] border-0 bg-white p-7 text-center shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
                     {/* label pill */}
                     <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 mx-auto">
                         {featuredService.highlight}
@@ -116,7 +116,7 @@ export function HeroServices() {
                                 {featuredService.priceLine && (
                                     <Link
                                         href={featuredService.href}
-                                        className="mt-3 inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[16px] font-bold text-emerald-800 transition hover:bg-emerald-100"
+                                        className="mt-3 inline-flex items-center rounded-full bg-emerald-50 px-4 py-2 text-[16px] font-bold text-emerald-800 transition hover:bg-emerald-100"
                                     >
                                         {featuredService.priceLine}
                                     </Link>
@@ -131,7 +131,7 @@ export function HeroServices() {
                                             {featuredService.brands.map((brand) => (
                                                 <div
                                                     key={brand.name}
-                                                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5"
+                                                    className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-[0_1px_6px_rgba(15,23,42,0.06)]"
                                                 >
                                                     {brand.logo ? (
                                                         <img
@@ -177,7 +177,7 @@ export function HeroServices() {
                             ).map((imgSrc, idx) => (
                                 <div
                                     key={`${imgSrc}-${idx}`}
-                                    className="flex items-center justify-center rounded-xl bg-white border border-slate-200 p-2"
+                                    className="flex items-center justify-center rounded-xl bg-white p-2 shadow-[0_1px_6px_rgba(15,23,42,0.06)]"
                                 >
                                     <img
                                         src={imgSrc}
@@ -195,7 +195,7 @@ export function HeroServices() {
                 {otherServices.map((service) => (
                     <Card
                         key={service.id}
-                        className="group relative flex flex-col items-center text-center overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
+                        className="group relative flex flex-col items-center text-center overflow-hidden rounded-[26px] border-0 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
                     >
                         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                             {service.highlight}
@@ -224,7 +224,7 @@ export function HeroServices() {
                             <div className="mt-5">
                                 <Link
                                     href={service.href}
-                                    className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:border-slate-400"
+                                    className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-200"
                                 >
                                     Book now
                                     <ArrowRight className="h-4 w-4" />

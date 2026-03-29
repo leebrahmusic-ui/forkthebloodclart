@@ -1045,9 +1045,10 @@ export default function InstallPage({ booking }) {
                 }
             `}</style>
             <BlueQuoteSkin>
-                <PageHeader />
+                <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50 quote-page-bg" />
+                <div className="min-h-screen quote-page-bg bg-gradient-to-br from-slate-50 via-white to-emerald-50">
+                <PageHeader theme="blue" />
 
-            <div className="min-h-screen bg-white quote-page-bg">
                 <div className="max-w-7xl mx-auto px-4 py-10 md:py-14 pb-28 lg:pb-10">
                     <div className="flex items-end gap-6 mb-10">
                         <button

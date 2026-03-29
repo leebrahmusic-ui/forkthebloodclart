@@ -111,10 +111,10 @@ export function GoogleReview({ theme = "light" }) {
     if (loading) {
         return (
             <section className={isBlue ? "py-12 quote-page-bg" : "bg-slate-50 py-12"}>
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+                <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                     <div className={isBlue
                         ? "rounded-[32px] border border-white/30 bg-[var(--qb-panel)] p-6 shadow-sm"
-                        : "rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm"}>
+                        : "rounded-[32px] bg-white p-6 shadow-sm"}>
                         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
                             <div className="space-y-4">
                                 <div className={isBlue ? "h-12 w-44 rounded-2xl bg-white/20" : "h-12 w-44 rounded-2xl bg-slate-100"} />
@@ -132,18 +132,18 @@ export function GoogleReview({ theme = "light" }) {
 
     return (
         <section className={isBlue ? "py-12 quote-page-bg" : "bg-slate-50 py-12 no-auto-dark-surface"}>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+            <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                 <div className={isBlue
                     ? "overflow-hidden rounded-[32px] border border-white/30 bg-[var(--qb-panel)] shadow-sm"
-                    : "overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] no-auto-dark-card"}>
+                    : "overflow-hidden rounded-[32px] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] no-auto-dark-card"}>
                     <div className="grid gap-0 lg:grid-cols-[320px_minmax(0,1fr)]">
                         <aside className={isBlue
                             ? "flex min-h-full flex-col border-b border-white/15 bg-white/8 p-6 lg:border-b-0 lg:border-r lg:border-r-white/15"
-                            : "flex min-h-full flex-col border-b border-slate-200 bg-slate-50 p-6 lg:border-b-0 lg:border-r lg:border-r-slate-200"}>
+                            : "flex min-h-full flex-col bg-slate-50 p-6"}>
                             <div className="flex items-center gap-3">
                                 <span className={isBlue
                                     ? "inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10"
-                                    : "inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white"}>
+                                    : "inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-[0_1px_6px_rgba(15,23,42,0.08)]"}>
                                     <GoogleMark />
                                 </span>
                                 <div>
@@ -160,7 +160,7 @@ export function GoogleReview({ theme = "light" }) {
 
                             <div className={isBlue
                                 ? "mt-6 rounded-[24px] border border-white/20 bg-white/10 p-5"
-                                : "mt-6 rounded-[24px] border border-slate-200 bg-white p-5"}>
+                                : "mt-6 rounded-[24px] bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.06)]"}>
                                 <p className={isBlue ? "text-4xl font-bold text-white" : "text-4xl font-bold text-slate-900"}>
                                     {formatRating(payload.rating)}
                                 </p>
@@ -203,7 +203,7 @@ export function GoogleReview({ theme = "light" }) {
                                     rel="noreferrer"
                                     className={isBlue
                                         ? "mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 lg:mt-auto"
-                                        : "mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 lg:mt-auto"}
+                                        : "mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 lg:mt-auto"}
                                 >
                                     View all on Google <span aria-hidden>↗</span>
                                 </a>
@@ -213,7 +213,7 @@ export function GoogleReview({ theme = "light" }) {
                         <div className="p-6 lg:p-8">
                             <article className={isBlue
                                 ? "flex min-h-[320px] flex-col rounded-[28px] border border-white/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.08))] p-6"
-                                : "flex min-h-[320px] flex-col rounded-[28px] border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-6"}>
+                                : "flex min-h-[320px] flex-col rounded-[28px] bg-gradient-to-b from-white to-slate-50 p-6 shadow-[0_10px_25px_rgba(15,23,42,0.06)]"}>
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex min-w-0 items-center gap-4">
                                         {activeReview.profile_photo_url ? (
@@ -222,14 +222,14 @@ export function GoogleReview({ theme = "light" }) {
                                                 alt={activeReview.author_name || "Google reviewer"}
                                                 className={isBlue
                                                     ? "h-14 w-14 shrink-0 rounded-full border border-white/35 object-cover"
-                                                    : "h-14 w-14 shrink-0 rounded-full border border-slate-200 object-cover"}
+                                                    : "h-14 w-14 shrink-0 rounded-full object-cover shadow-[0_1px_6px_rgba(15,23,42,0.08)]"}
                                                 loading="lazy"
                                                 referrerPolicy="no-referrer"
                                             />
                                         ) : (
                                             <div className={isBlue
                                                 ? "grid h-14 w-14 shrink-0 place-items-center rounded-full border border-white/35 bg-white/15 text-sm font-bold text-white"
-                                                : "grid h-14 w-14 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700"}>
+                                                : "grid h-14 w-14 shrink-0 place-items-center rounded-full bg-white text-sm font-bold text-slate-700 shadow-[0_1px_6px_rgba(15,23,42,0.08)]"}>
                                                 {initialsFromName(activeReview.author_name)}
                                             </div>
                                         )}
@@ -246,7 +246,7 @@ export function GoogleReview({ theme = "light" }) {
 
                                     <div className={isBlue
                                         ? "rounded-full border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white"
-                                        : "rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"}>
+                                        : "rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_1px_6px_rgba(15,23,42,0.08)]"}>
                                         {activeIndex + 1}/{reviews.length}
                                     </div>
                                 </div>
@@ -266,7 +266,7 @@ export function GoogleReview({ theme = "light" }) {
                                 </div>
 
                                 <div
-                                    className="mt-6 flex items-center justify-between gap-3 border-t pt-5"
+                                    className="mt-6 flex items-center justify-between gap-3 pt-5"
                                     style={isBlue ? { borderColor: "rgba(255,255,255,0.18)" } : undefined}
                                 >
                                     <p className={isBlue ? "text-sm text-cyan-100" : "text-sm text-slate-500"}>
@@ -280,7 +280,7 @@ export function GoogleReview({ theme = "light" }) {
                                                 onClick={goPrev}
                                                 className={isBlue
                                                     ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20"
-                                                    : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"}
+                                                    : "inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 transition hover:bg-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.08)]"}
                                                 aria-label="Previous review"
                                             >
                                                 ←
@@ -290,7 +290,7 @@ export function GoogleReview({ theme = "light" }) {
                                                 onClick={goNext}
                                                 className={isBlue
                                                     ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20"
-                                                    : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"}
+                                                    : "inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 transition hover:bg-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.08)]"}
                                                 aria-label="Next review"
                                             >
                                                 →

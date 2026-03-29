@@ -2,7 +2,7 @@ import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { Link, usePage, Head, useForm, router, createInertiaApp } from "@inertiajs/react";
 import * as React from "react";
 import { useState, useEffect, createContext, useContext, useMemo, useRef, forwardRef, useImperativeHandle, useCallback } from "react";
-import { X, Menu, ArrowRight, Phone, MapPin, Shield, Users, CheckCircle2, Clock, ChevronDown, Flame, MessageCircleMore, Touchpad, Hammer, ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon, CalendarDays, ChevronRight, ShieldCheck, BadgeCheck, Clock4, PhoneCall, ArrowLeft, Home as Home$2, Building2, Castle, Building } from "lucide-react";
+import { X, Menu, ArrowRight, Phone, MapPin, Shield, Users, CheckCircle2, Clock, ChevronDown, Flame, MessageCircleMore, Touchpad, Hammer, CalendarDays, ChevronRight, ShieldCheck, BadgeCheck, Clock4, PhoneCall } from "lucide-react";
 import { AiOutlineWhatsApp, AiOutlineQuestion } from "react-icons/ai";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
@@ -11,30 +11,99 @@ import { twMerge } from "tailwind-merge";
 import { Transition, Dialog, TransitionChild, DialogPanel } from "@headlessui/react";
 import { FiAward, FiHeart, FiTag, FiStar, FiShield, FiZap, FiInfo, FiLoader, FiCreditCard, FiHome, FiTool, FiClock, FiX, FiCheck, FiRefreshCcw, FiChevronLeft, FiChevronRight, FiXCircle, FiCalendar, FiMapPin, FiCheckSquare, FiCpu, FiPackage, FiCamera, FiCheckCircle, FiFileText, FiArrowRight, FiChevronDown } from "react-icons/fi";
 import { IoChevronDown } from "react-icons/io5";
-import { startOfDay, addMonths, startOfMonth, format, isSameDay } from "date-fns";
-import { getDefaultClassNames, DayPicker } from "react-day-picker";
+import { startOfDay, addMonths, format } from "date-fns";
 import axios from "axios";
 import { FaWhatsapp } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { loadStripe } from "@stripe/stripe-js";
 import createServer from "@inertiajs/server";
 import { renderToString } from "react-dom/server";
+const HELP_ADVICE_GROUPS = [
+  {
+    title: "Boiler problem guides",
+    links: [
+      { label: "All advice pages", href: "/advice" },
+      { label: "Boiler problems hub", href: "/advice/boiler-problems" },
+      { label: "Boiler pressure keeps increasing", href: "/advice/boiler-pressure-keeps-increasing" },
+      { label: "Boiler pressure keeps dropping", href: "/advice/boiler-pressure-keeps-dropping" },
+      { label: "Ideal boiler making a noise", href: "/advice/ideal-boiler-making-a-noise" }
+    ]
+  },
+  {
+    title: "Manufacturer help",
+    links: [
+      { label: "Ideal boiler help", href: "/advice/ideal-boiler-help" },
+      { label: "Vaillant boiler help", href: "/advice/vaillant-boiler-help" },
+      { label: "Worcester boiler help", href: "/advice/worcester-boiler-help" }
+    ]
+  },
+  {
+    title: "Fault code pages",
+    links: [
+      { label: "Ideal fault codes", href: "/advice/ideal-boiler-fault-codes" },
+      { label: "Vaillant fault codes", href: "/advice/vaillant-boiler-fault-codes" },
+      { label: "Worcester fault codes", href: "/advice/worcester-boiler-fault-codes" }
+    ]
+  }
+];
+const HELP_ADVICE_MEGA_CARDS = [
+  {
+    title: "All Help & Advice pages",
+    description: "Browse every Help & Advice page in one place.",
+    href: "/advice"
+  },
+  {
+    title: "Boiler problems hub",
+    description: "Troubleshoot common boiler symptoms and next safe steps.",
+    href: "/advice/boiler-problems"
+  },
+  {
+    title: "Pressure keeps dropping",
+    description: "Why pressure drops and what to check before booking a repair.",
+    href: "/advice/boiler-pressure-keeps-dropping"
+  },
+  {
+    title: "Pressure keeps increasing",
+    description: "Causes of over-pressure and when to stop and call an engineer.",
+    href: "/advice/boiler-pressure-keeps-increasing"
+  },
+  {
+    title: "Ideal help & fault codes",
+    description: "Model help plus common Ideal fault code guidance.",
+    href: "/advice/ideal-boiler-help"
+  },
+  {
+    title: "Vaillant help & fault codes",
+    description: "Troubleshooting and Vaillant code references.",
+    href: "/advice/vaillant-boiler-help"
+  },
+  {
+    title: "Worcester help & fault codes",
+    description: "Common Worcester issues and fault code pages.",
+    href: "/advice/worcester-boiler-help"
+  }
+];
 const MEGA_SECTIONS = {
   services: [
     {
-      title: "Boiler installation",
-      description: "Fixed-price installs by engineers across Leeds & Surrounding.",
-      href: "/#services"
+      title: "New boiler quote",
+      description: "Start your fixed-price new boiler quote in a few quick steps.",
+      href: "/book/quote/new"
     },
     {
-      title: "Boiler repair & servicing",
-      description: "Fast repairs and servicing with clear, upfront pricing.",
-      href: "/#services"
+      title: "Boiler servicing",
+      description: "Book an annual boiler service with clear local pricing.",
+      href: "/book/quote/service"
     },
     {
-      title: "Gas safety certificates",
-      description: "Landlord and homeowner safety checks by qualified engineers.",
-      href: "/#services"
+      title: "Boiler repairs",
+      description: "Report your fault and book a repair visit from a local engineer.",
+      href: "/book/quote/repair"
+    },
+    {
+      title: "Powerflush",
+      description: "Get a powerflush quote to improve system performance.",
+      href: "/book/quote/powerflush"
     }
   ],
   about: [
@@ -70,10 +139,12 @@ const MEGA_SECTIONS = {
       description: "Simple questions, clear pricing, no pushy sales visits.",
       href: "/#contact"
     }
-  ]
+  ],
+  advice: HELP_ADVICE_MEGA_CARDS
 };
 const NAV_ITEMS = [
   { id: "services", label: "Services" },
+  { id: "advice", label: "Help & Advice" },
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" }
 ];
@@ -154,7 +225,7 @@ function Header({
         onClick: closeMega
       }
     ),
-    isMegaOpen && /* @__PURE__ */ jsx("div", { className: "pointer-events-auto hidden md:block", children: /* @__PURE__ */ jsx("div", { className: "absolute left-1/2 top-0 z-30 w-full max-w-3xl -translate-x-1/2 px-4 pb-6 sm:px-6 lg:px-8", children: /* @__PURE__ */ jsx("div", { className: "mt-2 rounded-3xl bg-white shadow-xl", children: /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-6 p-6 md:grid-cols-3 md:p-8 !pt-20", children: currentCards.map((card) => /* @__PURE__ */ jsxs(
+    isMegaOpen && /* @__PURE__ */ jsx("div", { className: "pointer-events-auto hidden md:block", children: /* @__PURE__ */ jsx("div", { className: "absolute left-1/2 top-0 z-30 w-full max-w-3xl -translate-x-1/2 px-4 pb-6 sm:px-6 lg:px-8", children: /* @__PURE__ */ jsx("div", { className: "mt-2 rounded-3xl bg-white shadow-xl", children: /* @__PURE__ */ jsx("div", { className: `grid grid-cols-1 gap-6 p-6 md:p-8 !pt-20 ${openMenu === "services" ? "md:grid-cols-2" : "md:grid-cols-3"}`, children: currentCards.map((card) => /* @__PURE__ */ jsxs(
       Link,
       {
         href: card.href,
@@ -187,6 +258,15 @@ function Header({
           className: "rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100",
           onClick: () => setMobileMenuOpen(false),
           children: "About"
+        }
+      ),
+      /* @__PURE__ */ jsx(
+        Link,
+        {
+          href: "/advice",
+          className: "rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100",
+          onClick: () => setMobileMenuOpen(false),
+          children: "Help & Advice"
         }
       ),
       /* @__PURE__ */ jsx(
@@ -303,7 +383,7 @@ function Footer() {
         ] }) })
       ] })
     ] }),
-    /* @__PURE__ */ jsxs("div", { className: "mt-10 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row", children: [
+    /* @__PURE__ */ jsxs("div", { className: "mt-10 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center", children: [
       /* @__PURE__ */ jsxs("div", { children: [
         /* @__PURE__ */ jsxs("p", { children: [
           "© ",
@@ -312,11 +392,21 @@ function Footer() {
         ] }),
         /* @__PURE__ */ jsx("p", { className: "mt-1", children: "VAT No: 511 0588 26" })
       ] }),
-      /* @__PURE__ */ jsxs("div", { className: "flex gap-6", children: [
-        /* @__PURE__ */ jsx(Link, { href: "/about", className: "hover:text-slate-700", children: "About Us" }),
-        /* @__PURE__ */ jsx(Link, { href: "/privacy-policy", className: "hover:text-slate-700", children: "Privacy Policy" }),
-        /* @__PURE__ */ jsx(Link, { href: "/terms-conditions", className: "hover:text-slate-700", children: "Terms & Conditions" })
+      /* @__PURE__ */ jsxs("details", { className: "group", children: [
+        /* @__PURE__ */ jsxs("summary", { className: "inline-flex cursor-pointer list-none items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-400 hover:bg-slate-50", children: [
+          "Help & Advice",
+          /* @__PURE__ */ jsx("span", { className: "text-xs text-slate-500 transition group-open:rotate-180", children: "▾" })
+        ] }),
+        /* @__PURE__ */ jsx("div", { className: "mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:min-w-[640px] sm:p-5", children: /* @__PURE__ */ jsx("div", { className: "grid gap-5 sm:grid-cols-3", children: HELP_ADVICE_GROUPS.map((group) => /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-wide text-slate-500", children: group.title }),
+          /* @__PURE__ */ jsx("ul", { className: "mt-2 space-y-1.5", children: group.links.map((item) => /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, { href: item.href, className: "text-sm text-slate-700 hover:text-slate-900", children: item.label }) }, item.href)) })
+        ] }, group.title)) }) })
       ] })
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "mt-4 flex flex-wrap gap-6 text-sm text-slate-500", children: [
+      /* @__PURE__ */ jsx(Link, { href: "/about", className: "hover:text-slate-700", children: "About Us" }),
+      /* @__PURE__ */ jsx(Link, { href: "/privacy-policy", className: "hover:text-slate-700", children: "Privacy Policy" }),
+      /* @__PURE__ */ jsx(Link, { href: "/terms-conditions", className: "hover:text-slate-700", children: "Terms & Conditions" })
     ] })
   ] }) });
 }
@@ -339,7 +429,7 @@ const VALUES = [
   {
     icon: Clock,
     title: "Faster installs",
-    description: "Book this week. Next‑day installs available when ordered before 3pm."
+    description: "Book this week. Next‑day installs available when ordered before 4pm."
   }
 ];
 const STATS = [
@@ -390,7 +480,7 @@ function AboutPage() {
                 "WhatsApp or callback only",
                 "Fixed‑price quotes online",
                 "All prices include VAT",
-                "Next‑day installs before 3pm"
+                "Next‑day installs before 4pm"
               ].map((item) => /* @__PURE__ */ jsxs(
                 "div",
                 {
@@ -1474,6 +1564,10 @@ function blankProductForType(type = "combi") {
 function labelType(type) {
   return TYPE_OPTIONS.find((x) => x.value === type)?.label || type;
 }
+function parseKwList(input = "") {
+  const nums = String(input).split(",").map((x) => Number(String(x).trim())).filter((x) => Number.isFinite(x) && x > 0).map((x) => Math.round(x));
+  return Array.from(new Set(nums));
+}
 function BoilerCatalog() {
   const { catalogOverride } = usePage().props;
   const initial = useMemo(() => {
@@ -1485,6 +1579,16 @@ function BoilerCatalog() {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [openAdvanced, setOpenAdvanced] = useState({});
+  const [uploading, setUploading] = useState({});
+  const [uploadError, setUploadError] = useState("");
+  const [quickAdd, setQuickAdd] = useState({
+    type: "combi",
+    brand: "",
+    model: "",
+    warrantyYears: 10,
+    priceType: "fixed",
+    kwCsv: "24,30,35"
+  });
   const normalizedQuery = query.trim().toLowerCase();
   const filteredWithIndex = useMemo(() => {
     return products.map((p, idx) => ({ p, idx })).filter(({ p }) => {
@@ -1524,6 +1628,71 @@ function BoilerCatalog() {
   const removeProduct = (idx) => {
     setProducts((prev) => prev.filter((_, i) => i !== idx));
   };
+  const addBrandModelVariants = () => {
+    const brand = String(quickAdd.brand || "").trim();
+    const model = String(quickAdd.model || "").trim();
+    const kws = parseKwList(quickAdd.kwCsv);
+    if (!brand || !model || kws.length === 0) {
+      window.alert("Please enter brand, model and at least one kW value.");
+      return;
+    }
+    const rows = kws.map(
+      (kw) => toEditorRow({
+        id: `${slugify(brand)}_${slugify(model)}_${kw}`,
+        type: quickAdd.type,
+        brand,
+        model,
+        warrantyYears: Number(quickAdd.warrantyYears || 0),
+        kw,
+        priceType: quickAdd.priceType,
+        basePrice: quickAdd.type === "combi" ? null : null,
+        boilerCost: quickAdd.type === "combi" ? null : null,
+        minMargin: quickAdd.type === "combi" ? null : 750,
+        images: [],
+        includes: [],
+        notes: []
+      })
+    );
+    setProducts((prev) => [...rows, ...prev]);
+  };
+  const uploadProductImage = async (idx, file) => {
+    if (!file) return;
+    setUploadError("");
+    setUploading((prev) => ({ ...prev, [idx]: true }));
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+      const response = await fetch(route("admin.boilers.uploadImage"), {
+        method: "POST",
+        headers: {
+          "X-CSRF-TOKEN": token,
+          Accept: "application/json"
+        },
+        body: fd
+      });
+      if (!response.ok) {
+        throw new Error("Image upload failed");
+      }
+      const payload = await response.json();
+      const url = payload?.data?.url;
+      if (!url) {
+        throw new Error("Upload returned no URL");
+      }
+      setProducts((prev) => {
+        const next = [...prev];
+        const row = next[idx];
+        const existing = textToList(row.imagesText);
+        const merged = Array.from(/* @__PURE__ */ new Set([url, ...existing]));
+        next[idx] = { ...row, imagesText: merged.join("\n") };
+        return next;
+      });
+    } catch (e) {
+      setUploadError("Could not upload image. Please try again.");
+    } finally {
+      setUploading((prev) => ({ ...prev, [idx]: false }));
+    }
+  };
   const saveCatalog = () => {
     setSaving(true);
     router.post(
@@ -1552,7 +1721,81 @@ function BoilerCatalog() {
         /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-6", children: [
           /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-gray-200 bg-white p-5", children: [
             /* @__PURE__ */ jsx("h1", { className: "text-2xl font-bold text-gray-900", children: "Boiler Catalogue Management" }),
-            /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm text-slate-600 leading-relaxed", children: "Simple mode for day-to-day updates. Boilers are grouped by type and kW below." }),
+            /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm text-slate-600 leading-relaxed", children: "Add/edit products by type and kW. kW drives when a boiler appears in quote results." }),
+            /* @__PURE__ */ jsxs("div", { className: "mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4", children: [
+              /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-emerald-900", children: "Quick add brand + model variants" }),
+              /* @__PURE__ */ jsx("div", { className: "mt-1 text-xs text-emerald-800", children: "Create multiple kW versions in one click (example: 24,30,35)." }),
+              /* @__PURE__ */ jsxs("div", { className: "mt-3 grid grid-cols-1 md:grid-cols-6 gap-2", children: [
+                /* @__PURE__ */ jsx(
+                  "select",
+                  {
+                    value: quickAdd.type,
+                    onChange: (e) => setQuickAdd((p) => ({ ...p, type: e.target.value })),
+                    className: "rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm",
+                    children: TYPE_OPTIONS.map((o) => /* @__PURE__ */ jsx("option", { value: o.value, children: o.label }, o.value))
+                  }
+                ),
+                /* @__PURE__ */ jsx(
+                  "input",
+                  {
+                    value: quickAdd.brand,
+                    onChange: (e) => setQuickAdd((p) => ({ ...p, brand: e.target.value })),
+                    placeholder: "Brand (e.g. Worcester Bosch)",
+                    className: "rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                  }
+                ),
+                /* @__PURE__ */ jsx(
+                  "input",
+                  {
+                    value: quickAdd.model,
+                    onChange: (e) => setQuickAdd((p) => ({ ...p, model: e.target.value })),
+                    placeholder: "Model (e.g. Greenstar 4000)",
+                    className: "rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                  }
+                ),
+                /* @__PURE__ */ jsx(
+                  "input",
+                  {
+                    type: "number",
+                    min: "0",
+                    value: quickAdd.warrantyYears,
+                    onChange: (e) => setQuickAdd((p) => ({ ...p, warrantyYears: e.target.value })),
+                    placeholder: "Warranty",
+                    className: "rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                  }
+                ),
+                /* @__PURE__ */ jsx(
+                  "select",
+                  {
+                    value: quickAdd.priceType,
+                    onChange: (e) => setQuickAdd((p) => ({ ...p, priceType: e.target.value })),
+                    className: "rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm",
+                    children: PRICE_TYPE_OPTIONS.map((o) => /* @__PURE__ */ jsx("option", { value: o.value, children: o.label }, o.value))
+                  }
+                ),
+                /* @__PURE__ */ jsx(
+                  "input",
+                  {
+                    value: quickAdd.kwCsv,
+                    onChange: (e) => setQuickAdd((p) => ({ ...p, kwCsv: e.target.value })),
+                    placeholder: "kW list: 24,30,35",
+                    className: "rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxs("div", { className: "mt-3 flex flex-wrap gap-2", children: [
+                /* @__PURE__ */ jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: addBrandModelVariants,
+                    className: "rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white",
+                    children: "Add brand/model variants"
+                  }
+                ),
+                /* @__PURE__ */ jsx("div", { className: "text-xs text-emerald-900 self-center", children: "Combi guidance: typical bands are 24 / 30 / 35(36) kW." })
+              ] })
+            ] }),
             /* @__PURE__ */ jsxs("div", { className: "mt-4 grid grid-cols-1 md:grid-cols-3 gap-3", children: [
               /* @__PURE__ */ jsxs("div", { className: "rounded-xl border border-slate-200 bg-slate-50 px-4 py-3", children: [
                 /* @__PURE__ */ jsx("div", { className: "text-xs uppercase tracking-wide text-slate-500", children: "Total boilers" }),
@@ -1615,6 +1858,7 @@ function BoilerCatalog() {
                 }
               )
             ] }),
+            uploadError ? /* @__PURE__ */ jsx("div", { className: "mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700", children: uploadError }) : null,
             /* @__PURE__ */ jsxs("div", { className: "mt-4 grid grid-cols-1 md:grid-cols-3 gap-3", children: [
               /* @__PURE__ */ jsx(
                 "input",
@@ -1731,8 +1975,50 @@ function BoilerCatalog() {
                         }
                       )
                     ] }),
+                    /* @__PURE__ */ jsxs("div", { className: "mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
+                        /* @__PURE__ */ jsx("div", { className: "text-xs font-semibold text-slate-700", children: "Product images" }),
+                        /* @__PURE__ */ jsxs("label", { className: "rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-100", children: [
+                          uploading[idx] ? "Uploading..." : "Upload image",
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              type: "file",
+                              accept: "image/*",
+                              className: "hidden",
+                              disabled: !!uploading[idx],
+                              onChange: (e) => {
+                                const file = e.target.files?.[0];
+                                uploadProductImage(idx, file);
+                                e.target.value = "";
+                              }
+                            }
+                          )
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsx(
+                        "textarea",
+                        {
+                          value: p.imagesText,
+                          onChange: (e) => update(idx, "imagesText", e.target.value),
+                          rows: 3,
+                          placeholder: "Image URLs (one per line)",
+                          className: "mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs"
+                        }
+                      ),
+                      /* @__PURE__ */ jsx("div", { className: "mt-2 flex flex-wrap gap-2", children: textToList(p.imagesText).slice(0, 4).map((src) => /* @__PURE__ */ jsx(
+                        "img",
+                        {
+                          src,
+                          alt: "Boiler",
+                          className: "h-12 w-12 rounded-md border object-cover bg-white",
+                          loading: "lazy"
+                        },
+                        src
+                      )) })
+                    ] }),
                     openAdvanced[idx] && /* @__PURE__ */ jsxs("div", { className: "mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-3", children: [
-                      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
                         /* @__PURE__ */ jsx(
                           "input",
                           {
@@ -1742,7 +2028,6 @@ function BoilerCatalog() {
                             className: "rounded-lg border border-slate-300 px-3 py-2 text-sm"
                           }
                         ),
-                        /* @__PURE__ */ jsx("textarea", { value: p.imagesText, onChange: (e) => update(idx, "imagesText", e.target.value), rows: 4, placeholder: "Image URLs (one per line)", className: "rounded-lg border border-slate-300 px-3 py-2 text-xs" }),
                         /* @__PURE__ */ jsx("textarea", { value: p.includesText, onChange: (e) => update(idx, "includesText", e.target.value), rows: 4, placeholder: "Includes (one per line)", className: "rounded-lg border border-slate-300 px-3 py-2 text-xs" })
                       ] }),
                       /* @__PURE__ */ jsx("textarea", { value: p.notesText, onChange: (e) => update(idx, "notesText", e.target.value), rows: 3, placeholder: "Notes (one per line)", className: "w-full rounded-lg border border-slate-300 px-3 py-2 text-xs" })
@@ -2147,7 +2432,6 @@ function normalizePagination(paginated) {
 }
 function Pagination({ paginated }) {
   const { links } = normalizePagination(paginated);
-  console.log("Bookings Data", paginated);
   const current = paginated.current_page || 1;
   const last = paginated.last_page || 1;
   const prevUrl = links.find((l) => String(l.label || "").toLowerCase().includes("previous"))?.url || null;
@@ -2222,7 +2506,8 @@ function Management() {
       "/admin/order/management",
       {
         q: fd.get("q") || "",
-        per_page: fd.get("per_page") || 10
+        per_page: fd.get("per_page") || 10,
+        status: fd.get("status") || filters?.status || "all"
       },
       { preserveScroll: true, preserveState: true, replace: true }
     );
@@ -2359,7 +2644,7 @@ function Management() {
           /* @__PURE__ */ jsx("span", { className: "font-semibold", children: "Updated:" }),
           /* @__PURE__ */ jsx("span", { children: flash.success })
         ] }) }) : null,
-        /* @__PURE__ */ jsx("form", { onSubmit: onSearch, className: "mb-5 rounded-2xl border bg-white p-4", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_140px]", children: [
+        /* @__PURE__ */ jsx("form", { onSubmit: onSearch, className: "mb-5 rounded-2xl border bg-white p-4", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_180px_140px]", children: [
           /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1", children: [
             /* @__PURE__ */ jsx("label", { className: "text-xs font-semibold text-slate-600", children: "Search" }),
             /* @__PURE__ */ jsx(
@@ -2385,6 +2670,24 @@ function Management() {
                   /* @__PURE__ */ jsx("option", { value: 15, children: "15 rows" }),
                   /* @__PURE__ */ jsx("option", { value: 25, children: "25 rows" }),
                   /* @__PURE__ */ jsx("option", { value: 50, children: "50 rows" })
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1", children: [
+            /* @__PURE__ */ jsx("label", { className: "text-xs font-semibold text-slate-600", children: "Appointment status" }),
+            /* @__PURE__ */ jsxs(
+              "select",
+              {
+                name: "status",
+                defaultValue: filters?.status || "all",
+                className: "w-full rounded-xl border px-3 py-2.5 text-sm",
+                children: [
+                  /* @__PURE__ */ jsx("option", { value: "all", children: "All" }),
+                  /* @__PURE__ */ jsx("option", { value: "pending", children: "Pending" }),
+                  /* @__PURE__ */ jsx("option", { value: "confirmed", children: "Confirmed" }),
+                  /* @__PURE__ */ jsx("option", { value: "completed", children: "Completed" }),
+                  /* @__PURE__ */ jsx("option", { value: "cancelled", children: "Cancelled" })
                 ]
               }
             )
@@ -2432,7 +2735,7 @@ function Management() {
                   isSavingRow ? /* @__PURE__ */ jsxs("span", { className: "inline-flex items-center gap-2 rounded-full border bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700", children: [
                     /* @__PURE__ */ jsx(Spinner, { className: "h-3.5 w-3.5" }),
                     "Saving…"
-                  ] }) : ``
+                  ] }) : null
                 ] }),
                 /* @__PURE__ */ jsxs("div", { className: "mt-2 grid grid-cols-1 gap-1 text-sm text-slate-600 sm:grid-cols-3", children: [
                   /* @__PURE__ */ jsxs("div", { className: "truncate", children: [
@@ -2477,6 +2780,19 @@ function Management() {
                   /* @__PURE__ */ jsx("div", { className: "text-xs text-slate-500", children: "Update statuses without leaving this screen." })
                 ] }),
                 /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-3 sm:flex-row sm:items-center", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1", children: [
+                    /* @__PURE__ */ jsx("label", { className: "text-xs font-semibold text-slate-600", children: "Payment status" }),
+                    /* @__PURE__ */ jsx(
+                      "select",
+                      {
+                        value: b.payment_status || "pending",
+                        className: "w-full rounded-xl border px-3 py-2.5 text-sm sm:w-[220px]",
+                        disabled: isSavingRow,
+                        onChange: (e) => updateStatus(b.id, "payment_status", e.target.value),
+                        children: PAYMENT_OPTIONS.map((o) => /* @__PURE__ */ jsx("option", { value: o.value, children: o.label }, o.value))
+                      }
+                    )
+                  ] }),
                   /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-1", children: [
                     /* @__PURE__ */ jsx("label", { className: "text-xs font-semibold text-slate-600", children: "Appointment status" }),
                     /* @__PURE__ */ jsx(
@@ -4007,9 +4323,9 @@ const BENEFITS = [
 function WhyChooseUs() {
   return /* @__PURE__ */ jsxs("section", { className: "relative bg-white py-16 sm:py-20", children: [
     /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-100/40 via-transparent to-transparent" }),
-    /* @__PURE__ */ jsxs("div", { className: "relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-0", children: [
+    /* @__PURE__ */ jsxs("div", { className: "relative mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: [
       /* @__PURE__ */ jsxs("header", { className: "mx-auto max-w-3xl text-center", children: [
-        /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1", children: [
+        /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1", children: [
           /* @__PURE__ */ jsx("span", { className: "h-1.5 w-1.5 rounded-full bg-emerald-500" }),
           /* @__PURE__ */ jsx("span", { className: "text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-700", children: "Why choose us" })
         ] }),
@@ -4021,7 +4337,7 @@ function WhyChooseUs() {
         return /* @__PURE__ */ jsxs(
           "article",
           {
-            className: "\n                                    relative flex h-full flex-col items-center gap-4 text-center\n                                    rounded-2xl border border-slate-200 \n                                    bg-white\n                                    p-5 sm:p-6 \n                                    shadow-[0_10px_30px_rgba(15,23,42,0.08)] \n                                    transition-colors duration-300 \n                                    hover:border-emerald-300\n                                ",
+            className: "\n                                    relative flex h-full flex-col items-center gap-4 text-center\n                                    rounded-2xl\n                                    bg-white\n                                    p-5 sm:p-6 \n                                    shadow-[0_10px_30px_rgba(15,23,42,0.08)] \n                                    transition-colors duration-300 \n                                    hover:bg-emerald-50/40\n                                ",
             children: [
               /* @__PURE__ */ jsx(
                 "span",
@@ -4029,7 +4345,7 @@ function WhyChooseUs() {
                   className: "\n                                        pointer-events-none\n                                        absolute inset-y-2 left-0\n                                        w-[3px]\n                                        rounded-full \n                                        bg-emerald-400\n                                        shadow-[0_0_8px_rgba(16,185,129,0.35)]\n                                    "
                 }
               ),
-              /* @__PURE__ */ jsx("div", { className: "mt-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50", children: /* @__PURE__ */ jsx("div", { className: "flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-emerald-100", children: /* @__PURE__ */ jsx(
+              /* @__PURE__ */ jsx("div", { className: "mt-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50", children: /* @__PURE__ */ jsx("div", { className: "flex h-11 w-11 items-center justify-center rounded-xl bg-white", children: /* @__PURE__ */ jsx(
                 Icon,
                 {
                   className: `h-6 w-6 ${item.iconColor}`
@@ -4081,14 +4397,14 @@ function ServiceCards() {
       children: [
         /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute -left-32 top-0 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl" }),
         /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute -right-40 bottom-0 h-72 w-72 rounded-full bg-emerald-100/40 blur-3xl" }),
-        /* @__PURE__ */ jsx("div", { className: "relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-0", children: /* @__PURE__ */ jsx("div", { className: "grid gap-10 justify-items-center lg:grid-cols-1 lg:items-start", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-5 text-center", children: [
+        /* @__PURE__ */ jsx("div", { className: "relative mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: /* @__PURE__ */ jsx("div", { className: "grid gap-10 justify-items-center lg:grid-cols-1 lg:items-start", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-5 text-center", children: [
           /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-3xl", children: [
             /* @__PURE__ */ jsxs("h2", { className: "text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 leading-10", children: [
               "A clear online quote, without a sales visit.",
               /* @__PURE__ */ jsx("br", { className: "hidden sm:block" }),
               /* @__PURE__ */ jsx("span", { className: "block mt-2 text-emerald-600", children: "Local engineers, tidy installs, clear pricing." })
             ] }),
-            /* @__PURE__ */ jsx("p", { className: "mt-3 text-lg text-slate-600", children: "Book this week. Next‑day installs available when ordered before 3pm." })
+            /* @__PURE__ */ jsx("p", { className: "mt-3 text-lg text-slate-600", children: "Book this week. Next‑day installs available when ordered before 4pm." })
           ] }),
           /* @__PURE__ */ jsx("div", { className: "relative mt-3", children: /* @__PURE__ */ jsx("div", { className: "relative grid gap-4 sm:grid-cols-3", children: steps.map((step) => {
             const Icon = step.icon;
@@ -4110,7 +4426,7 @@ function ServiceCards() {
                   /* @__PURE__ */ jsx("h3", { className: "mt-4 text-[18px] font-semibold text-slate-900", children: step.title }),
                   /* @__PURE__ */ jsx("p", { className: "mt-1.5 text-[14px] leading-relaxed text-slate-600", children: step.description }),
                   /* @__PURE__ */ jsxs("div", { className: "mt-4 flex items-center justify-center gap-3", children: [
-                    /* @__PURE__ */ jsx("span", { className: "inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-[5px] text-[11px] font-medium tracking-[0.16em] text-slate-600 uppercase", children: step.step }),
+                    /* @__PURE__ */ jsx("span", { className: "inline-flex rounded-full bg-slate-50 px-3 py-[5px] text-[11px] font-medium tracking-[0.16em] text-slate-600 uppercase", children: step.step }),
                     /* @__PURE__ */ jsx("span", { className: "h-[2px] w-16 rounded-full bg-gradient-to-r from-emerald-400/60 via-emerald-300/40 to-transparent" })
                   ] })
                 ]
@@ -4157,7 +4473,7 @@ function Faq() {
   const [openIndex, setOpenIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
   const displayedFaqs = showAll ? FAQ_LIST : FAQ_LIST.slice(0, 5);
-  return /* @__PURE__ */ jsx("section", { className: "bg-slate-50 py-20 rounded-b-[45px]", children: /* @__PURE__ */ jsxs("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-0", children: [
+  return /* @__PURE__ */ jsx("section", { className: "bg-slate-50 py-20 rounded-b-[45px]", children: /* @__PURE__ */ jsxs("div", { className: "max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-0", children: [
     /* @__PURE__ */ jsxs("div", { className: "mb-16 max-w-3xl mx-auto text-center", children: [
       /* @__PURE__ */ jsx("span", { className: "text-xs uppercase tracking-[0.3em] text-emerald-600", children: "Leeds & Surrounding support" }),
       /* @__PURE__ */ jsx("h2", { className: "mt-3 text-4xl sm:text-5xl font-bold text-slate-900", children: "Questions, answered" })
@@ -4180,12 +4496,11 @@ function Faq() {
                 onClick: () => setOpenIndex(isOpen ? null : index),
                 className: `
                                             group relative w-full cursor-pointer
-                                            border
                                             px-8 pt-9 pb-6
                                             flex flex-col items-center gap-3
                                             text-center
                                             transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]
-                                            ${isOpen ? "bg-white border-emerald-200 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)]" : "bg-white border-slate-200 hover:border-emerald-200 hover:shadow-md"}
+                                            ${isOpen ? "bg-white shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)]" : "bg-white hover:shadow-md"}
                                         `,
                 children: [
                   /* @__PURE__ */ jsx(
@@ -4231,7 +4546,7 @@ function Faq() {
                                             overflow-hidden transition-all duration-500 ease-[cubic-bezier(.4,0,.2,1)]
                                             ${isOpen ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"}
                                         `,
-                children: /* @__PURE__ */ jsx("div", { className: "mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 text-center border border-slate-200 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]", children: item.a })
+                children: /* @__PURE__ */ jsx("div", { className: "mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 text-center shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]", children: item.a })
               }
             )
           ]
@@ -4246,7 +4561,7 @@ function Faq() {
           setShowAll((prev) => !prev);
           setOpenIndex(0);
         },
-        className: "\n                            inline-flex items-center gap-3 cursor-pointer\n                            rounded-full\n                            border border-slate-300\n                            bg-white\n                            px-6 py-3\n                            text-sm font-semibold text-slate-900\n                            transition-all duration-300\n                            hover:border-emerald-300 hover:shadow-md\n                        ",
+        className: "\n                            inline-flex items-center gap-3 cursor-pointer\n                            rounded-full\n                            bg-white\n                            px-6 py-3\n                            text-sm font-semibold text-slate-900\n                            transition-all duration-300\n                            hover:shadow-md\n                        ",
         children: [
           showAll ? "Show less questions" : "View all questions",
           /* @__PURE__ */ jsx(
@@ -4262,7 +4577,8 @@ function Faq() {
 }
 const renderStars = (rating = 0) => {
   const safe = Math.max(0, Math.min(5, Number(rating) || 0));
-  return "★".repeat(Math.round(safe)) + "☆".repeat(5 - Math.round(safe));
+  const rounded = Math.round(safe);
+  return /* @__PURE__ */ jsx("span", { className: "inline-flex items-center gap-0.5", "aria-hidden": true, children: Array.from({ length: 5 }).map((_, index) => /* @__PURE__ */ jsx("span", { className: index < rounded ? "text-amber-400" : "text-amber-200", children: "★" }, index)) });
 };
 const truncate = (text = "", max = 320) => {
   if (!text || text.length <= max) return text;
@@ -4341,7 +4657,7 @@ function GoogleReview({ theme = "light" }) {
   };
   const activeReview = reviews[activeIndex] ?? null;
   if (loading) {
-    return /* @__PURE__ */ jsx("section", { className: isBlue ? "py-12 quote-page-bg" : "bg-slate-50 py-12", children: /* @__PURE__ */ jsx("div", { className: "mx-auto max-w-7xl px-4 sm:px-6 lg:px-0", children: /* @__PURE__ */ jsx("div", { className: isBlue ? "rounded-[32px] border border-white/30 bg-[var(--qb-panel)] p-6 shadow-sm" : "rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm", children: /* @__PURE__ */ jsxs("div", { className: "grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]", children: [
+    return /* @__PURE__ */ jsx("section", { className: isBlue ? "py-12 quote-page-bg" : "bg-slate-50 py-12", children: /* @__PURE__ */ jsx("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: /* @__PURE__ */ jsx("div", { className: isBlue ? "rounded-[32px] border border-white/30 bg-[var(--qb-panel)] p-6 shadow-sm" : "rounded-[32px] bg-white p-6 shadow-sm", children: /* @__PURE__ */ jsxs("div", { className: "grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]", children: [
       /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
         /* @__PURE__ */ jsx("div", { className: isBlue ? "h-12 w-44 rounded-2xl bg-white/20" : "h-12 w-44 rounded-2xl bg-slate-100" }),
         /* @__PURE__ */ jsx("div", { className: isBlue ? "h-32 rounded-[24px] bg-white/15" : "h-32 rounded-[24px] bg-slate-100" })
@@ -4350,16 +4666,16 @@ function GoogleReview({ theme = "light" }) {
     ] }) }) }) });
   }
   if (!payload?.configured || reviews.length === 0 || !activeReview) return null;
-  return /* @__PURE__ */ jsx("section", { className: isBlue ? "py-12 quote-page-bg" : "bg-slate-50 py-12 no-auto-dark-surface", children: /* @__PURE__ */ jsx("div", { className: "mx-auto max-w-7xl px-4 sm:px-6 lg:px-0", children: /* @__PURE__ */ jsx("div", { className: isBlue ? "overflow-hidden rounded-[32px] border border-white/30 bg-[var(--qb-panel)] shadow-sm" : "overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] no-auto-dark-card", children: /* @__PURE__ */ jsxs("div", { className: "grid gap-0 lg:grid-cols-[320px_minmax(0,1fr)]", children: [
-    /* @__PURE__ */ jsxs("aside", { className: isBlue ? "flex min-h-full flex-col border-b border-white/15 bg-white/8 p-6 lg:border-b-0 lg:border-r lg:border-r-white/15" : "flex min-h-full flex-col border-b border-slate-200 bg-slate-50 p-6 lg:border-b-0 lg:border-r lg:border-r-slate-200", children: [
+  return /* @__PURE__ */ jsx("section", { className: isBlue ? "py-12 quote-page-bg" : "bg-slate-50 py-12 no-auto-dark-surface", children: /* @__PURE__ */ jsx("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: /* @__PURE__ */ jsx("div", { className: isBlue ? "overflow-hidden rounded-[32px] border border-white/30 bg-[var(--qb-panel)] shadow-sm" : "overflow-hidden rounded-[32px] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] no-auto-dark-card", children: /* @__PURE__ */ jsxs("div", { className: "grid gap-0 lg:grid-cols-[320px_minmax(0,1fr)]", children: [
+    /* @__PURE__ */ jsxs("aside", { className: isBlue ? "flex min-h-full flex-col border-b border-white/15 bg-white/8 p-6 lg:border-b-0 lg:border-r lg:border-r-white/15" : "flex min-h-full flex-col bg-slate-50 p-6", children: [
       /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsx("span", { className: isBlue ? "inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10" : "inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white", children: /* @__PURE__ */ jsx(GoogleMark, {}) }),
+        /* @__PURE__ */ jsx("span", { className: isBlue ? "inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10" : "inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-[0_1px_6px_rgba(15,23,42,0.08)]", children: /* @__PURE__ */ jsx(GoogleMark, {}) }),
         /* @__PURE__ */ jsxs("div", { children: [
           /* @__PURE__ */ jsx("p", { className: isBlue ? "text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70" : "text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500", children: "Google Reviews" }),
           /* @__PURE__ */ jsx("h3", { className: isBlue ? "text-2xl font-bold text-white" : "text-2xl font-bold text-slate-900", style: isBlue ? { color: "#ffffff" } : void 0, children: payload.name || "MD Gas Leeds" })
         ] })
       ] }),
-      /* @__PURE__ */ jsxs("div", { className: isBlue ? "mt-6 rounded-[24px] border border-white/20 bg-white/10 p-5" : "mt-6 rounded-[24px] border border-slate-200 bg-white p-5", children: [
+      /* @__PURE__ */ jsxs("div", { className: isBlue ? "mt-6 rounded-[24px] border border-white/20 bg-white/10 p-5" : "mt-6 rounded-[24px] bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.06)]", children: [
         /* @__PURE__ */ jsx("p", { className: isBlue ? "text-4xl font-bold text-white" : "text-4xl font-bold text-slate-900", children: formatRating(payload.rating) }),
         /* @__PURE__ */ jsx("p", { className: "mt-2 text-lg leading-none text-amber-500", children: renderStars(payload.rating) }),
         /* @__PURE__ */ jsx("p", { className: isBlue ? "mt-3 text-sm leading-6 text-cyan-100" : "mt-3 text-sm leading-6 text-slate-600", children: "Rated by homeowners in Leeds and surrounding areas." }),
@@ -4385,7 +4701,7 @@ function GoogleReview({ theme = "light" }) {
           href: payload.maps_url,
           target: "_blank",
           rel: "noreferrer",
-          className: isBlue ? "mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 lg:mt-auto" : "mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 lg:mt-auto",
+          className: isBlue ? "mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 lg:mt-auto" : "mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 lg:mt-auto",
           children: [
             "View all on Google ",
             /* @__PURE__ */ jsx("span", { "aria-hidden": true, children: "↗" })
@@ -4393,7 +4709,7 @@ function GoogleReview({ theme = "light" }) {
         }
       ) : null
     ] }),
-    /* @__PURE__ */ jsx("div", { className: "p-6 lg:p-8", children: /* @__PURE__ */ jsxs("article", { className: isBlue ? "flex min-h-[320px] flex-col rounded-[28px] border border-white/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.08))] p-6" : "flex min-h-[320px] flex-col rounded-[28px] border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-6", children: [
+    /* @__PURE__ */ jsx("div", { className: "p-6 lg:p-8", children: /* @__PURE__ */ jsxs("article", { className: isBlue ? "flex min-h-[320px] flex-col rounded-[28px] border border-white/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.08))] p-6" : "flex min-h-[320px] flex-col rounded-[28px] bg-gradient-to-b from-white to-slate-50 p-6 shadow-[0_10px_25px_rgba(15,23,42,0.06)]", children: [
       /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between gap-4", children: [
         /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-4", children: [
           activeReview.profile_photo_url ? /* @__PURE__ */ jsx(
@@ -4401,26 +4717,23 @@ function GoogleReview({ theme = "light" }) {
             {
               src: activeReview.profile_photo_url,
               alt: activeReview.author_name || "Google reviewer",
-              className: isBlue ? "h-14 w-14 shrink-0 rounded-full border border-white/35 object-cover" : "h-14 w-14 shrink-0 rounded-full border border-slate-200 object-cover",
+              className: isBlue ? "h-14 w-14 shrink-0 rounded-full border border-white/35 object-cover" : "h-14 w-14 shrink-0 rounded-full object-cover shadow-[0_1px_6px_rgba(15,23,42,0.08)]",
               loading: "lazy",
               referrerPolicy: "no-referrer"
             }
-          ) : /* @__PURE__ */ jsx("div", { className: isBlue ? "grid h-14 w-14 shrink-0 place-items-center rounded-full border border-white/35 bg-white/15 text-sm font-bold text-white" : "grid h-14 w-14 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700", children: initialsFromName(activeReview.author_name) }),
+          ) : /* @__PURE__ */ jsx("div", { className: isBlue ? "grid h-14 w-14 shrink-0 place-items-center rounded-full border border-white/35 bg-white/15 text-sm font-bold text-white" : "grid h-14 w-14 shrink-0 place-items-center rounded-full bg-white text-sm font-bold text-slate-700 shadow-[0_1px_6px_rgba(15,23,42,0.08)]", children: initialsFromName(activeReview.author_name) }),
           /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
             /* @__PURE__ */ jsx("p", { className: isBlue ? "truncate text-lg font-semibold text-white" : "truncate text-lg font-semibold text-slate-900", children: activeReview.author_name }),
             /* @__PURE__ */ jsx("p", { className: isBlue ? "mt-1 text-sm text-cyan-100" : "mt-1 text-sm text-slate-500", children: activeReview.relative_time_description })
           ] })
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: isBlue ? "rounded-full border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white" : "rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700", children: [
+        /* @__PURE__ */ jsxs("div", { className: isBlue ? "rounded-full border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white" : "rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-[0_1px_6px_rgba(15,23,42,0.08)]", children: [
           activeIndex + 1,
           "/",
           reviews.length
         ] })
       ] }),
-      /* @__PURE__ */ jsxs("div", { className: "mt-6 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsx("span", { className: "text-lg leading-none text-amber-500", children: "★" }),
-        /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold tracking-[0.18em] text-amber-500", children: renderStars(activeReview.rating) })
-      ] }),
+      /* @__PURE__ */ jsx("div", { className: "mt-6 flex items-center gap-2", children: /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold tracking-[0.18em] text-amber-500", children: renderStars(activeReview.rating) }) }),
       /* @__PURE__ */ jsx("div", { className: "mt-6 flex-1", children: /* @__PURE__ */ jsxs("p", { className: isBlue ? "min-h-[168px] text-lg leading-8 text-white/95" : "min-h-[168px] text-lg leading-8 text-slate-700", children: [
         "“",
         truncate(activeReview.text, 320),
@@ -4429,7 +4742,7 @@ function GoogleReview({ theme = "light" }) {
       /* @__PURE__ */ jsxs(
         "div",
         {
-          className: "mt-6 flex items-center justify-between gap-3 border-t pt-5",
+          className: "mt-6 flex items-center justify-between gap-3 pt-5",
           style: isBlue ? { borderColor: "rgba(255,255,255,0.18)" } : void 0,
           children: [
             /* @__PURE__ */ jsx("p", { className: isBlue ? "text-sm text-cyan-100" : "text-sm text-slate-500", children: "Real Google feedback helping customers choose with confidence." }),
@@ -4439,7 +4752,7 @@ function GoogleReview({ theme = "light" }) {
                 {
                   type: "button",
                   onClick: goPrev,
-                  className: isBlue ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20" : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100",
+                  className: isBlue ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20" : "inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 transition hover:bg-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.08)]",
                   "aria-label": "Previous review",
                   children: "←"
                 }
@@ -4449,7 +4762,7 @@ function GoogleReview({ theme = "light" }) {
                 {
                   type: "button",
                   onClick: goNext,
-                  className: isBlue ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20" : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100",
+                  className: isBlue ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20" : "inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 transition hover:bg-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.08)]",
                   "aria-label": "Next review",
                   children: "→"
                 }
@@ -4588,198 +4901,6 @@ const __vite_glob_0_14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: Home$1
 }, Symbol.toStringTag, { value: "Module" }));
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  captionLayout = "label",
-  buttonVariant = "ghost",
-  formatters,
-  Components,
-  ...props
-}) {
-  const defaultClassNames = getDefaultClassNames();
-  return /* @__PURE__ */ jsx(
-    DayPicker,
-    {
-      showOutsideDays,
-      className: cn$2(
-        " group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
-        className
-      ),
-      captionLayout,
-      formatters: {
-        formatMonthDropdown: (date) => date.toLocaleString("default", { month: "short" }),
-        ...formatters
-      },
-      classNames: {
-        root: cn$2("w-fit", defaultClassNames.root),
-        months: cn$2(
-          "relative flex flex-col gap-4 md:flex-row",
-          defaultClassNames.months
-        ),
-        month: cn$2(
-          "flex w-full flex-col gap-4",
-          defaultClassNames.month
-        ),
-        nav: cn$2(
-          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
-          defaultClassNames.nav
-        ),
-        button_previous: cn$2(
-          buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_previous
-        ),
-        button_next: cn$2(
-          buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_next
-        ),
-        month_caption: cn$2(
-          "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]",
-          defaultClassNames.month_caption
-        ),
-        dropdowns: cn$2(
-          "flex h-[--cell-size] w-full items-center justify-center gap-1.5 text-sm font-medium",
-          defaultClassNames.dropdowns
-        ),
-        dropdown_root: cn$2(
-          "has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
-          defaultClassNames.dropdown_root
-        ),
-        dropdown: cn$2(
-          "bg-popover absolute inset-0 opacity-0",
-          defaultClassNames.dropdown
-        ),
-        caption_label: cn$2(
-          "select-none font-medium",
-          captionLayout === "label" ? "text-sm" : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5",
-          defaultClassNames.caption_label
-        ),
-        table: "w-full border-collapse",
-        weekdays: cn$2("grid grid-cols-7", defaultClassNames.weekdays),
-        weekday: cn$2(
-          "text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal",
-          defaultClassNames.weekday
-        ),
-        week: cn$2("mt-2 grid grid-cols-7 w-full", defaultClassNames.week),
-        week_number_header: cn$2(
-          "w-[--cell-size] select-none",
-          defaultClassNames.week_number_header
-        ),
-        week_number: cn$2(
-          "text-muted-foreground select-none text-[0.8rem]",
-          defaultClassNames.week_number
-        ),
-        day: cn$2(
-          "group/day relative h-[--cell-size] w-[--cell-size] select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md",
-          defaultClassNames.day
-        ),
-        range_start: cn$2(
-          "bg-accent rounded-l-md",
-          defaultClassNames.range_start
-        ),
-        range_middle: cn$2(
-          "rounded-none",
-          defaultClassNames.range_middle
-        ),
-        range_end: cn$2(
-          "bg-accent rounded-r-md",
-          defaultClassNames.range_end
-        ),
-        today: cn$2(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
-          defaultClassNames.today
-        ),
-        outside: cn$2(
-          "text-muted-foreground aria-selected:text-muted-foreground",
-          defaultClassNames.outside
-        ),
-        disabled: cn$2(
-          "text-muted-foreground opacity-50",
-          defaultClassNames.disabled
-        ),
-        hidden: cn$2("invisible", defaultClassNames.hidden),
-        ...classNames
-      },
-      Components: {
-        Root: ({ className: className2, rootRef, ...props2 }) => {
-          return /* @__PURE__ */ jsx(
-            "div",
-            {
-              "data-slot": "calendar",
-              ref: rootRef,
-              className: cn$2(className2),
-              ...props2
-            }
-          );
-        },
-        Chevron: ({ className: className2, orientation, ...props2 }) => {
-          if (orientation === "left") {
-            return /* @__PURE__ */ jsx(
-              ChevronLeftIcon,
-              {
-                className: cn$2("size-4", className2),
-                ...props2
-              }
-            );
-          }
-          if (orientation === "right") {
-            return /* @__PURE__ */ jsx(
-              ChevronRightIcon,
-              {
-                className: cn$2("size-4", className2),
-                ...props2
-              }
-            );
-          }
-          return /* @__PURE__ */ jsx(
-            ChevronDownIcon,
-            {
-              className: cn$2("size-4", className2),
-              ...props2
-            }
-          );
-        },
-        DayButton: CalendarDayButton,
-        WeekNumber: ({ children, ...props2 }) => {
-          return /* @__PURE__ */ jsx("td", { ...props2, children: /* @__PURE__ */ jsx("div", { className: "flex size-[--cell-size] items-center justify-center text-center", children }) });
-        },
-        ...Components
-      },
-      ...props
-    }
-  );
-}
-function CalendarDayButton({ className, day, modifiers, ...props }) {
-  const defaultClassNames = getDefaultClassNames();
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
-  }, [modifiers.focused]);
-  return /* @__PURE__ */ jsx(
-    Button,
-    {
-      ref,
-      variant: "ghost",
-      size: "icon",
-      "data-day": day.date.toLocaleDateString(),
-      "data-selected-single": modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle,
-      "data-range-start": modifiers.range_start,
-      "data-range-end": modifiers.range_end,
-      "data-range-middle": modifiers.range_middle,
-      className: cn$2(
-        "data-[selected-single=true]:bg-light-grey data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-light-grey data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-light-grey data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex h-[--cell-size] w-[--cell-size] min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[1px] [&>span]:text-xs [&>span]:opacity-70",
-        defaultClassNames.day,
-        className
-      ),
-      ...props
-    }
-  );
-}
 const AppointmentDateRangePicker = ({ type, value, onChange }) => {
   const serviceKey = useMemo(() => {
     if (!type) return null;
@@ -4788,26 +4909,47 @@ const AppointmentDateRangePicker = ({ type, value, onChange }) => {
   }, [type]);
   const today = useMemo(() => startOfDay(/* @__PURE__ */ new Date()), []);
   const maxDate = useMemo(() => addMonths(today, 2), [today]);
-  const fromMonth = useMemo(() => startOfMonth(today), [today]);
-  const toMonth = useMemo(() => startOfMonth(maxDate), [maxDate]);
   const [date, setDate] = useState(value?.date ? new Date(value.date) : null);
   const [time, setTime] = useState(value?.time || null);
-  const [month, setMonth] = useState(() => startOfMonth(date || today));
   const [loading, setLoading] = useState(false);
   const [slotsByDay, setSlotsByDay] = useState({});
   const [error, setError] = useState(null);
   const lastAppliedRef = useRef({ date: null, time: null });
-  const monthKey = useMemo(() => format(month, "yyyy-MM"), [month]);
+  const monthKeys = useMemo(() => {
+    const keys = [
+      format(today, "yyyy-MM"),
+      format(addMonths(today, 1), "yyyy-MM"),
+      format(addMonths(today, 2), "yyyy-MM")
+    ];
+    return [...new Set(keys)];
+  }, [today]);
+  const emit = (d, t) => {
+    onChange?.({
+      date: d ? format(d, "yyyy-MM-dd") : null,
+      time: t || null
+    });
+  };
   useEffect(() => {
     if (!serviceKey) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
-    axios.get("/appointments/availability", {
-      params: { type: serviceKey, month: monthKey }
-    }).then((res) => {
+    Promise.all(
+      monthKeys.map(
+        (month) => axios.get("/appointments/availability", {
+          params: { type: serviceKey, month }
+        })
+      )
+    ).then((responses) => {
       if (cancelled) return;
-      setSlotsByDay(res.data?.data?.days || {});
+      const merged = {};
+      responses.forEach((res) => {
+        const days = res?.data?.data?.days || {};
+        Object.entries(days).forEach(([day, slots]) => {
+          merged[day] = Array.isArray(slots) ? slots : [];
+        });
+      });
+      setSlotsByDay(merged);
     }).catch(() => {
       if (cancelled) return;
       setError("Unable to load availability. Please try again.");
@@ -4819,7 +4961,36 @@ const AppointmentDateRangePicker = ({ type, value, onChange }) => {
     return () => {
       cancelled = true;
     };
-  }, [serviceKey, monthKey]);
+  }, [serviceKey, monthKeys]);
+  const availableDays = useMemo(() => {
+    return Object.entries(slotsByDay).filter(([, slots]) => Array.isArray(slots) && slots.length > 0).map(([key]) => {
+      const parsed = /* @__PURE__ */ new Date(`${key}T00:00:00`);
+      return {
+        key,
+        date: parsed,
+        label: format(parsed, "EEE d MMM"),
+        sublabel: format(parsed, "MMMM yyyy")
+      };
+    }).filter(({ date: parsed }) => {
+      if (Number.isNaN(parsed.getTime())) return false;
+      return parsed >= today && parsed <= maxDate;
+    }).sort((a, b) => a.date.getTime() - b.date.getTime());
+  }, [slotsByDay, today, maxDate]);
+  const availableDaySections = useMemo(() => {
+    const map = /* @__PURE__ */ new Map();
+    availableDays.forEach((day) => {
+      const sectionKey = format(day.date, "yyyy-MM");
+      if (!map.has(sectionKey)) {
+        map.set(sectionKey, {
+          key: sectionKey,
+          label: format(day.date, "MMMM yyyy"),
+          days: []
+        });
+      }
+      map.get(sectionKey).days.push(day);
+    });
+    return Array.from(map.values());
+  }, [availableDays]);
   const dayKey = date ? format(date, "yyyy-MM-dd") : null;
   const daySlots = dayKey ? slotsByDay[dayKey] || [] : [];
   useEffect(() => {
@@ -4834,65 +5005,149 @@ const AppointmentDateRangePicker = ({ type, value, onChange }) => {
       const nextDate = incomingDateStr ? new Date(incomingDateStr) : null;
       setDate(nextDate);
       setTime(incomingTime || null);
-      if (nextDate) setMonth(startOfMonth(nextDate));
     }
   }, [value?.date, value?.time]);
-  const emit = (d, t) => {
-    onChange?.({
-      date: d ? format(d, "yyyy-MM-dd") : null,
-      time: t || null
-    });
-  };
-  const disabled = useMemo(
-    () => ({ before: today, after: maxDate }),
-    [today, maxDate]
-  );
+  useEffect(() => {
+    if (!date && availableDays.length > 0) {
+      const firstAvailable = availableDays[0].date;
+      setDate(firstAvailable);
+      setTime(null);
+      emit(firstAvailable, null);
+    }
+  }, [availableDays, date]);
+  useEffect(() => {
+    if (!dayKey) return;
+    if (availableDays.some((d) => d.key === dayKey)) return;
+    setDate(null);
+    setTime(null);
+    emit(null, null);
+  }, [availableDays, dayKey]);
   const selectDate = (d) => {
     if (!d) return;
-    if (d < today || d > maxDate) return;
-    if (date && isSameDay(d, date)) return;
     setDate(d);
     setTime(null);
     emit(d, null);
   };
+  const parseHourFromSlot = (slot) => {
+    const raw = String(slot || "").trim();
+    if (!raw) return null;
+    const match = raw.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+    if (!match) return null;
+    let hour = Number(match[1]);
+    const ampm = (match[3] || "").toLowerCase();
+    if (ampm === "pm" && hour < 12) hour += 12;
+    if (ampm === "am" && hour === 12) hour = 0;
+    return Number.isFinite(hour) ? hour : null;
+  };
+  const groupedDaySlots = useMemo(() => {
+    const groups = {
+      morning: [],
+      afternoon: [],
+      evening: []
+    };
+    daySlots.forEach((slot) => {
+      const hour = parseHourFromSlot(slot);
+      if (hour === null) {
+        groups.afternoon.push(slot);
+        return;
+      }
+      if (hour < 12) groups.morning.push(slot);
+      else if (hour < 17) groups.afternoon.push(slot);
+      else groups.evening.push(slot);
+    });
+    return groups;
+  }, [daySlots]);
+  const slotSections = [
+    {
+      key: "morning",
+      title: "Morning",
+      subtitle: "Before 12:00",
+      slots: groupedDaySlots.morning
+    },
+    {
+      key: "afternoon",
+      title: "Afternoon",
+      subtitle: "12:00 – 17:00",
+      slots: groupedDaySlots.afternoon
+    },
+    {
+      key: "evening",
+      title: "Evening",
+      subtitle: "After 17:00",
+      slots: groupedDaySlots.evening
+    }
+  ];
   const selectTime = (t) => {
     if (!date) return;
     setTime(t);
     emit(date, t);
   };
-  return /* @__PURE__ */ jsxs("div", { className: "w-full max-w-6xl rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden lg:h-[600px]", children: [
+  return /* @__PURE__ */ jsxs("div", { className: "w-full max-w-6xl rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden lg:min-h-[600px]", children: [
     /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between px-4 lg:px-6 py-4 border-b border-slate-200", children: [
       /* @__PURE__ */ jsxs("div", { children: [
         /* @__PURE__ */ jsx("div", { className: "text-base font-semibold text-slate-900 line-clamp-1", children: "Select a date and time" }),
-        /* @__PURE__ */ jsx("div", { className: "text-sm text-slate-600 line-clamp-1", children: "Choose an available slot to confirm your appointment." })
+        /* @__PURE__ */ jsx("div", { className: "text-sm text-slate-600 line-clamp-1", children: "Pick your preferred day, then choose a time window." })
       ] }),
       serviceKey ? /* @__PURE__ */ jsx("span", { className: "inline-flex items-center rounded-full border text-center border-slate-200 bg-slate-50 px-3 py-1 text-[10px] lg:text-xs font-medium text-slate-700 whitespace-nowrap", children: String(serviceKey).replaceAll("_", " ").toUpperCase() }) : /* @__PURE__ */ jsx("span", { className: "inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800", children: "Select service type first" })
     ] }),
     /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 items-stretch h-full", children: [
       /* @__PURE__ */ jsxs("div", { className: "border-b lg:border-b-0 lg:border-r border-slate-200 p-5 sm:p-6", children: [
+        /* @__PURE__ */ jsxs("div", { className: "mb-4 grid grid-cols-2 gap-2 text-xs", children: [
+          /* @__PURE__ */ jsx(
+            "div",
+            {
+              className: cn$2(
+                "rounded-lg border px-3 py-2",
+                date ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-slate-50 text-slate-600"
+              ),
+              children: /* @__PURE__ */ jsx("p", { className: "font-semibold", children: "1) Choose a day" })
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            "div",
+            {
+              className: cn$2(
+                "rounded-lg border px-3 py-2",
+                time ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-slate-50 text-slate-600"
+              ),
+              children: /* @__PURE__ */ jsx("p", { className: "font-semibold", children: "2) Choose a time" })
+            }
+          )
+        ] }),
         /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 mb-4", children: [
           /* @__PURE__ */ jsx(CalendarDays, { className: "h-4 w-4 text-slate-700" }),
-          /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-slate-900", children: "Calendar" }),
-          /* @__PURE__ */ jsx("div", { className: "text-xs text-slate-500", children: "Next 2 months only" })
+          /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-slate-900", children: "Available dates" }),
+          /* @__PURE__ */ jsx("div", { className: "text-xs text-slate-500", children: "Next 2 months" })
         ] }),
-        /* @__PURE__ */ jsx("div", { className: "rounded-lg border border-slate-200 bg-white p-0 md:p-3", children: /* @__PURE__ */ jsx(
-          Calendar,
-          {
-            mode: "single",
-            month,
-            onMonthChange: setMonth,
-            fromMonth,
-            toMonth,
-            selected: date,
-            onSelect: selectDate,
-            weekStartsOn: 1,
-            disabled,
-            className: "w-full",
-            classNames: {
-              disabled: "text-muted-foreground opacity-50"
-            }
-          }
-        ) }),
+        /* @__PURE__ */ jsx("div", { className: "rounded-lg border border-slate-200 bg-white p-3", children: loading ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx("div", { className: "h-10 rounded-lg bg-slate-100" }),
+          /* @__PURE__ */ jsx("div", { className: "h-10 rounded-lg bg-slate-100" }),
+          /* @__PURE__ */ jsx("div", { className: "h-10 rounded-lg bg-slate-100" })
+        ] }) : error ? /* @__PURE__ */ jsx("div", { className: "rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800", children: error }) : availableDays.length === 0 ? /* @__PURE__ */ jsx("div", { className: "rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700", children: "No dates available right now. Please try again shortly." }) : /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsx("div", { className: "space-y-4 max-h-[320px] overflow-y-auto pr-1", children: availableDaySections.map((section) => /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("p", { className: "mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500", children: section.label }),
+          /* @__PURE__ */ jsx("div", { className: "grid grid-cols-2 gap-2", children: section.days.map((d, idx) => {
+            const active = dayKey === d.key;
+            const isEarliest = d.key === availableDays[0]?.key;
+            return /* @__PURE__ */ jsxs(
+              "button",
+              {
+                type: "button",
+                onClick: () => selectDate(d.date),
+                className: cn$2(
+                  "w-full min-w-0 rounded-lg border px-3 py-2 text-left transition-all",
+                  active ? "border-blue-600 bg-blue-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                ),
+                "aria-pressed": active,
+                children: [
+                  isEarliest && idx === 0 && /* @__PURE__ */ jsx("span", { className: "mb-1 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800", children: "Earliest" }),
+                  /* @__PURE__ */ jsx("p", { className: "text-sm font-semibold text-slate-900 leading-tight whitespace-normal break-words", children: d.label }),
+                  /* @__PURE__ */ jsx("p", { className: "text-xs text-slate-500 leading-tight whitespace-normal", children: format(d.date, "EEEE") })
+                ]
+              },
+              d.key
+            );
+          }) })
+        ] }, section.key)) }) }) }),
         /* @__PURE__ */ jsx("div", { className: "mt-2 rounded-lg border border-slate-200 bg-slate-50 p-4", children: date && time ? /* @__PURE__ */ jsxs("div", { className: "text-sm text-slate-800", children: [
           "Your chosen appointment:",
           " ",
@@ -4932,37 +5187,37 @@ const AppointmentDateRangePicker = ({ type, value, onChange }) => {
         ] }) : daySlots.length === 0 ? /* @__PURE__ */ jsxs("div", { className: "rounded-lg border border-slate-200 bg-white p-4", children: [
           /* @__PURE__ */ jsx("div", { className: "text-sm font-medium text-slate-900", children: "No slots available" }),
           /* @__PURE__ */ jsx("div", { className: "text-sm text-slate-600 mt-1", children: "Try another day to find an open slot." })
-        ] }) : /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-3", children: daySlots.map((t) => {
-          const active = time === t;
-          return /* @__PURE__ */ jsx(
-            "button",
+        ] }) : /* @__PURE__ */ jsx("div", { className: "space-y-4", children: slotSections.map((section) => {
+          if (!section.slots.length) return null;
+          return /* @__PURE__ */ jsxs(
+            "div",
             {
-              type: "button",
-              onClick: () => selectTime(t),
-              "aria-pressed": active,
-              className: cn$2(
-                "rounded-lg border px-4 py-3 text-left transition-all",
-                "bg-white hover:bg-slate-50",
-                active ? "border-blue-600 bg-blue-50" : "border-slate-200 hover:border-slate-300"
-              ),
-              children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between gap-3", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex flex-col", children: [
-                  /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold text-slate-900", children: t }),
-                  /* @__PURE__ */ jsx("span", { className: "text-xs text-slate-500", children: active ? "Chosen slot" : "Tap to choose" })
+              className: "rounded-lg border border-slate-200 bg-white p-3",
+              children: [
+                /* @__PURE__ */ jsxs("div", { className: "mb-2 flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsx("p", { className: "text-sm font-semibold text-slate-900", children: section.title }),
+                  /* @__PURE__ */ jsx("p", { className: "text-xs text-slate-500", children: section.subtitle })
                 ] }),
-                /* @__PURE__ */ jsx(
-                  "span",
-                  {
-                    className: cn$2(
-                      "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold",
-                      active ? "bg-blue-600 text-white" : "bg-green-500 text-white"
-                    ),
-                    children: active ? "Selected" : "Available"
-                  }
-                )
-              ] })
+                /* @__PURE__ */ jsx("div", { className: "grid grid-cols-2 sm:grid-cols-3 gap-2", children: section.slots.map((t) => {
+                  const active = time === t;
+                  return /* @__PURE__ */ jsx(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => selectTime(t),
+                      "aria-pressed": active,
+                      className: cn$2(
+                        "rounded-lg border px-3 py-2 text-sm font-semibold transition-all",
+                        active ? "border-blue-600 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-900 hover:border-slate-300 hover:bg-slate-50"
+                      ),
+                      children: t
+                    },
+                    `${section.key}-${t}`
+                  );
+                }) })
+              ]
             },
-            t
+            section.key
           );
         }) }) })
       ] })
@@ -4970,14 +5225,22 @@ const AppointmentDateRangePicker = ({ type, value, onChange }) => {
   ] });
 };
 const STEPS$2 = ["Choose", "Customise", "Book", "Complete"];
-function PageHeader({ variant = "default", currentStep = 4 }) {
+function PageHeader({ variant = "default", currentStep = 4, theme = "light" }) {
   const waHref = "https://wa.me/447454796398";
   const waNumber = "+447454796398";
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const shouldForceBlueByPath = pathname === "/book/quote/new/install" || pathname === "/book/quote/new/results" || pathname === "/book/quote/service/checkout";
+  const isBlue = theme === "blue" || shouldForceBlueByPath;
   return /* @__PURE__ */ jsx(
     "header",
     {
-      className: "page-header-clean border-b border-slate-200 bg-white",
-      style: { backgroundColor: "#ffffff", borderBottomColor: "#e2e8f0" },
+      className: `page-header-clean ${isBlue ? "page-header-blue" : "border-b border-slate-200 bg-white"}`,
+      style: {
+        backgroundColor: isBlue ? "transparent" : "#ffffff",
+        backgroundImage: "none",
+        borderBottomColor: isBlue ? "transparent" : "#e2e8f0",
+        boxShadow: isBlue ? "none" : void 0
+      },
       children: /* @__PURE__ */ jsx("div", { className: "mx-auto max-w-7xl px-6 sm:px-8 lg:px-10", children: /* @__PURE__ */ jsxs("div", { className: "flex h-[75px] items-center justify-between", children: [
         /* @__PURE__ */ jsx(Link, { href: "/", className: "w-[120px]", children: /* @__PURE__ */ jsx("img", { src: "/images/logo%20FIXED.png", alt: "MD Gas Leeds" }) }),
         variant === "results" && /* @__PURE__ */ jsx("div", { className: "hidden md:flex items-center gap-3", children: STEPS$2.map((label2, i) => {
@@ -4993,7 +5256,7 @@ function PageHeader({ variant = "default", currentStep = 4 }) {
                   "div",
                   {
                     className: `h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold
-                                                ${done ? "bg-primary text-white" : active ? "border-2 border-primary text-primary" : "border border-gray-300 text-gray-400"}
+                                                ${done ? "bg-primary text-white" : active ? isBlue ? "border-2 border-white text-white" : "border-2 border-primary text-primary" : isBlue ? "border border-white/50 text-white/70" : "border border-gray-300 text-gray-400"}
                                             `,
                     children: step
                   }
@@ -5001,11 +5264,11 @@ function PageHeader({ variant = "default", currentStep = 4 }) {
                 /* @__PURE__ */ jsx(
                   "span",
                   {
-                    className: `text-sm ${active ? "font-semibold text-slate-900" : "text-gray-400"}`,
+                    className: `text-sm ${active ? isBlue ? "font-semibold text-white" : "font-semibold text-slate-900" : isBlue ? "text-white/75" : "text-gray-400"}`,
                     children: label2
                   }
                 ),
-                i !== STEPS$2.length - 1 && /* @__PURE__ */ jsx(ChevronRight, { className: "h-4 w-4 text-gray-300 mx-1" })
+                i !== STEPS$2.length - 1 && /* @__PURE__ */ jsx(ChevronRight, { className: `mx-1 h-4 w-4 ${isBlue ? "text-white/60" : "text-gray-300"}` })
               ]
             },
             label2
@@ -5017,7 +5280,7 @@ function PageHeader({ variant = "default", currentStep = 4 }) {
             href: waHref,
             target: "_blank",
             rel: "noopener noreferrer",
-            className: "inline-flex items-center gap-2 rounded-full bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
+            className: `inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 ${isBlue ? "bg-white text-cyan-700 hover:bg-cyan-50 focus-visible:ring-white/40" : "bg-primary text-white hover:opacity-90 focus-visible:ring-primary/30"}`,
             "aria-label": `Chat on WhatsApp ${waNumber}`,
             children: [
               /* @__PURE__ */ jsx(FaWhatsapp, { className: "h-4 w-4" }),
@@ -5039,24 +5302,31 @@ function BlueQuoteSkin({ children }) {
                 }
 
                 .quote-blue-skin {
-                    --qb-base: #00ABDB;
-                    --qb-mid: #0098c4;
-                    --qb-deep: #007ea3;
-                    --qb-panel: #0089b2;
-                    --qb-panel-dark: #00779b;
-                    --qb-option: #0082a8;
-                    --qb-option-active: #006f91;
+                    --qb-base: #06263f;
+                    --qb-mid: #0b3654;
+                    --qb-deep: #114c73;
+                    --qb-panel: #0b3654;
+                    --qb-panel-dark: #114c73;
+                    --qb-option: #114c73;
+                    --qb-option-active: #0b3654;
                 }
 
                 .quote-blue-skin .quote-page-bg {
                     background: var(--qb-base) !important;
-                    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
+                    background-image: radial-gradient(circle at top, rgba(54, 193, 255, 0.22), rgba(255, 255, 255, 0.00) 45%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
                 }
 
-                .quote-blue-skin .page-header-clean {
+                .quote-blue-skin .page-header-clean:not(.page-header-blue) {
                     background: var(--qb-panel) !important;
                     border-color: rgba(255, 255, 255, 0.30) !important;
                     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+                }
+
+                .quote-blue-skin .page-header-clean.page-header-blue {
+                    background: transparent !important;
+                    background-image: none !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
                 }
 
                 .quote-blue-skin .quote-trust-card {
@@ -5207,13 +5477,13 @@ function BlueQuoteSkin({ children }) {
                         background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
                     }
 
-                    .quote-blue-skin .page-header-clean,
+                    .quote-blue-skin .page-header-clean:not(.page-header-blue),
                     .quote-blue-skin .quote-trust-card,
                     .quote-blue-skin .quote-question-shell {
                         background-color: var(--qb-panel) !important;
                     }
 
-                    .quote-blue-skin .page-header-clean,
+                    .quote-blue-skin .page-header-clean:not(.page-header-blue),
                     .quote-blue-skin .quote-trust-card,
                     .quote-blue-skin .quote-question-shell,
                     .quote-blue-skin .quote-question-shell [class*="bg-slate"],
@@ -6046,870 +6316,873 @@ function InstallPage({ booking }) {
                 }
             ` }),
     /* @__PURE__ */ jsxs(BlueQuoteSkin, { children: [
-      /* @__PURE__ */ jsx(PageHeader, {}),
-      /* @__PURE__ */ jsx("div", { className: "min-h-screen bg-white quote-page-bg", children: /* @__PURE__ */ jsxs("div", { className: "max-w-7xl mx-auto px-4 py-10 md:py-14 pb-28 lg:pb-10", children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex items-end gap-6 mb-10", children: [
-          /* @__PURE__ */ jsxs(
-            "button",
-            {
-              type: "button",
-              onClick: () => window.history.back(),
-              className: "group flex w-fit items-center gap-2 text-[13px] cursor-pointer font-semibold uppercase tracking-wide text-slate-400 transition-colors hover:text-slate-900",
-              children: [
-                /* @__PURE__ */ jsx("span", { className: "flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 transition-transform duration-300 group-hover:-translate-x-1 group-hover:bg-slate-200", children: /* @__PURE__ */ jsx(
-                  "svg",
-                  {
-                    className: "h-4 w-4",
-                    fill: "none",
-                    viewBox: "0 0 24 24",
-                    stroke: "currentColor",
-                    strokeWidth: 3,
-                    children: /* @__PURE__ */ jsx(
-                      "path",
-                      {
-                        strokeLinecap: "round",
-                        strokeLinejoin: "round",
-                        d: "M15 19l-7-7 7-7"
-                      }
-                    )
-                  }
-                ) }),
-                "Back"
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { className: "text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500", children: "Checkout" }),
-            /* @__PURE__ */ jsx("h2", { className: "text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight whitespace-nowrap", children: "Finalise booking" })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsx("div", { className: "mb-5 rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)]", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between", children: [
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500", children: "Selected boiler package" }),
-            /* @__PURE__ */ jsxs("h3", { className: "mt-1 text-lg md:text-xl font-bold text-slate-900", children: [
-              booking?.brand,
-              " ",
-              booking?.model
-            ] }),
-            /* @__PURE__ */ jsxs("div", { className: "mt-2 flex flex-wrap gap-2", children: [
-              /* @__PURE__ */ jsxs("span", { className: "rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary", children: [
-                booking?.kw,
-                "kW"
-              ] }),
-              /* @__PURE__ */ jsxs("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700", children: [
-                booking?.warrantyYears,
-                " year warranty"
-              ] }),
-              /* @__PURE__ */ jsx("span", { className: "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800", children: "Installation included" })
+      /* @__PURE__ */ jsx("div", { className: "fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50 quote-page-bg" }),
+      /* @__PURE__ */ jsxs("div", { className: "min-h-screen quote-page-bg bg-gradient-to-br from-slate-50 via-white to-emerald-50", children: [
+        /* @__PURE__ */ jsx(PageHeader, { theme: "blue" }),
+        /* @__PURE__ */ jsxs("div", { className: "max-w-7xl mx-auto px-4 py-10 md:py-14 pb-28 lg:pb-10", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-end gap-6 mb-10", children: [
+            /* @__PURE__ */ jsxs(
+              "button",
+              {
+                type: "button",
+                onClick: () => window.history.back(),
+                className: "group flex w-fit items-center gap-2 text-[13px] cursor-pointer font-semibold uppercase tracking-wide text-slate-400 transition-colors hover:text-slate-900",
+                children: [
+                  /* @__PURE__ */ jsx("span", { className: "flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 transition-transform duration-300 group-hover:-translate-x-1 group-hover:bg-slate-200", children: /* @__PURE__ */ jsx(
+                    "svg",
+                    {
+                      className: "h-4 w-4",
+                      fill: "none",
+                      viewBox: "0 0 24 24",
+                      stroke: "currentColor",
+                      strokeWidth: 3,
+                      children: /* @__PURE__ */ jsx(
+                        "path",
+                        {
+                          strokeLinecap: "round",
+                          strokeLinejoin: "round",
+                          d: "M15 19l-7-7 7-7"
+                        }
+                      )
+                    }
+                  ) }),
+                  "Back"
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxs("div", { children: [
+              /* @__PURE__ */ jsx("p", { className: "text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500", children: "Checkout" }),
+              /* @__PURE__ */ jsx("h2", { className: "text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight whitespace-nowrap", children: "Finalise booking" })
             ] })
           ] }),
-          /* @__PURE__ */ jsxs("div", { className: "text-left sm:text-right", children: [
-            /* @__PURE__ */ jsx("p", { className: "text-xs uppercase tracking-wider text-slate-500", children: "Total" }),
-            /* @__PURE__ */ jsx("div", { className: "text-2xl font-bold text-slate-900", children: formatMoney(payableAmount) }),
-            discountAmount > 0 && /* @__PURE__ */ jsxs("p", { className: "text-[11px] text-emerald-700 font-semibold", children: [
-              "Coupon saved ",
-              formatMoney(discountAmount)
-            ] }),
-            /* @__PURE__ */ jsx("p", { className: "text-[11px] text-slate-500", children: "inc VAT" })
-          ] })
-        ] }) }),
-        /* @__PURE__ */ jsxs("div", { className: "mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3", children: [
-          /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-slate-200 bg-slate-50 p-4", children: [
-            /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-slate-500 font-semibold", children: "Google Reviews" }),
-            /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm font-semibold text-slate-900", children: "Rated Excellent by local customers" })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-emerald-200 bg-emerald-50 p-4", children: [
-            /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsx(
-                "img",
-                {
-                  src: "/images/gas%20safe%20logo%20mega.png",
-                  alt: "Gas Safe Register",
-                  className: "h-5 w-auto object-contain",
-                  loading: "lazy",
-                  onError: (e) => {
-                    e.currentTarget.src = "/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png";
-                  }
-                }
-              ),
-              /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-emerald-800 font-semibold", children: "Gas Safe" })
-            ] }),
-            /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm font-semibold text-emerald-900", children: "Registered business: 636354" })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-sky-200 bg-sky-50 p-4", children: [
-            /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-sky-800 font-semibold", children: "Secure payment" }),
-            /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm font-semibold text-sky-900", children: "Card payments accepted online" })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-8", children: [
-          /* @__PURE__ */ jsxs("div", { className: "lg:col-span-2 space-y-6", children: [
-            /* @__PURE__ */ jsxs("section", { className: "rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)]", children: [
-              /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2 border-b border-slate-100 p-5 md:p-7 lg:p-8", children: /* @__PURE__ */ jsxs("div", { className: "flex-1 flex gap-2 items-center justify-between", children: [
-                /* @__PURE__ */ jsxs("div", { children: [
-                  /* @__PURE__ */ jsx("h2", { className: "text-lg lg:text-2xl font-semibold text-slate-900", children: "Select Installation Date" }),
-                  /* @__PURE__ */ jsx("p", { className: "text-sm text-slate-500 line-clamp-1", children: "Our engineers are available in your area." })
+          /* @__PURE__ */ jsx("div", { className: "mb-5 rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)]", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between", children: [
+            /* @__PURE__ */ jsxs("div", { children: [
+              /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500", children: "Selected boiler package" }),
+              /* @__PURE__ */ jsxs("h3", { className: "mt-1 text-lg md:text-xl font-bold text-slate-900", children: [
+                booking?.brand,
+                " ",
+                booking?.model
+              ] }),
+              /* @__PURE__ */ jsxs("div", { className: "mt-2 flex flex-wrap gap-2", children: [
+                /* @__PURE__ */ jsxs("span", { className: "rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary", children: [
+                  booking?.kw,
+                  "kW"
                 ] }),
-                /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-[10px] font-bold uppercase tracking-wide text-primary ", children: [
-                  /* @__PURE__ */ jsxs("span", { className: "relative flex h-2 w-2", children: [
-                    /* @__PURE__ */ jsx("span", { className: "absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" }),
-                    /* @__PURE__ */ jsx("span", { className: "relative inline-flex h-2 w-2 rounded-full bg-primary" })
-                  ] }),
-                  "Real-time Availability"
-                ] })
-              ] }) }),
-              /* @__PURE__ */ jsx("div", { className: "flex flex-col md:flex-row", children: /* @__PURE__ */ jsx("div", { className: "flex-1 p-4 md:p-7", children: /* @__PURE__ */ jsxs(
-                "div",
-                {
-                  ref: dateRef,
-                  className: "min-h-[300px]",
-                  children: [
-                    /* @__PURE__ */ jsx(
-                      AppointmentDateRangePicker,
-                      {
-                        type: "new_boiler_quote",
-                        value: {
-                          date: selectedDate,
-                          time: selectedTime
-                        },
-                        onChange: handleAppointmentChange
-                      }
-                    ),
-                    errors.appointment && /* @__PURE__ */ jsx("p", { className: "mt-3 text-sm font-semibold text-red-600", children: errors.appointment })
-                  ]
-                }
-              ) }) })
+                /* @__PURE__ */ jsxs("span", { className: "rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700", children: [
+                  booking?.warrantyYears,
+                  " year warranty"
+                ] }),
+                /* @__PURE__ */ jsx("span", { className: "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800", children: "Installation included" })
+              ] })
             ] }),
-            /* @__PURE__ */ jsxs("section", { className: "rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)] transition-all duration-500", children: [
-              /* @__PURE__ */ jsx("div", { className: "relative border-b border-slate-200/70 px-6 md:px-8 py-5", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-                /* @__PURE__ */ jsxs("div", { children: [
-                  /* @__PURE__ */ jsx("h2", { className: "text-2xl font-semibold tracking-tight text-slate-900", children: "Personal Details" }),
-                  /* @__PURE__ */ jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxs("div", { className: "text-left sm:text-right", children: [
+              /* @__PURE__ */ jsx("p", { className: "text-xs uppercase tracking-wider text-slate-500", children: "Total" }),
+              /* @__PURE__ */ jsx("div", { className: "text-2xl font-bold text-slate-900", children: formatMoney(payableAmount) }),
+              discountAmount > 0 && /* @__PURE__ */ jsxs("p", { className: "text-[11px] text-emerald-700 font-semibold", children: [
+                "Coupon saved ",
+                formatMoney(discountAmount)
+              ] }),
+              /* @__PURE__ */ jsx("p", { className: "text-[11px] text-slate-500", children: "inc VAT" })
+            ] })
+          ] }) }),
+          /* @__PURE__ */ jsxs("div", { className: "mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3", children: [
+            /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-slate-200 bg-slate-50 p-4", children: [
+              /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-slate-500 font-semibold", children: "Google Reviews" }),
+              /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm font-semibold text-slate-900", children: "Rated Excellent by local customers" })
+            ] }),
+            /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-emerald-200 bg-emerald-50 p-4", children: [
+              /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ jsx(
+                  "img",
+                  {
+                    src: "/images/gas%20safe%20logo%20mega.png",
+                    alt: "Gas Safe Register",
+                    className: "h-5 w-auto object-contain",
+                    loading: "lazy",
+                    onError: (e) => {
+                      e.currentTarget.src = "/images/511-5113277-gas-safe-register-logo-symbol-gas-safe-logo.png";
+                    }
+                  }
+                ),
+                /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-emerald-800 font-semibold", children: "Gas Safe" })
+              ] }),
+              /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm font-semibold text-emerald-900", children: "Registered business: 636354" })
+            ] }),
+            /* @__PURE__ */ jsxs("div", { className: "rounded-2xl border border-sky-200 bg-sky-50 p-4", children: [
+              /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-sky-800 font-semibold", children: "Secure payment" }),
+              /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm font-semibold text-sky-900", children: "Card payments accepted online" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-8", children: [
+            /* @__PURE__ */ jsxs("div", { className: "lg:col-span-2 space-y-6", children: [
+              /* @__PURE__ */ jsxs("section", { className: "rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)]", children: [
+                /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2 border-b border-slate-100 p-5 md:p-7 lg:p-8", children: /* @__PURE__ */ jsxs("div", { className: "flex-1 flex gap-2 items-center justify-between", children: [
+                  /* @__PURE__ */ jsxs("div", { children: [
+                    /* @__PURE__ */ jsx("h2", { className: "text-lg lg:text-2xl font-semibold text-slate-900", children: "Select Installation Date" }),
+                    /* @__PURE__ */ jsx("p", { className: "text-sm text-slate-500 line-clamp-1", children: "Our engineers are available in your area." })
+                  ] }),
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-[10px] font-bold uppercase tracking-wide text-primary ", children: [
                     /* @__PURE__ */ jsxs("span", { className: "relative flex h-2 w-2", children: [
                       /* @__PURE__ */ jsx("span", { className: "absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" }),
                       /* @__PURE__ */ jsx("span", { className: "relative inline-flex h-2 w-2 rounded-full bg-primary" })
                     ] }),
-                    /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-slate-500", children: "Secure checkout active" })
-                  ] }),
-                  /* @__PURE__ */ jsxs("div", { className: "mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-800", children: [
-                    /* @__PURE__ */ jsx(FiShield, { className: "h-3.5 w-3.5" }),
-                    "Your details are used only to arrange your installation and confirmation."
+                    "Real-time Availability"
                   ] })
-                ] }),
-                /* @__PURE__ */ jsx("div", { className: "flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-white to-slate-50 shadow-[0_8px_16px_-6px_rgba(0,0,0,0.05)] ring-1 ring-slate-100", children: /* @__PURE__ */ jsx(
-                  "svg",
+                ] }) }),
+                /* @__PURE__ */ jsx("div", { className: "flex flex-col md:flex-row", children: /* @__PURE__ */ jsx("div", { className: "flex-1 p-4 md:p-7", children: /* @__PURE__ */ jsxs(
+                  "div",
                   {
-                    className: "h-6 w-6 text-primary",
-                    fill: "none",
-                    viewBox: "0 0 24 24",
-                    stroke: "currentColor",
-                    children: /* @__PURE__ */ jsx(
-                      "path",
-                      {
-                        strokeLinecap: "round",
-                        strokeLinejoin: "round",
-                        strokeWidth: 2,
-                        d: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      }
-                    )
+                    ref: dateRef,
+                    className: "min-h-[300px]",
+                    children: [
+                      /* @__PURE__ */ jsx(
+                        AppointmentDateRangePicker,
+                        {
+                          type: "new_boiler_quote",
+                          value: {
+                            date: selectedDate,
+                            time: selectedTime
+                          },
+                          onChange: handleAppointmentChange
+                        }
+                      ),
+                      errors.appointment && /* @__PURE__ */ jsx("p", { className: "mt-3 text-sm font-semibold text-red-600", children: errors.appointment })
+                    ]
                   }
-                ) })
-              ] }) }),
-              /* @__PURE__ */ jsx("div", { className: "relative p-8 pt-6", children: /* @__PURE__ */ jsxs("div", { className: "space-y-7", children: [
-                /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow", children: [
-                  /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "Who are we installing for?" }),
-                  /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 lg:grid-cols-4 gap-4", children: [
-                    /* @__PURE__ */ jsx("div", { className: "col-span-1", children: /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                      /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Title" }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative", children: [
-                        /* @__PURE__ */ jsxs(
-                          "select",
-                          {
-                            ref: titleRef,
-                            name: "title",
-                            value: formData.title,
-                            onChange: handleInputChange,
-                            className: `w-full appearance-none rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all hover:bg-white focus:bg-white focus:ring-2 focus:shadow-lg focus:outline-none
-                                      ${errors.title ? "ring-red-400 focus:ring-red-400/50 focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-primary/10"}`,
-                            children: [
-                              /* @__PURE__ */ jsx("option", { value: "", children: "--" }),
-                              titleOptions.map(
-                                (t) => /* @__PURE__ */ jsx(
-                                  "option",
-                                  {
-                                    value: t,
-                                    children: t
-                                  },
-                                  t
-                                )
-                              )
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400", children: /* @__PURE__ */ jsx(
-                          "svg",
-                          {
-                            className: "h-3 w-3",
-                            fill: "none",
-                            viewBox: "0 0 24 24",
-                            stroke: "currentColor",
-                            children: /* @__PURE__ */ jsx(
-                              "path",
-                              {
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 3,
-                                d: "M19 9l-7 7-7-7"
-                              }
-                            )
-                          }
-                        ) })
+                ) }) })
+              ] }),
+              /* @__PURE__ */ jsxs("section", { className: "rounded-3xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)] transition-all duration-500", children: [
+                /* @__PURE__ */ jsx("div", { className: "relative border-b border-slate-200/70 px-6 md:px-8 py-5", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsxs("div", { children: [
+                    /* @__PURE__ */ jsx("h2", { className: "text-2xl font-semibold tracking-tight text-slate-900", children: "Personal Details" }),
+                    /* @__PURE__ */ jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
+                      /* @__PURE__ */ jsxs("span", { className: "relative flex h-2 w-2", children: [
+                        /* @__PURE__ */ jsx("span", { className: "absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" }),
+                        /* @__PURE__ */ jsx("span", { className: "relative inline-flex h-2 w-2 rounded-full bg-primary" })
                       ] }),
-                      errors.title && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.title })
-                    ] }) }),
-                    /* @__PURE__ */ jsxs("div", { className: "col-span-3 grid grid-cols-2 gap-4", children: [
-                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "First Name" }),
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: firstNameRef,
-                            name: "firstName",
-                            placeholder: "e.g. John",
-                            value: formData.firstName,
-                            onChange: handleInputChange,
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.firstName ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        errors.firstName && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.firstName })
-                      ] }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Last Name" }),
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: lastNameRef,
-                            name: "lastName",
-                            placeholder: "e.g. Doe",
-                            value: formData.lastName,
-                            onChange: handleInputChange,
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.lastName ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        errors.lastName && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.lastName })
-                      ] })
-                    ] })
-                  ] })
-                ] }) }) }),
-                /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow pt-1.5", children: [
-                  /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "How can we reach you?" }),
-                  /* @__PURE__ */ jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [
-                    /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                      /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Email Address" }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative", children: [
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: emailRef,
-                            type: "email",
-                            name: "email",
-                            placeholder: "your@email.com",
-                            value: formData.email,
-                            onChange: handleInputChange,
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.email ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsx(
-                          "svg",
-                          {
-                            className: "w-5 h-5",
-                            fill: "none",
-                            viewBox: "0 0 24 24",
-                            stroke: "currentColor",
-                            children: /* @__PURE__ */ jsx(
-                              "path",
-                              {
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 1.5,
-                                d: "M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                              }
-                            )
-                          }
-                        ) })
-                      ] }),
-                      errors.email && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.email })
+                      /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-slate-500", children: "Secure checkout active" })
                     ] }),
-                    /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                      /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Phone Number" }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative", children: [
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: phoneRef,
-                            name: "phone",
-                            placeholder: "07xxx xxxxxx",
-                            value: formData.phone,
-                            onChange: handleInputChange,
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.phone ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsx(
-                          "svg",
-                          {
-                            className: "w-5 h-5",
-                            fill: "none",
-                            viewBox: "0 0 24 24",
-                            stroke: "currentColor",
-                            children: /* @__PURE__ */ jsx(
-                              "path",
-                              {
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 1.5,
-                                d: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                              }
-                            )
-                          }
-                        ) })
-                      ] }),
-                      errors.phone && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.phone })
+                    /* @__PURE__ */ jsxs("div", { className: "mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-800", children: [
+                      /* @__PURE__ */ jsx(FiShield, { className: "h-3.5 w-3.5" }),
+                      "Your details are used only to arrange your installation and confirmation."
                     ] })
-                  ] })
-                ] }) }) }),
-                /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow pt-1.5", children: [
-                  /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "Where are we installing?" }),
-                  /* @__PURE__ */ jsxs("div", { className: "space-y-5", children: [
-                    /* @__PURE__ */ jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [
-                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2", children: [
-                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Address line 1" }),
-                        /* @__PURE__ */ jsxs("div", { className: "relative group/input", children: [
+                  ] }),
+                  /* @__PURE__ */ jsx("div", { className: "flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-white to-slate-50 shadow-[0_8px_16px_-6px_rgba(0,0,0,0.05)] ring-1 ring-slate-100", children: /* @__PURE__ */ jsx(
+                    "svg",
+                    {
+                      className: "h-6 w-6 text-primary",
+                      fill: "none",
+                      viewBox: "0 0 24 24",
+                      stroke: "currentColor",
+                      children: /* @__PURE__ */ jsx(
+                        "path",
+                        {
+                          strokeLinecap: "round",
+                          strokeLinejoin: "round",
+                          strokeWidth: 2,
+                          d: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        }
+                      )
+                    }
+                  ) })
+                ] }) }),
+                /* @__PURE__ */ jsx("div", { className: "relative p-8 pt-6", children: /* @__PURE__ */ jsxs("div", { className: "space-y-7", children: [
+                  /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow", children: [
+                    /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "Who are we installing for?" }),
+                    /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 lg:grid-cols-4 gap-4", children: [
+                      /* @__PURE__ */ jsx("div", { className: "col-span-1", children: /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Title" }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+                          /* @__PURE__ */ jsxs(
+                            "select",
+                            {
+                              ref: titleRef,
+                              name: "title",
+                              value: formData.title,
+                              onChange: handleInputChange,
+                              className: `w-full appearance-none rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all hover:bg-white focus:bg-white focus:ring-2 focus:shadow-lg focus:outline-none
+                                      ${errors.title ? "ring-red-400 focus:ring-red-400/50 focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-primary/10"}`,
+                              children: [
+                                /* @__PURE__ */ jsx("option", { value: "", children: "--" }),
+                                titleOptions.map(
+                                  (t) => /* @__PURE__ */ jsx(
+                                    "option",
+                                    {
+                                      value: t,
+                                      children: t
+                                    },
+                                    t
+                                  )
+                                )
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400", children: /* @__PURE__ */ jsx(
+                            "svg",
+                            {
+                              className: "h-3 w-3",
+                              fill: "none",
+                              viewBox: "0 0 24 24",
+                              stroke: "currentColor",
+                              children: /* @__PURE__ */ jsx(
+                                "path",
+                                {
+                                  strokeLinecap: "round",
+                                  strokeLinejoin: "round",
+                                  strokeWidth: 3,
+                                  d: "M19 9l-7 7-7-7"
+                                }
+                              )
+                            }
+                          ) })
+                        ] }),
+                        errors.title && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.title })
+                      ] }) }),
+                      /* @__PURE__ */ jsxs("div", { className: "col-span-3 grid grid-cols-2 gap-4", children: [
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                          /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "First Name" }),
                           /* @__PURE__ */ jsx(
                             "input",
                             {
-                              ref: addressLine1Ref,
-                              name: "addressLine1",
-                              placeholder: "House number/name and street",
-                              value: formData.addressLine1,
+                              ref: firstNameRef,
+                              name: "firstName",
+                              placeholder: "e.g. John",
+                              value: formData.firstName,
                               onChange: handleInputChange,
-                              autoComplete: "address-line1",
-                              className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.addressLine1 ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.firstName ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
                             }
                           ),
-                          /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsxs(
+                          errors.firstName && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.firstName })
+                        ] }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                          /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Last Name" }),
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: lastNameRef,
+                              name: "lastName",
+                              placeholder: "e.g. Doe",
+                              value: formData.lastName,
+                              onChange: handleInputChange,
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.lastName ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          errors.lastName && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.lastName })
+                        ] })
+                      ] })
+                    ] })
+                  ] }) }) }),
+                  /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow pt-1.5", children: [
+                    /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "How can we reach you?" }),
+                    /* @__PURE__ */ jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Email Address" }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: emailRef,
+                              type: "email",
+                              name: "email",
+                              placeholder: "your@email.com",
+                              value: formData.email,
+                              onChange: handleInputChange,
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.email ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsx(
                             "svg",
                             {
                               className: "w-5 h-5",
                               fill: "none",
                               viewBox: "0 0 24 24",
                               stroke: "currentColor",
-                              children: [
-                                /* @__PURE__ */ jsx(
-                                  "path",
-                                  {
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    strokeWidth: 1.5,
-                                    d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                  }
-                                ),
-                                /* @__PURE__ */ jsx(
-                                  "path",
-                                  {
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    strokeWidth: 1.5,
-                                    d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                  }
-                                )
-                              ]
+                              children: /* @__PURE__ */ jsx(
+                                "path",
+                                {
+                                  strokeLinecap: "round",
+                                  strokeLinejoin: "round",
+                                  strokeWidth: 1.5,
+                                  d: "M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                                }
+                              )
                             }
                           ) })
                         ] }),
-                        errors.addressLine1 && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.addressLine1 })
-                      ] }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2", children: [
-                        /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
-                          "Address line 2 ",
-                          /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
-                        ] }),
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: addressLine2Ref,
-                            name: "addressLine2",
-                            placeholder: "Apartment, building, or area",
-                            value: formData.addressLine2,
-                            onChange: handleInputChange,
-                            autoComplete: "address-line2",
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.addressLine2 ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        errors.addressLine2 && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.addressLine2 })
+                        errors.email && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.email })
                       ] }),
                       /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Town / city" }),
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: cityRef,
-                            name: "city",
-                            placeholder: "e.g. Leeds",
-                            value: formData.city,
-                            onChange: handleInputChange,
-                            autoComplete: "address-level2",
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.city ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        errors.city && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.city })
-                      ] }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                        /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
-                          "County ",
-                          /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
-                        ] }),
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: countyRef,
-                            name: "county",
-                            placeholder: "e.g. West Yorkshire",
-                            value: formData.county,
-                            onChange: handleInputChange,
-                            autoComplete: "address-level1",
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.county ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        errors.county && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.county })
-                      ] }),
-                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:max-w-sm", children: [
-                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Postcode" }),
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            ref: postcodeRef,
-                            name: "postcode",
-                            placeholder: "e.g. LS1 1AA",
-                            value: formData.postcode,
-                            onChange: handleInputChange,
-                            autoComplete: "postal-code",
-                            className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold uppercase text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
-                                    ${errors.postcode ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
-                          }
-                        ),
-                        errors.postcode && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.postcode })
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ jsx("p", { className: "-mt-1 text-xs text-slate-500", children: "Checkout is restricted to LS, WF, HG and BD postcodes only." }),
-                    /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
-                      /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
-                        "Access & parking notes",
-                        " ",
-                        /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
-                      ] }),
-                      /* @__PURE__ */ jsx(
-                        "textarea",
-                        {
-                          name: "notes",
-                          rows: 3,
-                          placeholder: "Tell us about parking, gate access, alarms, mobility requirements, or anything else we should know.",
-                          value: formData.notes,
-                          onChange: handleInputChange,
-                          className: "w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-medium text-slate-900 ring-1 ring-slate-200 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10 focus:outline-none resize-none"
-                        }
-                      )
-                    ] }),
-                    /* @__PURE__ */ jsxs("div", { "data-pet-policy-wrap": "true", className: "relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 group/pet-policy", children: [
-                      /* @__PURE__ */ jsx("span", { className: "pet-doggy-wrap inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100/90 ring-1 ring-amber-200", children: /* @__PURE__ */ jsxs("svg", { viewBox: "0 0 24 24", className: "h-4.5 w-4.5", "aria-hidden": "true", children: [
-                        /* @__PURE__ */ jsx("path", { className: "pet-doggy-ear-left", d: "M7 7.2c-.8-1.5-2.3-1.9-3.2-.8-.8 1-.6 2.5.8 3.4L7 10.9V7.2Z", fill: "#c08457" }),
-                        /* @__PURE__ */ jsx("path", { className: "pet-doggy-ear-right", d: "M17 7.2c.8-1.5 2.3-1.9 3.2-.8.8 1 .6 2.5-.8 3.4L17 10.9V7.2Z", fill: "#c08457" }),
-                        /* @__PURE__ */ jsx("circle", { cx: "12", cy: "12", r: "7", fill: "#f5c892" }),
-                        /* @__PURE__ */ jsx("circle", { cx: "9.4", cy: "11.3", r: "0.9", fill: "#1f2937" }),
-                        /* @__PURE__ */ jsx("circle", { cx: "14.6", cy: "11.3", r: "0.9", fill: "#1f2937" }),
-                        /* @__PURE__ */ jsx("ellipse", { cx: "12", cy: "13.7", rx: "1.2", ry: "0.9", fill: "#111827" }),
-                        /* @__PURE__ */ jsx("path", { d: "M10.8 15.4c.3.5.7.8 1.2.8s.9-.3 1.2-.8", stroke: "#7c2d12", strokeWidth: "1", strokeLinecap: "round", fill: "none" })
-                      ] }) }),
-                      /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-800", children: "Pet-friendly visits" }),
-                      /* @__PURE__ */ jsx(
-                        "button",
-                        {
-                          type: "button",
-                          onClick: () => setOpenPetTooltip(
-                            (prev) => !prev
-                          ),
-                          className: "inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary",
-                          "aria-label": "Show pet-friendly information",
-                          children: /* @__PURE__ */ jsx(FiInfo, { className: "h-3.5 w-3.5" })
-                        }
-                      ),
-                      /* @__PURE__ */ jsxs(
-                        "div",
-                        {
-                          className: `quote-solid-popover absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${openPetTooltip ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 group-hover/pet-policy:pointer-events-auto group-hover/pet-policy:opacity-100 group-hover/pet-policy:translate-y-0 group-focus-within/pet-policy:pointer-events-auto group-focus-within/pet-policy:opacity-100 group-focus-within/pet-policy:translate-y-0"}`,
-                          children: [
-                            /* @__PURE__ */ jsx("p", { children: "We are dog-friendly and happy for them to be around during the visit." }),
-                            /* @__PURE__ */ jsx("p", { className: "mt-1.5", children: "If your dog is feeling social, we are always glad to say hello first." }),
-                            /* @__PURE__ */ jsx("p", { className: "mt-1.5", children: "During active work, we ask that pets are kept clear of tools and working areas for everyone’s safety." })
-                          ]
-                        }
-                      )
-                    ] })
-                  ] }),
-                  Object.keys(errors).length > 0 && /* @__PURE__ */ jsx("div", { className: "mt-6 rounded-xl border border-red-200 bg-red-50 p-4", children: /* @__PURE__ */ jsx("p", { className: "text-sm font-bold text-red-700", children: "Please fix the highlighted fields to continue." }) })
-                ] }) }) })
-              ] }) })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsx("div", { className: "lg:col-span-1", children: /* @__PURE__ */ jsx("aside", { className: "sticky top-6", children: /* @__PURE__ */ jsxs("div", { className: "rounded-3xl border border-slate-200 bg-white text-slate-800 shadow-[0_16px_40px_rgba(15,23,42,0.08)]", children: [
-            /* @__PURE__ */ jsxs("div", { className: "bg-slate-50 p-6 border-b border-slate-200 text-center rounded-t-3xl space-y-1", children: [
-              /* @__PURE__ */ jsx("h2", { className: "text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500", children: "Installation Summary" }),
-              /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("span", { className: "text-5xl font-bold tracking-tight text-slate-900", children: formatMoney(payableAmount) }) }),
-              discountAmount > 0 && /* @__PURE__ */ jsxs("p", { className: "text-[11px] font-semibold uppercase tracking-wider text-emerald-700", children: [
-                "Coupon discount: ",
-                formatMoney(discountAmount)
-              ] }),
-              /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-slate-500", children: "Instant price • inc VAT" })
-            ] }),
-            /* @__PURE__ */ jsxs("div", { className: "p-6 space-y-4", children: [
-              /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-                /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-                  /* @__PURE__ */ jsx("p", { className: "font-bold text-[18px] text-slate-900", children: booking?.model }),
-                  /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-2", children: [
-                    /* @__PURE__ */ jsxs("span", { className: "bg-primary/10 text-primary text-[14px] px-2 py-0.5 rounded font-mono", children: [
-                      booking?.kw,
-                      "KW"
-                    ] }),
-                    /* @__PURE__ */ jsxs("span", { className: "bg-slate-100 text-slate-600 text-[14px] px-2 py-0.5 rounded font-mono", children: [
-                      booking?.warrantyYears,
-                      "Y Warranty"
-                    ] })
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsx("div", { className: "h-20 w-20 bg-slate-100/40 rounded-full flex items-center justify-center text-xl p-2", children: /* @__PURE__ */ jsx(
-                  "img",
-                  {
-                    src: booking?.images?.[0],
-                    className: "h-full object-contain drop-shadow-2xl",
-                    onError: (e) => {
-                      e.target.src = "/images/ideal-20logic.png";
-                    }
-                  }
-                ) })
-              ] }),
-              /* @__PURE__ */ jsx("div", { className: "w-full border-t-2 border-dashed border-dark/40" }),
-              /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
-                /* @__PURE__ */ jsx("p", { className: "text-[14px] font-bold uppercase text-dark/60 tracking-wider", children: "What's Included" }),
-                includes.length > 0 && /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
-                  /* @__PURE__ */ jsxs("ul", { className: "space-y-2", children: [
-                    /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
-                      trvItem && /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
-                        /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: "TRV supply & fit" }),
-                        /* @__PURE__ */ jsx("div", { className: "text-slate-900 font-bold", children: trvItem ? `${trvItem.qty} × £${trvItem.unitPrice} = £${trvItem.total}` : "—" })
-                      ] }),
-                      (() => {
-                        const relocation = addOns.find(
-                          (x) => x.key === "boiler_relocation"
-                        );
-                        if (!relocation)
-                          return null;
-                        return /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
-                          /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: relocation.label }),
-                          /* @__PURE__ */ jsxs("div", { className: "text-slate-900 font-bold", children: [
-                            "£",
-                            relocation.total
-                          ] })
-                        ] });
-                      })(),
-                      (() => {
-                        const convert_to_combi = addOns.find(
-                          (x) => x.key === "convert_to_combi"
-                        );
-                        if (!convert_to_combi)
-                          return null;
-                        return /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
-                          /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: convert_to_combi.label }),
-                          /* @__PURE__ */ jsxs("div", { className: "text-slate-900 font-bold", children: [
-                            "£",
-                            convert_to_combi.total
-                          ] })
-                        ] });
-                      })(),
-                      /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
-                        /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: "Flue Type" }),
-                        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                        /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Phone Number" }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative", children: [
                           /* @__PURE__ */ jsx(
-                            "span",
+                            "input",
                             {
-                              className: `px-2 py-0.5 rounded font-bold text-[12px] uppercase tracking-wider ${isVertical ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-900"}`,
-                              children: isVertical ? "Vertical" : "Horizontal"
+                              ref: phoneRef,
+                              name: "phone",
+                              placeholder: "07xxx xxxxxx",
+                              value: formData.phone,
+                              onChange: handleInputChange,
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.phone ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
                             }
                           ),
-                          isVertical && verticalFlueItem ? /* @__PURE__ */ jsxs("span", { className: "text-slate-900 font-bold", children: [
-                            "£",
-                            verticalFlueItem.total
-                          ] }) : /* @__PURE__ */ jsx("span", { className: "text-slate-500 font-semibold text-[13px]", children: "Included" })
-                        ] })
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
-                      /* @__PURE__ */ jsx("span", { className: "text-slate-700 font-semibold", children: "Thermostat" }),
-                      /* @__PURE__ */ jsx(
-                        "span",
-                        {
-                          className: `font-bold ${hasSmartThermostat ? "text-primary" : "text-slate-700"}`,
-                          children: thermostatLabel
-                        }
-                      )
-                    ] }),
-                    visibleIncludes.map(
-                      (item, i) => /* @__PURE__ */ jsxs(
-                        "li",
-                        {
-                          className: "relative flex justify-between items-center font-medium text-dark opacity-0 included-animation",
-                          style: {
-                            animationDelay: `${i * 40}ms`
-                          },
-                          children: [
-                            /* @__PURE__ */ jsxs("span", { className: "max-w-[90%] text-[15px] inline-flex items-center gap-1.5", children: [
-                              /* @__PURE__ */ jsx("span", { children: item }),
-                              isCompatibilityDependentItem(
-                                item
-                              ) && /* @__PURE__ */ jsxs(
-                                "span",
+                          /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsx(
+                            "svg",
+                            {
+                              className: "w-5 h-5",
+                              fill: "none",
+                              viewBox: "0 0 24 24",
+                              stroke: "currentColor",
+                              children: /* @__PURE__ */ jsx(
+                                "path",
                                 {
-                                  "data-install-compat-wrap": "true",
-                                  className: "relative inline-flex items-center group/compat",
-                                  children: [
-                                    /* @__PURE__ */ jsx(
-                                      "button",
-                                      {
-                                        type: "button",
-                                        "aria-label": compatibilityTooltipText,
-                                        onClick: () => setOpenInstallCompatibilityTip(
-                                          openInstallCompatibilityTip === i ? null : i
-                                        ),
-                                        className: "inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500",
-                                        children: /* @__PURE__ */ jsx(FiInfo, { className: "h-3 w-3" })
-                                      }
-                                    ),
-                                    /* @__PURE__ */ jsx(
-                                      "div",
-                                      {
-                                        className: `quote-solid-popover absolute left-0 top-[calc(100%+0.3rem)] z-40 w-[240px] rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-relaxed text-slate-700 shadow-lg translate-y-1 transition-all duration-200 ${openInstallCompatibilityTip === i ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 group-hover/compat:pointer-events-auto group-hover/compat:opacity-100 group-hover/compat:translate-y-0 group-focus-within/compat:pointer-events-auto group-focus-within/compat:opacity-100 group-focus-within/compat:translate-y-0"}`,
-                                        children: compatibilityTooltipText
-                                      }
-                                    )
-                                  ]
+                                  strokeLinecap: "round",
+                                  strokeLinejoin: "round",
+                                  strokeWidth: 1.5,
+                                  d: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                                 }
                               )
-                            ] }),
-                            /* @__PURE__ */ jsx("span", { className: "text-primary text-sm font-semibold", children: "Included" })
-                          ]
-                        },
-                        i
-                      )
-                    )
-                  ] }),
-                  includes.length > 3 && /* @__PURE__ */ jsx(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: () => setShowAllIncludes(
-                        (v) => !v
-                      ),
-                      className: "text-[14px] mt-3 border border-gray-200 cursor-pointer hover:border-primary px-3 py-2 uppercase tracking-wider font-semibold text-dark/80 hover:text-primary transition-colors",
-                      children: showAllIncludes ? "- Hide full item" : `+ See full item (${includes.length})`
-                    }
-                  )
-                ] })
+                            }
+                          ) })
+                        ] }),
+                        errors.phone && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.phone })
+                      ] })
+                    ] })
+                  ] }) }) }),
+                  /* @__PURE__ */ jsx("div", { className: "group relative rounded-2xl border border-slate-200 bg-slate-50/60 p-5", children: /* @__PURE__ */ jsx("div", { className: "flex gap-6", children: /* @__PURE__ */ jsxs("div", { className: "flex-grow pt-1.5", children: [
+                    /* @__PURE__ */ jsx("h3", { className: "mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition-colors group-focus-within:text-primary", children: "Where are we installing?" }),
+                    /* @__PURE__ */ jsxs("div", { className: "space-y-5", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2", children: [
+                          /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Address line 1" }),
+                          /* @__PURE__ */ jsxs("div", { className: "relative group/input", children: [
+                            /* @__PURE__ */ jsx(
+                              "input",
+                              {
+                                ref: addressLine1Ref,
+                                name: "addressLine1",
+                                placeholder: "House number/name and street",
+                                value: formData.addressLine1,
+                                onChange: handleInputChange,
+                                autoComplete: "address-line1",
+                                className: `w-full rounded-xl border-0 bg-slate-50/80 pl-11 pr-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.addressLine1 ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                              }
+                            ),
+                            /* @__PURE__ */ jsx("div", { className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400", children: /* @__PURE__ */ jsxs(
+                              "svg",
+                              {
+                                className: "w-5 h-5",
+                                fill: "none",
+                                viewBox: "0 0 24 24",
+                                stroke: "currentColor",
+                                children: [
+                                  /* @__PURE__ */ jsx(
+                                    "path",
+                                    {
+                                      strokeLinecap: "round",
+                                      strokeLinejoin: "round",
+                                      strokeWidth: 1.5,
+                                      d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                    }
+                                  ),
+                                  /* @__PURE__ */ jsx(
+                                    "path",
+                                    {
+                                      strokeLinecap: "round",
+                                      strokeLinejoin: "round",
+                                      strokeWidth: 1.5,
+                                      d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                    }
+                                  )
+                                ]
+                              }
+                            ) })
+                          ] }),
+                          errors.addressLine1 && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.addressLine1 })
+                        ] }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:col-span-2", children: [
+                          /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
+                            "Address line 2 ",
+                            /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
+                          ] }),
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: addressLine2Ref,
+                              name: "addressLine2",
+                              placeholder: "Apartment, building, or area",
+                              value: formData.addressLine2,
+                              onChange: handleInputChange,
+                              autoComplete: "address-line2",
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.addressLine2 ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          errors.addressLine2 && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.addressLine2 })
+                        ] }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                          /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Town / city" }),
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: cityRef,
+                              name: "city",
+                              placeholder: "e.g. Leeds",
+                              value: formData.city,
+                              onChange: handleInputChange,
+                              autoComplete: "address-level2",
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.city ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          errors.city && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.city })
+                        ] }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                          /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
+                            "County ",
+                            /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
+                          ] }),
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: countyRef,
+                              name: "county",
+                              placeholder: "e.g. West Yorkshire",
+                              value: formData.county,
+                              onChange: handleInputChange,
+                              autoComplete: "address-level1",
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.county ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          errors.county && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.county })
+                        ] }),
+                        /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1 md:max-w-sm", children: [
+                          /* @__PURE__ */ jsx("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: "Postcode" }),
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              ref: postcodeRef,
+                              name: "postcode",
+                              placeholder: "e.g. LS1 1AA",
+                              value: formData.postcode,
+                              onChange: handleInputChange,
+                              autoComplete: "postal-code",
+                              className: `w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-semibold uppercase text-slate-900 ring-1 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:outline-none
+                                    ${errors.postcode ? "ring-red-400 focus:ring-red-400/50 focus:shadow-lg focus:shadow-red-500/10" : "ring-slate-200 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10"}`
+                            }
+                          ),
+                          errors.postcode && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: errors.postcode })
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsx("p", { className: "-mt-1 text-xs text-slate-500", children: "Checkout is restricted to LS, WF, HG and BD postcodes only." }),
+                      /* @__PURE__ */ jsxs("div", { className: "relative transition-all duration-300 focus-within:-translate-y-1", children: [
+                        /* @__PURE__ */ jsxs("label", { className: "mb-1.5 block text-[14px] font-semibold text-slate-600 ml-1", children: [
+                          "Access & parking notes",
+                          " ",
+                          /* @__PURE__ */ jsx("span", { className: "font-normal text-slate-400 ml-1 opacity-70", children: "(Optional)" })
+                        ] }),
+                        /* @__PURE__ */ jsx(
+                          "textarea",
+                          {
+                            name: "notes",
+                            rows: 3,
+                            placeholder: "Tell us about parking, gate access, alarms, mobility requirements, or anything else we should know.",
+                            value: formData.notes,
+                            onChange: handleInputChange,
+                            className: "w-full rounded-xl border-0 bg-slate-50/80 px-4 py-3.5 text-sm font-medium text-slate-900 ring-1 ring-slate-200 transition-all placeholder:font-normal placeholder:text-slate-400 hover:bg-white focus:bg-white focus:ring-2 focus:ring-primary/50 focus:shadow-lg focus:shadow-primary/10 focus:outline-none resize-none"
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsxs("div", { "data-pet-policy-wrap": "true", className: "relative inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 group/pet-policy", children: [
+                        /* @__PURE__ */ jsx("span", { className: "pet-doggy-wrap inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100/90 ring-1 ring-amber-200", children: /* @__PURE__ */ jsxs("svg", { viewBox: "0 0 24 24", className: "h-4.5 w-4.5", "aria-hidden": "true", children: [
+                          /* @__PURE__ */ jsx("path", { className: "pet-doggy-ear-left", d: "M7 7.2c-.8-1.5-2.3-1.9-3.2-.8-.8 1-.6 2.5.8 3.4L7 10.9V7.2Z", fill: "#c08457" }),
+                          /* @__PURE__ */ jsx("path", { className: "pet-doggy-ear-right", d: "M17 7.2c.8-1.5 2.3-1.9 3.2-.8.8 1 .6 2.5-.8 3.4L17 10.9V7.2Z", fill: "#c08457" }),
+                          /* @__PURE__ */ jsx("circle", { cx: "12", cy: "12", r: "7", fill: "#f5c892" }),
+                          /* @__PURE__ */ jsx("circle", { cx: "9.4", cy: "11.3", r: "0.9", fill: "#1f2937" }),
+                          /* @__PURE__ */ jsx("circle", { cx: "14.6", cy: "11.3", r: "0.9", fill: "#1f2937" }),
+                          /* @__PURE__ */ jsx("ellipse", { cx: "12", cy: "13.7", rx: "1.2", ry: "0.9", fill: "#111827" }),
+                          /* @__PURE__ */ jsx("path", { d: "M10.8 15.4c.3.5.7.8 1.2.8s.9-.3 1.2-.8", stroke: "#7c2d12", strokeWidth: "1", strokeLinecap: "round", fill: "none" })
+                        ] }) }),
+                        /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-800", children: "Pet-friendly visits" }),
+                        /* @__PURE__ */ jsx(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: () => setOpenPetTooltip(
+                              (prev) => !prev
+                            ),
+                            className: "inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary",
+                            "aria-label": "Show pet-friendly information",
+                            children: /* @__PURE__ */ jsx(FiInfo, { className: "h-3.5 w-3.5" })
+                          }
+                        ),
+                        /* @__PURE__ */ jsxs(
+                          "div",
+                          {
+                            className: `quote-solid-popover absolute left-0 top-9 z-20 w-[320px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${openPetTooltip ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 group-hover/pet-policy:pointer-events-auto group-hover/pet-policy:opacity-100 group-hover/pet-policy:translate-y-0 group-focus-within/pet-policy:pointer-events-auto group-focus-within/pet-policy:opacity-100 group-focus-within/pet-policy:translate-y-0"}`,
+                            children: [
+                              /* @__PURE__ */ jsx("p", { children: "We are dog-friendly and happy for them to be around during the visit." }),
+                              /* @__PURE__ */ jsx("p", { className: "mt-1.5", children: "If your dog is feeling social, we are always glad to say hello first." }),
+                              /* @__PURE__ */ jsx("p", { className: "mt-1.5", children: "During active work, we ask that pets are kept clear of tools and working areas for everyone’s safety." })
+                            ]
+                          }
+                        )
+                      ] })
+                    ] }),
+                    Object.keys(errors).length > 0 && /* @__PURE__ */ jsx("div", { className: "mt-6 rounded-xl border border-red-200 bg-red-50 p-4", children: /* @__PURE__ */ jsx("p", { className: "text-sm font-bold text-red-700", children: "Please fix the highlighted fields to continue." }) })
+                  ] }) }) })
+                ] }) })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsx("div", { className: "lg:col-span-1", children: /* @__PURE__ */ jsx("aside", { className: "sticky top-6", children: /* @__PURE__ */ jsxs("div", { className: "rounded-3xl border border-slate-200 bg-white text-slate-800 shadow-[0_16px_40px_rgba(15,23,42,0.08)]", children: [
+              /* @__PURE__ */ jsxs("div", { className: "bg-slate-50 p-6 border-b border-slate-200 text-center rounded-t-3xl space-y-1", children: [
+                /* @__PURE__ */ jsx("h2", { className: "text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500", children: "Installation Summary" }),
+                /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("span", { className: "text-5xl font-bold tracking-tight text-slate-900", children: formatMoney(payableAmount) }) }),
+                discountAmount > 0 && /* @__PURE__ */ jsxs("p", { className: "text-[11px] font-semibold uppercase tracking-wider text-emerald-700", children: [
+                  "Coupon discount: ",
+                  formatMoney(discountAmount)
+                ] }),
+                /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-slate-500", children: "Instant price • inc VAT" })
               ] }),
-              /* @__PURE__ */ jsxs("div", { className: "bg-slate-50 -mx-6 -mb-6 p-6 pb-10 mt-6 border-t border-slate-200 text-slate-900", children: [
-                /* @__PURE__ */ jsx("div", { className: "mb-4 rounded-xl border border-slate-200 bg-white px-3 py-2.5", children: /* @__PURE__ */ jsxs("div", { "data-cancel-policy-wrap": "true", className: "relative inline-flex items-center gap-1.5 text-xs text-slate-600 group/cancel-policy", children: [
-                  /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-800", children: "Cancellation policy" }),
+              /* @__PURE__ */ jsxs("div", { className: "p-6 space-y-4", children: [
+                /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ jsx("p", { className: "font-bold text-[18px] text-slate-900", children: booking?.model }),
+                    /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-2", children: [
+                      /* @__PURE__ */ jsxs("span", { className: "bg-primary/10 text-primary text-[14px] px-2 py-0.5 rounded font-mono", children: [
+                        booking?.kw,
+                        "KW"
+                      ] }),
+                      /* @__PURE__ */ jsxs("span", { className: "bg-slate-100 text-slate-600 text-[14px] px-2 py-0.5 rounded font-mono", children: [
+                        booking?.warrantyYears,
+                        "Y Warranty"
+                      ] })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsx("div", { className: "h-20 w-20 bg-slate-100/40 rounded-full flex items-center justify-center text-xl p-2", children: /* @__PURE__ */ jsx(
+                    "img",
+                    {
+                      src: booking?.images?.[0],
+                      className: "h-full object-contain drop-shadow-2xl",
+                      onError: (e) => {
+                        e.target.src = "/images/ideal-20logic.png";
+                      }
+                    }
+                  ) })
+                ] }),
+                /* @__PURE__ */ jsx("div", { className: "w-full border-t-2 border-dashed border-dark/40" }),
+                /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+                  /* @__PURE__ */ jsx("p", { className: "text-[14px] font-bold uppercase text-dark/60 tracking-wider", children: "What's Included" }),
+                  includes.length > 0 && /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+                    /* @__PURE__ */ jsxs("ul", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
+                        trvItem && /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
+                          /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: "TRV supply & fit" }),
+                          /* @__PURE__ */ jsx("div", { className: "text-slate-900 font-bold", children: trvItem ? `${trvItem.qty} × £${trvItem.unitPrice} = £${trvItem.total}` : "—" })
+                        ] }),
+                        (() => {
+                          const relocation = addOns.find(
+                            (x) => x.key === "boiler_relocation"
+                          );
+                          if (!relocation)
+                            return null;
+                          return /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
+                            /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: relocation.label }),
+                            /* @__PURE__ */ jsxs("div", { className: "text-slate-900 font-bold", children: [
+                              "£",
+                              relocation.total
+                            ] })
+                          ] });
+                        })(),
+                        (() => {
+                          const convert_to_combi = addOns.find(
+                            (x) => x.key === "convert_to_combi"
+                          );
+                          if (!convert_to_combi)
+                            return null;
+                          return /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
+                            /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: convert_to_combi.label }),
+                            /* @__PURE__ */ jsxs("div", { className: "text-slate-900 font-bold", children: [
+                              "£",
+                              convert_to_combi.total
+                            ] })
+                          ] });
+                        })(),
+                        /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
+                          /* @__PURE__ */ jsx("div", { className: "text-slate-700 font-semibold", children: "Flue Type" }),
+                          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                            /* @__PURE__ */ jsx(
+                              "span",
+                              {
+                                className: `px-2 py-0.5 rounded font-bold text-[12px] uppercase tracking-wider ${isVertical ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-900"}`,
+                                children: isVertical ? "Vertical" : "Horizontal"
+                              }
+                            ),
+                            isVertical && verticalFlueItem ? /* @__PURE__ */ jsxs("span", { className: "text-slate-900 font-bold", children: [
+                              "£",
+                              verticalFlueItem.total
+                            ] }) : /* @__PURE__ */ jsx("span", { className: "text-slate-500 font-semibold text-[13px]", children: "Included" })
+                          ] })
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between text-[14px]", children: [
+                        /* @__PURE__ */ jsx("span", { className: "text-slate-700 font-semibold", children: "Thermostat" }),
+                        /* @__PURE__ */ jsx(
+                          "span",
+                          {
+                            className: `font-bold ${hasSmartThermostat ? "text-primary" : "text-slate-700"}`,
+                            children: thermostatLabel
+                          }
+                        )
+                      ] }),
+                      visibleIncludes.map(
+                        (item, i) => /* @__PURE__ */ jsxs(
+                          "li",
+                          {
+                            className: "relative flex justify-between items-center font-medium text-dark opacity-0 included-animation",
+                            style: {
+                              animationDelay: `${i * 40}ms`
+                            },
+                            children: [
+                              /* @__PURE__ */ jsxs("span", { className: "max-w-[90%] text-[15px] inline-flex items-center gap-1.5", children: [
+                                /* @__PURE__ */ jsx("span", { children: item }),
+                                isCompatibilityDependentItem(
+                                  item
+                                ) && /* @__PURE__ */ jsxs(
+                                  "span",
+                                  {
+                                    "data-install-compat-wrap": "true",
+                                    className: "relative inline-flex items-center group/compat",
+                                    children: [
+                                      /* @__PURE__ */ jsx(
+                                        "button",
+                                        {
+                                          type: "button",
+                                          "aria-label": compatibilityTooltipText,
+                                          onClick: () => setOpenInstallCompatibilityTip(
+                                            openInstallCompatibilityTip === i ? null : i
+                                          ),
+                                          className: "inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-slate-500",
+                                          children: /* @__PURE__ */ jsx(FiInfo, { className: "h-3 w-3" })
+                                        }
+                                      ),
+                                      /* @__PURE__ */ jsx(
+                                        "div",
+                                        {
+                                          className: `quote-solid-popover absolute left-0 top-[calc(100%+0.3rem)] z-40 w-[240px] rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-relaxed text-slate-700 shadow-lg translate-y-1 transition-all duration-200 ${openInstallCompatibilityTip === i ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 group-hover/compat:pointer-events-auto group-hover/compat:opacity-100 group-hover/compat:translate-y-0 group-focus-within/compat:pointer-events-auto group-focus-within/compat:opacity-100 group-focus-within/compat:translate-y-0"}`,
+                                          children: compatibilityTooltipText
+                                        }
+                                      )
+                                    ]
+                                  }
+                                )
+                              ] }),
+                              /* @__PURE__ */ jsx("span", { className: "text-primary text-sm font-semibold", children: "Included" })
+                            ]
+                          },
+                          i
+                        )
+                      )
+                    ] }),
+                    includes.length > 3 && /* @__PURE__ */ jsx(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => setShowAllIncludes(
+                          (v) => !v
+                        ),
+                        className: "text-[14px] mt-3 border border-gray-200 cursor-pointer hover:border-primary px-3 py-2 uppercase tracking-wider font-semibold text-dark/80 hover:text-primary transition-colors",
+                        children: showAllIncludes ? "- Hide full item" : `+ See full item (${includes.length})`
+                      }
+                    )
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxs("div", { className: "bg-slate-50 -mx-6 -mb-6 p-6 pb-10 mt-6 border-t border-slate-200 text-slate-900", children: [
+                  /* @__PURE__ */ jsx("div", { className: "mb-4 rounded-xl border border-slate-200 bg-white px-3 py-2.5", children: /* @__PURE__ */ jsxs("div", { "data-cancel-policy-wrap": "true", className: "relative inline-flex items-center gap-1.5 text-xs text-slate-600 group/cancel-policy", children: [
+                    /* @__PURE__ */ jsx("span", { className: "font-semibold text-slate-800", children: "Cancellation policy" }),
+                    /* @__PURE__ */ jsx(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => setOpenCancellationTooltip(
+                          (prev) => !prev
+                        ),
+                        className: "inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary",
+                        "aria-label": "Show cancellation policy",
+                        children: /* @__PURE__ */ jsx(FiInfo, { className: "h-3.5 w-3.5" })
+                      }
+                    ),
+                    /* @__PURE__ */ jsxs(
+                      "div",
+                      {
+                        className: `quote-solid-popover absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${openCancellationTooltip ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 group-hover/cancel-policy:pointer-events-auto group-hover/cancel-policy:opacity-100 group-hover/cancel-policy:translate-y-0 group-focus-within/cancel-policy:pointer-events-auto group-focus-within/cancel-policy:opacity-100 group-focus-within/cancel-policy:translate-y-0"}`,
+                        children: [
+                          /* @__PURE__ */ jsx("p", { children: "You can cancel for a full refund up to 24 hours before your booking." }),
+                          /* @__PURE__ */ jsx("p", { className: "mt-1.5", children: "Cancellations made with less than 24 hours’ notice may be chargeable, including where materials have already been ordered or engineer time has been allocated." }),
+                          /* @__PURE__ */ jsxs("p", { className: "mt-2 text-slate-500", children: [
+                            "This does not affect your statutory rights. Full terms:",
+                            /* @__PURE__ */ jsx(
+                              "a",
+                              {
+                                href: "/terms-conditions",
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                className: "ml-1 font-semibold text-primary underline underline-offset-2",
+                                children: "view full terms"
+                              }
+                            )
+                          ] })
+                        ]
+                      }
+                    )
+                  ] }) }),
+                  /* @__PURE__ */ jsxs(
+                    "div",
+                    {
+                      ref: termsRef,
+                      className: `mb-4 rounded-xl border p-3 ${termsError ? "border-red-300 bg-red-50" : "border-slate-200 bg-white"}`,
+                      children: [
+                        /* @__PURE__ */ jsxs("div", { className: "mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3", children: [
+                          /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2", children: "Have a coupon code?" }),
+                          /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
+                            /* @__PURE__ */ jsx(
+                              "input",
+                              {
+                                type: "text",
+                                value: couponCode,
+                                onChange: (e) => {
+                                  setCouponCode(e.target.value.toUpperCase());
+                                  setCouponError("");
+                                  setCouponApplied(null);
+                                },
+                                placeholder: "Enter code",
+                                className: "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm uppercase"
+                              }
+                            ),
+                            /* @__PURE__ */ jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: handleApplyCoupon,
+                                disabled: processing || applyingCoupon,
+                                className: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-60",
+                                children: applyingCoupon ? "Applying..." : "Apply"
+                              }
+                            )
+                          ] }),
+                          couponApplied?.coupon?.code && /* @__PURE__ */ jsxs("p", { className: "mt-2 text-xs font-semibold text-emerald-700", children: [
+                            "Applied ",
+                            couponApplied.coupon.code,
+                            " • -",
+                            formatMoney(discountAmount)
+                          ] }),
+                          couponError && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: couponError })
+                        ] }),
+                        /* @__PURE__ */ jsxs("label", { className: "flex items-start gap-3 text-sm leading-relaxed text-slate-700", children: [
+                          /* @__PURE__ */ jsx(
+                            "input",
+                            {
+                              type: "checkbox",
+                              checked: acceptedTerms,
+                              onChange: (e) => {
+                                setAcceptedTerms(
+                                  e.target.checked
+                                );
+                                setTermsError("");
+                              },
+                              className: "mt-0.5 h-4 w-4 rounded border-slate-300 bg-white text-primary focus:ring-primary"
+                            }
+                          ),
+                          /* @__PURE__ */ jsxs("span", { children: [
+                            "I confirm that I have read and agree to the",
+                            " ",
+                            /* @__PURE__ */ jsx(
+                              "a",
+                              {
+                                href: "/terms-conditions",
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                className: "font-semibold underline underline-offset-2",
+                                children: "Terms & Conditions"
+                              }
+                            ),
+                            " ",
+                            "and",
+                            " ",
+                            /* @__PURE__ */ jsx(
+                              "a",
+                              {
+                                href: "/privacy-policy",
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                className: "font-semibold underline underline-offset-2",
+                                children: "Privacy Policy"
+                              }
+                            ),
+                            ", including any advertised",
+                            " ",
+                            /* @__PURE__ */ jsx(
+                              "a",
+                              {
+                                href: "/terms-conditions#next-day",
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                className: "font-semibold underline underline-offset-2",
+                                children: "next-day installation terms"
+                              }
+                            ),
+                            "."
+                          ] })
+                        ] }),
+                        termsError && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: termsError })
+                      ]
+                    }
+                  ),
                   /* @__PURE__ */ jsx(
                     "button",
                     {
                       type: "button",
-                      onClick: () => setOpenCancellationTooltip(
-                        (prev) => !prev
-                      ),
-                      className: "inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition-colors hover:border-primary hover:text-primary",
-                      "aria-label": "Show cancellation policy",
-                      children: /* @__PURE__ */ jsx(FiInfo, { className: "h-3.5 w-3.5" })
+                      onClick: handlePayAndBook,
+                      disabled: processing,
+                      "aria-busy": processing,
+                      className: [
+                        "w-full py-4 text-sm font-bold rounded-xl uppercase tracking-wide border transition-all flex items-center justify-center gap-2",
+                        processing ? "bg-gray-400 border-gray-400 cursor-not-allowed text-white" : paymentClientSecret && !acceptedTerms ? "bg-primary border-primary text-white opacity-70 cursor-not-allowed" : "bg-primary border-primary text-white hover:opacity-95"
+                      ].join(" "),
+                      children: processing ? /* @__PURE__ */ jsxs(Fragment, { children: [
+                        /* @__PURE__ */ jsx(FiLoader, { className: "animate-spin" }),
+                        "Processing…"
+                      ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+                        /* @__PURE__ */ jsx(FiCreditCard, {}),
+                        paymentClientSecret ? "Confirm & Book Installation" : "Continue to secure payment"
+                      ] })
                     }
                   ),
-                  /* @__PURE__ */ jsxs(
+                  paymentClientSecret && /* @__PURE__ */ jsx(
                     "div",
                     {
-                      className: `quote-solid-popover absolute left-0 top-7 z-20 w-[290px] rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 shadow-xl translate-y-1 transition-all duration-200 ${openCancellationTooltip ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 group-hover/cancel-policy:pointer-events-auto group-hover/cancel-policy:opacity-100 group-hover/cancel-policy:translate-y-0 group-focus-within/cancel-policy:pointer-events-auto group-focus-within/cancel-policy:opacity-100 group-focus-within/cancel-policy:translate-y-0"}`,
-                      children: [
-                        /* @__PURE__ */ jsx("p", { children: "You can cancel for a full refund up to 24 hours before your booking." }),
-                        /* @__PURE__ */ jsx("p", { className: "mt-1.5", children: "Cancellations made with less than 24 hours’ notice may be chargeable, including where materials have already been ordered or engineer time has been allocated." }),
-                        /* @__PURE__ */ jsxs("p", { className: "mt-2 text-slate-500", children: [
-                          "This does not affect your statutory rights. Full terms:",
-                          /* @__PURE__ */ jsx(
-                            "a",
-                            {
-                              href: "/terms-conditions",
-                              target: "_blank",
-                              rel: "noopener noreferrer",
-                              className: "ml-1 font-semibold text-primary underline underline-offset-2",
-                              children: "view full terms"
-                            }
-                          )
-                        ] })
-                      ]
+                      ref: paymentSectionRef,
+                      className: "mt-4 rounded-2xl border border-slate-200 bg-white p-3",
+                      children: /* @__PURE__ */ jsx("div", { ref: paymentElementContainerRef })
                     }
-                  )
-                ] }) }),
-                /* @__PURE__ */ jsxs(
-                  "div",
-                  {
-                    ref: termsRef,
-                    className: `mb-4 rounded-xl border p-3 ${termsError ? "border-red-300 bg-red-50" : "border-slate-200 bg-white"}`,
-                    children: [
-                      /* @__PURE__ */ jsxs("div", { className: "mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3", children: [
-                        /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2", children: "Have a coupon code?" }),
-                        /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
-                          /* @__PURE__ */ jsx(
-                            "input",
-                            {
-                              type: "text",
-                              value: couponCode,
-                              onChange: (e) => {
-                                setCouponCode(e.target.value.toUpperCase());
-                                setCouponError("");
-                                setCouponApplied(null);
-                              },
-                              placeholder: "Enter code",
-                              className: "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm uppercase"
-                            }
-                          ),
-                          /* @__PURE__ */ jsx(
-                            "button",
-                            {
-                              type: "button",
-                              onClick: handleApplyCoupon,
-                              disabled: processing || applyingCoupon,
-                              className: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-60",
-                              children: applyingCoupon ? "Applying..." : "Apply"
-                            }
-                          )
-                        ] }),
-                        couponApplied?.coupon?.code && /* @__PURE__ */ jsxs("p", { className: "mt-2 text-xs font-semibold text-emerald-700", children: [
-                          "Applied ",
-                          couponApplied.coupon.code,
-                          " • -",
-                          formatMoney(discountAmount)
-                        ] }),
-                        couponError && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: couponError })
-                      ] }),
-                      /* @__PURE__ */ jsxs("label", { className: "flex items-start gap-3 text-sm leading-relaxed text-slate-700", children: [
-                        /* @__PURE__ */ jsx(
-                          "input",
-                          {
-                            type: "checkbox",
-                            checked: acceptedTerms,
-                            onChange: (e) => {
-                              setAcceptedTerms(
-                                e.target.checked
-                              );
-                              setTermsError("");
-                            },
-                            className: "mt-0.5 h-4 w-4 rounded border-slate-300 bg-white text-primary focus:ring-primary"
-                          }
-                        ),
-                        /* @__PURE__ */ jsxs("span", { children: [
-                          "I confirm that I have read and agree to the",
-                          " ",
-                          /* @__PURE__ */ jsx(
-                            "a",
-                            {
-                              href: "/terms-conditions",
-                              target: "_blank",
-                              rel: "noopener noreferrer",
-                              className: "font-semibold underline underline-offset-2",
-                              children: "Terms & Conditions"
-                            }
-                          ),
-                          " ",
-                          "and",
-                          " ",
-                          /* @__PURE__ */ jsx(
-                            "a",
-                            {
-                              href: "/privacy-policy",
-                              target: "_blank",
-                              rel: "noopener noreferrer",
-                              className: "font-semibold underline underline-offset-2",
-                              children: "Privacy Policy"
-                            }
-                          ),
-                          ", including any advertised",
-                          " ",
-                          /* @__PURE__ */ jsx(
-                            "a",
-                            {
-                              href: "/terms-conditions#next-day",
-                              target: "_blank",
-                              rel: "noopener noreferrer",
-                              className: "font-semibold underline underline-offset-2",
-                              children: "next-day installation terms"
-                            }
-                          ),
-                          "."
-                        ] })
-                      ] }),
-                      termsError && /* @__PURE__ */ jsx("p", { className: "mt-2 text-xs font-semibold text-red-600", children: termsError })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsx(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: handlePayAndBook,
-                    disabled: processing,
-                    "aria-busy": processing,
-                    className: [
-                      "w-full py-4 text-sm font-bold rounded-xl uppercase tracking-wide border transition-all flex items-center justify-center gap-2",
-                      processing ? "bg-gray-400 border-gray-400 cursor-not-allowed text-white" : paymentClientSecret && !acceptedTerms ? "bg-primary border-primary text-white opacity-70 cursor-not-allowed" : "bg-primary border-primary text-white hover:opacity-95"
-                    ].join(" "),
-                    children: processing ? /* @__PURE__ */ jsxs(Fragment, { children: [
-                      /* @__PURE__ */ jsx(FiLoader, { className: "animate-spin" }),
-                      "Processing…"
-                    ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-                      /* @__PURE__ */ jsx(FiCreditCard, {}),
-                      paymentClientSecret ? "Confirm & Book Installation" : "Continue to secure payment"
-                    ] })
-                  }
-                ),
-                paymentClientSecret && /* @__PURE__ */ jsx(
-                  "div",
-                  {
-                    ref: paymentSectionRef,
-                    className: "mt-4 rounded-2xl border border-slate-200 bg-white p-3",
-                    children: /* @__PURE__ */ jsx("div", { ref: paymentElementContainerRef })
-                  }
-                ),
-                paymentError && /* @__PURE__ */ jsx("p", { className: "mt-3 text-center text-xs font-semibold text-red-600", children: paymentError }),
-                /* @__PURE__ */ jsxs("div", { className: "mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]", children: [
-                  /* @__PURE__ */ jsx("span", { className: "rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm", children: "Visa" }),
-                  /* @__PURE__ */ jsx("span", { className: "rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm", children: "Mastercard" }),
-                  /* @__PURE__ */ jsx("span", { className: "rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm", children: "Klarna" })
+                  ),
+                  paymentError && /* @__PURE__ */ jsx("p", { className: "mt-3 text-center text-xs font-semibold text-red-600", children: paymentError }),
+                  /* @__PURE__ */ jsxs("div", { className: "mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]", children: [
+                    /* @__PURE__ */ jsx("span", { className: "rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm", children: "Visa" }),
+                    /* @__PURE__ */ jsx("span", { className: "rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm", children: "Mastercard" }),
+                    /* @__PURE__ */ jsx("span", { className: "rounded-full border border-slate-300 bg-white text-slate-900 px-3 py-1 shadow-sm", children: "Klarna" })
+                  ] })
                 ] })
               ] })
-            ] })
-          ] }) }) })
+            ] }) }) })
+          ] })
         ] })
-      ] }) }),
+      ] }),
       /* @__PURE__ */ jsx("div", { className: "fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 backdrop-blur lg:hidden", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-7xl flex items-center gap-3", children: [
         /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
           /* @__PURE__ */ jsx("p", { className: "text-[11px] uppercase tracking-wider text-slate-500 font-semibold", children: "Total package" }),
@@ -7184,14 +7457,15 @@ function computeAddOns(answers, boilerType, { ADDONS: ADDONS2, RULES: RULES2 }) 
   return { items, total, derived: { flueType: flue } };
 }
 function combiKwMatch(productKw, targetKw) {
-  if (targetKw === 24) return productKw === 24 || productKw === 25;
-  if (targetKw === 30) return productKw === 30;
-  if (targetKw === 35) return productKw === 35 || productKw === 36;
+  const kw = Number(productKw);
+  if (!Number.isFinite(kw)) return false;
+  if (targetKw === 24) return kw >= 22 && kw <= 27;
+  if (targetKw === 30) return kw >= 28 && kw <= 32;
+  if (targetKw === 35) return kw >= 33 && kw <= 38;
   return false;
 }
 function buildBoilerQuote({ answers, questions = [] }) {
   const { RULES: RULES2, ADDONS: ADDONS2, PRODUCTS: PRODUCTS2 } = applyEffectiveConfig();
-  console.log("EFFECTIVE TRV:", ADDONS2.TRV.unitPrice, "MAX:", RULES2.TRV_MAX_QTY);
   const qMap = questionMap(questions);
   const radsBucket = parseRadsBucket(label(answers?.radiators));
   const baths = parseBaths(label(answers?.bathrooms));
@@ -8377,7 +8651,7 @@ function Stepper({
           backgroundImage: "radial-gradient(circle at top, rgba(16,185,129,0.30), transparent 45%)"
         },
         children: [
-          /* @__PURE__ */ jsx(PageHeader, {}),
+          /* @__PURE__ */ jsx(PageHeader, { theme: "blue" }),
           /* @__PURE__ */ jsx("input", { type: "hidden", name: "service_key", value: serviceKey }),
           /* @__PURE__ */ jsx("input", { type: "hidden", name: "service_name", value: title }),
           /* @__PURE__ */ jsxs("div", { className: "max-w-7xl mx-auto space-y-10 py-16 px-4 sm:px-6 lg:px-0", children: [
@@ -9852,6 +10126,52 @@ function TechnicianButton() {
     }
   );
 }
+function InstagramFeed() {
+  const embedRef = useRef(null);
+  useEffect(() => {
+    const scriptId = "EmbedSocialHashtagScript";
+    const existingScript = document.getElementById(scriptId);
+    if (existingScript) {
+      existingScript.remove();
+    }
+    if (embedRef.current) {
+      embedRef.current.innerHTML = "";
+    }
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.async = true;
+    script.src = `https://embedsocial.com/cdn/ht.js?cb=${Date.now()}`;
+    document.head.appendChild(script);
+    return () => {
+      script.remove();
+      if (embedRef.current) {
+        embedRef.current.innerHTML = "";
+      }
+    };
+  }, []);
+  return /* @__PURE__ */ jsx("section", { className: "bg-white py-20", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0", children: [
+    /* @__PURE__ */ jsx("div", { className: "flex flex-col items-center text-center gap-6", children: /* @__PURE__ */ jsxs("div", { children: [
+      /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600", children: "Recent work" }),
+      /* @__PURE__ */ jsx("h2", { className: "mt-3 text-3xl sm:text-4xl font-semibold text-slate-900", children: "Leeds installs, call-outs & behind-the-scenes" }),
+      /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm sm:text-base text-slate-600", children: "Expect everything from installs to fixes and day‑to‑day updates — all real, all local." })
+    ] }) }),
+    /* @__PURE__ */ jsxs("div", { className: "mt-10 rounded-3xl bg-white p-4 shadow-sm", children: [
+      /* @__PURE__ */ jsx("style", { children: `
+                        .embedsocial-hashtag .feed-powered-by-es {
+                            display: none !important;
+                        }
+                    ` }),
+      /* @__PURE__ */ jsx(
+        "div",
+        {
+          ref: embedRef,
+          className: "embedsocial-hashtag",
+          "data-ref": "98d397d59cef083016e0312428376fe3ae4f8fe1"
+        }
+      )
+    ] })
+  ] }) });
+}
 const pageTitle = "Get a Quote";
 const SERVICE_KEYS = {
   REPAIR: "repair",
@@ -9910,7 +10230,7 @@ const SERVICE_CONTENT = {
   },
   [SERVICE_KEYS.SERVICE]: {
     slug: SERVICE_KEYS.SERVICE,
-    heroTitle: "Boiler Servicing in Leeds & Surrounding",
+    heroTitle: "Professional Boiler Servicing in Leeds & Surrounding",
     heroDesc: "Full strip-down service with safety checks, combustion analysis, and clean. If strip-down shows worn seals, gaskets, or electrodes, we’ll show you and price the required service parts for your boiler model before fitting.",
     badge: "Boiler Service",
     sampleJobLabel: "Boiler Service • £115 inc VAT",
@@ -9919,7 +10239,7 @@ const SERVICE_CONTENT = {
     parts: "—",
     gaugeLabel: "Pass rate",
     gaugeValueText: "99%",
-    cta: "Book a service",
+    cta: "Check availability & book",
     pricingType: "estimate",
     // ✅ CORRECT PLACE
     serviceNote: "A strip-down can reveal failed seals, gaskets, or electrodes. These are routine service parts that occasionally need replacing; we’ll confirm the requirement and cost based on your boiler model before fitting. If your boiler isn’t working or showing faults, please book a repair/diagnosis instead of a service."
@@ -9977,16 +10297,12 @@ function QuotePage() {
   const gap = circumference - dash;
   return /* @__PURE__ */ jsxs(Fragment, { children: [
     /* @__PURE__ */ jsx(Head, { title }),
-    /* @__PURE__ */ jsx(BlueQuoteSkin, { children: /* @__PURE__ */ jsxs("div", { className: "relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-white overflow-x-hidden quote-page-bg", children: [
-      /* @__PURE__ */ jsx(PageHeader, { title: pageTitle }),
-      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-7xl px-4 sm:px-6 mt-16", children: [
+    /* @__PURE__ */ jsxs("div", { className: "relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/50 overflow-x-hidden quote-page-bg", children: [
+      /* @__PURE__ */ jsx(PageHeader, { title: pageTitle, theme: "blue" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0 mt-16", children: [
         /* @__PURE__ */ jsxs("section", { className: "grid grid-cols-1 md:grid-cols-12 gap-10 items-start", children: [
           /* @__PURE__ */ jsxs("div", { className: "md:col-span-7", children: [
-            content.slug === SERVICE_KEYS.SERVICE ? /* @__PURE__ */ jsxs("div", { className: "mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-800 border border-slate-200 shadow-sm", children: [
-              /* @__PURE__ */ jsx("span", { className: "h-2 w-2 rounded-full bg-slate-500" }),
-              "Boiler service • ",
-              content.sampleJobLabel.replace("Boiler Service • ", "")
-            ] }) : /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-white border border-slate-200 shadow-sm", children: [
+            content.slug !== SERVICE_KEYS.SERVICE && /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-white border border-slate-200 shadow-sm", children: [
               /* @__PURE__ */ jsx("div", { className: "w-2 h-2 bg-slate-500 rounded-full" }),
               /* @__PURE__ */ jsx("span", { className: "text-sm font-medium text-slate-800", children: content.badge })
             ] }),
@@ -9997,38 +10313,38 @@ function QuotePage() {
                 Link,
                 {
                   href: route(`book.quote.${content.slug}`),
-                  className: "group/primary relative inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-7 py-4 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 hover:scale-[1.02]",
+                  className: "group/primary relative inline-flex items-center justify-center gap-3 rounded-xl bg-[#ff5a00] px-7 py-4 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(255,90,0,0.48)] transition-all duration-300 hover:scale-[1.02] hover:bg-[#ff4a00] hover:shadow-[0_18px_40px_rgba(255,74,0,0.58)]",
+                  style: {
+                    backgroundColor: "#ff5a00",
+                    border: "1px solid #ff4a00"
+                  },
                   children: [
                     /* @__PURE__ */ jsx("span", { className: "relative z-10", children: content.cta }),
                     /* @__PURE__ */ jsx("span", { className: "relative z-10 transition-transform group-hover/primary:translate-x-1", children: "→" }),
-                    /* @__PURE__ */ jsx("div", { className: "absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-emerald-700 rounded-xl opacity-0 group-hover/primary:opacity-100 transition-opacity duration-300" })
+                    /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        "aria-hidden": true,
+                        className: "pointer-events-none absolute inset-0 rounded-xl bg-[linear-gradient(180deg,rgba(255,255,255,0.38)_0%,rgba(255,255,255,0)_45%)]"
+                      }
+                    )
                   ]
                 }
               ),
               /* @__PURE__ */ jsx(TechnicianButton, {})
             ] }),
-            /* @__PURE__ */ jsxs("div", { className: "mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5 flex items-center gap-4", children: [
-              /* @__PURE__ */ jsx("div", { className: "h-10 w-10 rounded-xl bg-gradient-to-br from-pink-400 to-pink-500 text-white font-black text-xl flex items-center justify-center", children: "K" }),
+            /* @__PURE__ */ jsxs("div", { className: "mt-6 rounded-2xl bg-white/90 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 p-4 sm:p-5 flex items-center gap-4 backdrop-blur-sm", children: [
+              /* @__PURE__ */ jsx("div", { className: "h-10 min-w-[72px] rounded-xl bg-[#ffb3c7] px-3 text-[#111] font-bold text-sm flex items-center justify-center", children: "Klarna." }),
               /* @__PURE__ */ jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsx("p", { className: "text-sm font-semibold text-slate-900", children: "Spread the cost with Klarna" }),
                 /* @__PURE__ */ jsx("p", { className: "text-sm text-slate-600", children: "Pay in 3 instalments, interest free. Subject to status. Choose Klarna at checkout." })
               ] })
             ] }),
-            content.slug === SERVICE_KEYS.SERVICE ? /* @__PURE__ */ jsx("div", { className: "mt-12 grid gap-4 sm:grid-cols-2", children: ["Full clean and combustion safety checks", "Strip-down inspection; service parts priced if worn", "Expansion vessel set and leak-checked", "Gas Safe engineers, tidy work"].map((item) => /* @__PURE__ */ jsxs(
-              "div",
-              {
-                className: "flex items-start gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-sm",
-                children: [
-                  /* @__PURE__ */ jsx("span", { className: "mt-0.5 h-2 w-2 rounded-full bg-emerald-500" }),
-                  /* @__PURE__ */ jsx("p", { className: "text-sm font-semibold text-slate-900 leading-snug", children: item })
-                ]
-              },
-              item
-            )) }) : /* @__PURE__ */ jsxs("div", { className: "mt-12 flex flex-wrap items-center gap-6", children: [
+            /* @__PURE__ */ jsxs("div", { className: "mt-12 flex flex-wrap items-center gap-6", children: [
               /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
                 /* @__PURE__ */ jsx("div", { className: "w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center", children: /* @__PURE__ */ jsx("span", { className: "text-emerald-600", children: "✓" }) }),
                 /* @__PURE__ */ jsxs("div", { children: [
-                  /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-slate-900", children: "Same-day service" }),
+                  /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-slate-900", children: "Next-day service" }),
                   /* @__PURE__ */ jsx("p", { className: "text-xs text-slate-500", children: "Emergency response" })
                 ] })
               ] }),
@@ -10103,71 +10419,89 @@ function QuotePage() {
                 )
               ] }) })
             ] })
-          ) : content.slug === SERVICE_KEYS.SERVICE ? /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl bg-white border border-slate-100 shadow-lg overflow-hidden", children: [
-            /* @__PURE__ */ jsx("div", { className: "px-6 pt-6 pb-4", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+          ) : content.slug === SERVICE_KEYS.SERVICE ? /* @__PURE__ */ jsxs("div", { className: "relative overflow-hidden rounded-[28px] bg-white/85 p-7 shadow-[0_20px_55px_rgba(15,23,42,0.10)] ring-1 ring-slate-100/70 backdrop-blur-sm", children: [
+            /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-emerald-100/50 blur-3xl" }),
+            /* @__PURE__ */ jsxs("div", { className: "relative flex items-start justify-between gap-4", children: [
               /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("h3", { className: "text-xl font-bold text-slate-900", children: "How boiler servicing works" }),
-                /* @__PURE__ */ jsx("p", { className: "text-slate-600 text-sm mt-1", children: "Strip-down service; if service parts are needed, we price them clearly before fitting." })
+                /* @__PURE__ */ jsx("p", { className: "text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700", children: "Boiler Service" }),
+                /* @__PURE__ */ jsx("h3", { className: "mt-2 text-2xl font-semibold text-slate-900", children: "Trusted annual service, done properly" }),
+                /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm leading-relaxed text-slate-600", children: "Local Gas Safe engineers, proper strip-down process, and clear communication if any service parts are required." })
               ] }),
-              /* @__PURE__ */ jsx("div", { className: "w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center", children: /* @__PURE__ */ jsx("span", { className: "text-emerald-600 animate-[spin_8s_linear_infinite]", children: "🧰" }) }),
-              /* @__PURE__ */ jsxs("div", { className: "mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900", children: [
-                /* @__PURE__ */ jsx("p", { className: "font-semibold text-emerald-800", children: "What we actually do on the strip-down:" }),
-                /* @__PURE__ */ jsxs("ul", { className: "mt-2 list-disc space-y-1 pl-5", children: [
-                  /* @__PURE__ */ jsx("li", { children: "Pump and set the expansion vessel, checking the Schrader valve" }),
-                  /* @__PURE__ */ jsx("li", { children: "Clean the combustion chamber and burner area" }),
-                  /* @__PURE__ */ jsx("li", { children: "Clean and flush the condensate trap" }),
-                  /* @__PURE__ */ jsx("li", { children: "Check and replace worn service parts (gaskets/electrodes) if needed" })
-                ] })
+              /* @__PURE__ */ jsxs("div", { className: "shrink-0 rounded-2xl bg-emerald-50/80 px-4 py-3 text-right ring-1 ring-emerald-100/70", children: [
+                /* @__PURE__ */ jsx("p", { className: "text-2xl font-bold text-slate-900", children: content.labour }),
+                /* @__PURE__ */ jsx("p", { className: "text-xs text-slate-500", children: "inc VAT" })
               ] })
-            ] }) }),
-            /* @__PURE__ */ jsx("div", { className: "px-6 pb-6", children: /* @__PURE__ */ jsx("div", { className: "grid gap-4 sm:grid-cols-3", children: [
+            ] }),
+            /* @__PURE__ */ jsxs("div", { className: "relative mt-6", children: [
+              /* @__PURE__ */ jsx("p", { className: "text-sm font-semibold text-slate-900", children: "What’s included:" }),
+              /* @__PURE__ */ jsx("ul", { className: "mt-3 grid gap-2 sm:grid-cols-2 text-sm text-slate-700", children: [
+                "Combustion and gas safety checks",
+                "Burner/chamber and condensate trap clean",
+                "Expansion vessel pressure check/reset",
+                "Service report and clear engineer advice"
+              ].map((item) => /* @__PURE__ */ jsxs(
+                "li",
+                {
+                  className: "flex items-start gap-2 rounded-xl bg-white px-3.5 py-2.5 shadow-[0_8px_18px_rgba(15,23,42,0.06)] ring-1 ring-slate-100",
+                  children: [
+                    /* @__PURE__ */ jsx("span", { className: "mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" }),
+                    /* @__PURE__ */ jsx("span", { children: item })
+                  ]
+                },
+                item
+              )) })
+            ] }),
+            /* @__PURE__ */ jsx("div", { className: "relative mt-6 grid gap-3", children: [
               {
-                step: "STEP 01",
-                title: "Book online in minutes",
-                text: "Answer the short questions and lock in your strip-down service instantly — no calls or back-and-forth."
+                step: "01",
+                title: "Answer quick questions",
+                text: "Takes about a minute. We use this to match engineer time and access needs."
               },
               {
-                step: "STEP 02",
-                title: "We confirm your slot",
-                text: "You get the appointment time and a reminder. If anything needs tweaking, we’ll message you straight away."
+                step: "02",
+                title: "Pick your slot",
+                text: "Choose a booking window that works for you. You’ll get confirmation straight away."
               },
               {
-                step: "STEP 03",
-                title: "Service + sign-off",
-                text: "We carry out the strip-down. If service parts are required, we’ll show you and price them before fitting; if your boiler has faults, we’ll recommend a repair visit instead."
+                step: "03",
+                title: "Engineer visit + sign-off",
+                text: "If worn service parts are needed, we confirm and price them before fitting."
               }
             ].map((item) => /* @__PURE__ */ jsxs(
               "div",
               {
-                className: "rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm",
+                className: "flex items-start gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.08)] ring-1 ring-slate-100",
                 children: [
-                  /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-                    /* @__PURE__ */ jsx("span", { className: "text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-600", children: item.step }),
-                    /* @__PURE__ */ jsx("span", { className: "h-2 w-2 rounded-full bg-emerald-500" })
-                  ] }),
-                  /* @__PURE__ */ jsx("h4", { className: "mt-4 text-base font-semibold text-slate-900", children: item.title }),
-                  /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm text-slate-600", children: item.text })
+                  /* @__PURE__ */ jsx("span", { className: "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700", children: item.step }),
+                  /* @__PURE__ */ jsxs("div", { children: [
+                    /* @__PURE__ */ jsx("p", { className: "text-sm font-semibold text-slate-900", children: item.title }),
+                    /* @__PURE__ */ jsx("p", { className: "mt-1 text-sm leading-relaxed text-slate-600", children: item.text })
+                  ] })
                 ]
               },
               item.step
-            )) }) }),
-            /* @__PURE__ */ jsx("div", { className: "px-6 py-5 bg-slate-50 border-t border-slate-100", children: /* @__PURE__ */ jsxs("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between gap-3", children: [
-              /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
-                /* @__PURE__ */ jsx("p", { className: "text-sm text-slate-600", children: "Fixed-price strip-down service. If worn service parts are needed, we price them clearly by boiler model before fitting." }),
-                /* @__PURE__ */ jsx("p", { className: "text-sm text-slate-600", children: "Service is for healthy or routine maintenance. If your boiler is showing faults or not working, please book a repair/diagnosis instead." })
-              ] }),
+            )) }),
+            /* @__PURE__ */ jsxs("div", { className: "relative mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between", children: [
+              /* @__PURE__ */ jsx("p", { className: "text-sm text-slate-600", children: "If your boiler is faulty or not working, we’ll advise a repair/diagnosis booking instead of charging for the wrong visit." }),
               /* @__PURE__ */ jsxs(
                 Link,
                 {
                   href: route(`book.quote.${content.slug}`),
-                  className: "inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity sm:w-auto w-full",
+                  className: "group/primary relative inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff5a00] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(255,90,0,0.45)] transition-all duration-300 hover:scale-[1.02] hover:bg-[#ff4a00] hover:shadow-[0_16px_36px_rgba(255,74,0,0.55)] sm:w-auto w-full",
                   children: [
-                    "Book a service",
-                    /* @__PURE__ */ jsx("span", { children: "→" })
+                    /* @__PURE__ */ jsx(
+                      "span",
+                      {
+                        "aria-hidden": true,
+                        className: "pointer-events-none absolute inset-0 rounded-xl bg-[linear-gradient(180deg,rgba(255,255,255,0.38)_0%,rgba(255,255,255,0)_45%)]"
+                      }
+                    ),
+                    /* @__PURE__ */ jsx("span", { className: "relative z-10", children: "Book a service" }),
+                    /* @__PURE__ */ jsx("span", { className: "relative z-10", children: "→" })
                   ]
                 }
               )
-            ] }) })
+            ] })
           ] }) : content.slug === SERVICE_KEYS.POWERFLUSH ? /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl bg-white border border-slate-100 shadow-lg overflow-hidden", children: [
             /* @__PURE__ */ jsx("div", { className: "px-6 pt-6 pb-4", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between mb-3", children: [
               /* @__PURE__ */ jsxs("div", { children: [
@@ -10435,9 +10769,10 @@ function QuotePage() {
             ] })
           ) })
         ] }),
-        /* @__PURE__ */ jsx("div", { className: "mt-20 pb-12", children: /* @__PURE__ */ jsx(GoogleReview, {}) })
+        /* @__PURE__ */ jsx("div", { className: "mt-20 pb-12", children: /* @__PURE__ */ jsx(GoogleReview, {}) }),
+        /* @__PURE__ */ jsx("div", { className: "pb-10", children: /* @__PURE__ */ jsx(InstagramFeed, {}) })
       ] })
-    ] }) })
+    ] })
   ] });
 }
 const __vite_glob_0_21 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
@@ -10893,10 +11228,6 @@ function RepairCheckout() {
         /* @__PURE__ */ jsx(PageHeader, {}),
         /* @__PURE__ */ jsxs("div", { className: "max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10", children: [
           /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
-            /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3 py-1 text-[12px] font-semibold text-emerald-800", children: [
-              /* @__PURE__ */ jsx(FiShield, { className: "h-3.5 w-3.5" }),
-              "Secure checkout"
-            ] }),
             /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-4xl font-bold text-slate-900", children: title }),
             /* @__PURE__ */ jsx("p", { className: "text-base text-slate-600 max-w-2xl", children: "Confirm your visit time and details. Repairs include diagnosis and the first hour on site; we agree any parts and extra labour with you before fitting." })
           ] }),
@@ -11847,13 +12178,9 @@ function ServiceCheckout() {
     /* @__PURE__ */ jsxs(BlueQuoteSkin, { children: [
       /* @__PURE__ */ jsx("div", { className: "fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50 quote-page-bg" }),
       /* @__PURE__ */ jsxs("div", { className: "min-h-screen quote-page-bg", children: [
-        /* @__PURE__ */ jsx(PageHeader, {}),
+        /* @__PURE__ */ jsx(PageHeader, { theme: "blue" }),
         /* @__PURE__ */ jsxs("div", { className: "max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10", children: [
           /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
-            /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3 py-1 text-[12px] font-semibold text-emerald-800", children: [
-              /* @__PURE__ */ jsx(FiShield, { className: "h-3.5 w-3.5" }),
-              "Secure checkout"
-            ] }),
             /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-4xl font-bold text-slate-900", children: title }),
             /* @__PURE__ */ jsx("p", { className: "text-base text-slate-600 max-w-2xl", children: "Confirm your visit time and details. Your service is fixed price—no surprises when the engineer arrives." })
           ] }),
@@ -12126,7 +12453,8 @@ function ServiceCheckout() {
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ jsx(GoogleReview, {})
+        /* @__PURE__ */ jsx(GoogleReview, {}),
+        /* @__PURE__ */ jsx(InstagramFeed, {})
       ] })
     ] })
   ] });
@@ -13166,6 +13494,14 @@ function DetailsQuoteSidebar({
     )
   ] });
 }
+const SORT_OPTIONS = [
+  { value: "recommended", label: "Recommended" },
+  { value: "price_low", label: "Price: Low to high" },
+  { value: "price_high", label: "Price: High to low" },
+  { value: "warranty_high", label: "Warranty: Longest first" },
+  { value: "kw_low", label: "Output (kW): Low to high" },
+  { value: "brand_az", label: "Brand: A to Z" }
+];
 function QuoteResultsPage({ answers }) {
   const isCompatibilityDependentItem = (label2 = "") => {
     const normalized = String(label2).toLowerCase();
@@ -13190,13 +13526,13 @@ function QuoteResultsPage({ answers }) {
   const [activeQuote, setActiveQuote] = useState(null);
   const [detailsQuote, setDetailsQuote] = useState(null);
   const [selectedPower, setSelectedPower] = useState("25");
-  const [visibleCount, setVisibleCount] = useState(3);
   const [showInstallTimeInfo, setShowInstallTimeInfo] = useState(false);
   const [showGasSafeInfo, setShowGasSafeInfo] = useState(false);
   const [showNextDayInfo, setShowNextDayInfo] = useState(false);
   const [showWarrantyInfo, setShowWarrantyInfo] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [openCompatibilityTip, setOpenCompatibilityTip] = useState(null);
+  const [sortBy, setSortBy] = useState("recommended");
   const mobileCarouselRef = useRef(null);
   const [productDetails, setProductDetails] = useState({});
   const calculatePrice = (product) => {
@@ -13270,7 +13606,35 @@ function QuoteResultsPage({ answers }) {
     if (b.includes("atag")) return "/images/brands/atag.svg";
     return null;
   };
-  const visibleProducts = products.slice(0, visibleCount);
+  const sortedProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    if (sortBy === "recommended") return products;
+    const ranked = products.map((p, i) => ({ p, i }));
+    ranked.sort((a, b) => {
+      const pa = Number(calculatePrice(a.p) || 0);
+      const pb = Number(calculatePrice(b.p) || 0);
+      const wa = Number(a.p?.warrantyYears || 0);
+      const wb = Number(b.p?.warrantyYears || 0);
+      const ka = Number(a.p?.kw || 0);
+      const kb = Number(b.p?.kw || 0);
+      const ba = String(a.p?.brand || "");
+      const bb = String(b.p?.brand || "");
+      if (sortBy === "price_low") return pa - pb || a.i - b.i;
+      if (sortBy === "price_high") return pb - pa || a.i - b.i;
+      if (sortBy === "warranty_high") return wb - wa || a.i - b.i;
+      if (sortBy === "kw_low") return ka - kb || a.i - b.i;
+      if (sortBy === "brand_az") return ba.localeCompare(bb) || a.i - b.i;
+      return a.i - b.i;
+    });
+    return ranked.map((x) => x.p);
+  }, [products, sortBy]);
+  const visibleProducts = sortedProducts;
+  useEffect(() => {
+    setActiveCardIndex(0);
+    const container = mobileCarouselRef.current;
+    if (!container) return;
+    container.scrollTo({ left: 0, behavior: "smooth" });
+  }, [sortBy]);
   useEffect(() => {
     if (activeCardIndex >= visibleProducts.length) {
       setActiveCardIndex(Math.max(0, visibleProducts.length - 1));
@@ -13302,20 +13666,20 @@ function QuoteResultsPage({ answers }) {
     el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     setActiveCardIndex(index);
   };
-  return /* @__PURE__ */ jsxs("div", { className: "relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50/40 px-4 py-8 md:px-6 md:py-10 overflow-hidden quote-page-bg", children: [
+  return /* @__PURE__ */ jsxs("div", { className: "relative min-h-screen bg-transparent px-4 py-8 md:px-6 md:py-10 overflow-hidden", children: [
     /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute -top-24 -left-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl" }),
     /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute -bottom-24 -right-12 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" }),
-    /* @__PURE__ */ jsx("div", { className: "relative max-w-7xl mx-auto mb-8", children: /* @__PURE__ */ jsx("div", { className: "rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]", children: /* @__PURE__ */ jsxs("div", { className: "grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-stretch", children: [
+    /* @__PURE__ */ jsx("div", { className: "relative max-w-7xl mx-auto mb-8", children: /* @__PURE__ */ jsx("div", { className: "rounded-3xl bg-white/85 p-6 md:p-8 shadow-[0_18px_48px_rgba(15,23,42,0.10)] ring-1 ring-slate-100/70 backdrop-blur-sm", children: /* @__PURE__ */ jsxs("div", { className: "grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-stretch", children: [
       /* @__PURE__ */ jsxs("div", { className: "space-y-3", children: [
-        /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary", children: [
+        /* @__PURE__ */ jsxs("div", { className: "inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary", children: [
           /* @__PURE__ */ jsx(FiStar, { className: "h-3.5 w-3.5" }),
           "Personalised results"
         ] }),
         /* @__PURE__ */ jsx("h1", { className: "text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 leading-tight", children: "Boiler options matched to your home" }),
         /* @__PURE__ */ jsx("p", { className: "text-sm md:text-base text-slate-600 max-w-3xl leading-relaxed", children: "Fixed-price packages based on your survey answers." }),
         /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-center gap-2 pt-1", children: [
-          /* @__PURE__ */ jsx("span", { className: "inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700", children: getResultsContextLine() }),
-          /* @__PURE__ */ jsxs("span", { className: "inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800", children: [
+          /* @__PURE__ */ jsx("span", { className: "inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700", children: getResultsContextLine() }),
+          /* @__PURE__ */ jsxs("span", { className: "inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800", children: [
             /* @__PURE__ */ jsx(FiCheck, { className: "h-3.5 w-3.5" }),
             "Installation included"
           ] })
@@ -13328,14 +13692,14 @@ function QuoteResultsPage({ answers }) {
               href: "https://wa.me/447454796398",
               target: "_blank",
               rel: "noopener noreferrer",
-              className: "inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100",
+              className: "inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100",
               children: "WhatsApp 24/7"
             }
           )
         ] })
       ] }),
       /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
-        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group flex items-center justify-center text-center", children: [
+        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl bg-white/75 p-3 ring-1 ring-slate-100 group flex items-center justify-center text-center", children: [
           /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center gap-2", children: [
             /* @__PURE__ */ jsx(
               "img",
@@ -13389,7 +13753,7 @@ function QuoteResultsPage({ answers }) {
             }
           )
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group", children: [
+        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl bg-white/75 p-3 ring-1 ring-slate-100 group", children: [
           /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-[11px] uppercase tracking-wider text-slate-500 font-semibold", children: [
             "Estimated install time",
             /* @__PURE__ */ jsx(
@@ -13417,9 +13781,9 @@ function QuoteResultsPage({ answers }) {
             }
           )
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl border border-emerald-200 bg-gradient-to-r from-white to-emerald-50 p-3 group", children: [
+        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl bg-gradient-to-r from-white/90 to-emerald-50 p-3 ring-1 ring-emerald-100 group", children: [
           /* @__PURE__ */ jsx("div", { className: "text-[11px] uppercase tracking-wider text-emerald-800 font-semibold", children: "Delivery priority" }),
-          /* @__PURE__ */ jsx("div", { className: "mt-1 text-sm font-semibold text-slate-900 leading-snug", children: "Next day installation when ordered before 3pm" }),
+          /* @__PURE__ */ jsx("div", { className: "mt-1 text-sm font-semibold text-slate-900 leading-snug", children: "Next day installation when ordered before 4pm" }),
           /* @__PURE__ */ jsxs(
             "button",
             {
@@ -13438,7 +13802,7 @@ function QuoteResultsPage({ answers }) {
             {
               className: `quote-solid-popover absolute left-4 right-4 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-600 shadow-lg transition-opacity ${showNextDayInfo ? "opacity-100" : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"}`,
               children: [
-                "Next-day order slots apply to standard, in-stock products confirmed and paid before 3:00pm Monday to Friday. Subject to final survey checks, engineer availability, postcode coverage, and supplier cut-off times. Excludes weekends, bank holidays, special-order items, and complex upgrade works. Installation dates may be adjusted for safety, access, weather, or third-party supply delays.",
+                "Next-day order slots apply to standard, in-stock products confirmed and paid before 4:00pm Monday to Friday. Subject to final survey checks, engineer availability, postcode coverage, and supplier cut-off times. Excludes weekends, bank holidays, special-order items, and complex upgrade works. Installation dates may be adjusted for safety, access, weather, or third-party supply delays.",
                 /* @__PURE__ */ jsx(
                   "a",
                   {
@@ -13453,7 +13817,7 @@ function QuoteResultsPage({ answers }) {
             }
           )
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group", children: [
+        /* @__PURE__ */ jsxs("div", { className: "relative rounded-2xl bg-white/75 p-3 ring-1 ring-slate-100 group", children: [
           /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm text-slate-900 font-semibold leading-snug", children: [
             "Warranty & workmanship cover",
             /* @__PURE__ */ jsx(
@@ -13478,6 +13842,30 @@ function QuoteResultsPage({ answers }) {
       ] })
     ] }) }) }),
     /* @__PURE__ */ jsxs("div", { className: "max-w-7xl mx-auto", children: [
+      /* @__PURE__ */ jsxs("div", { className: "mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-slate-100", children: [
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("div", { className: "text-xs uppercase tracking-wider text-slate-500 font-semibold", children: "Packages" }),
+          /* @__PURE__ */ jsxs("div", { className: "text-sm font-semibold text-slate-900", children: [
+            visibleProducts.length,
+            " options available"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsx("span", { className: "text-xs font-semibold text-slate-600", children: "Sort by" }),
+          /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+            /* @__PURE__ */ jsx(
+              "select",
+              {
+                value: sortBy,
+                onChange: (e) => setSortBy(e.target.value),
+                className: "appearance-none rounded-full border border-slate-300 bg-white py-2 pl-3 pr-9 text-xs font-semibold text-slate-800 shadow-sm hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20",
+                children: SORT_OPTIONS.map((option) => /* @__PURE__ */ jsx("option", { value: option.value, children: option.label }, option.value))
+              }
+            ),
+            /* @__PURE__ */ jsx(FiChevronDown, { className: "pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" })
+          ] })
+        ] })
+      ] }),
       /* @__PURE__ */ jsx("div", { className: "mb-4 flex gap-2 overflow-x-auto pb-1 lg:hidden", children: visibleProducts.map((product, index) => /* @__PURE__ */ jsx(
         "button",
         {
@@ -13488,7 +13876,7 @@ function QuoteResultsPage({ answers }) {
         },
         `switch-${product.id || index}`
       )) }),
-      /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/95 px-3 py-2.5 shadow-sm lg:hidden", children: [
+      /* @__PURE__ */ jsxs("div", { className: "mb-4 flex items-center justify-between rounded-2xl bg-white/90 px-3 py-2.5 shadow-sm ring-1 ring-slate-100 lg:hidden", children: [
         /* @__PURE__ */ jsxs(
           "button",
           {
@@ -13541,11 +13929,11 @@ function QuoteResultsPage({ answers }) {
               {
                 id: `quote-product-card-${index}`,
                 "data-card-index": index,
-                className: "relative min-w-[88%] snap-center rounded-3xl bg-slate-50 shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden border border-slate-200 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0",
+                className: "relative min-w-[88%] snap-center rounded-3xl bg-white/92 shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden ring-1 ring-slate-100 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0",
                 children: [
                   /* @__PURE__ */ jsx("div", { className: "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary to-secondary" }),
                   /* @__PURE__ */ jsx("div", { className: "h-28 bg-slate-50 relative overflow-hidden", children: /* @__PURE__ */ jsxs("div", { className: "relative p-6 flex justify-between items-start", children: [
-                    tierLabel && /* @__PURE__ */ jsx("div", { className: "inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-slate-800 shadow-sm border border-slate-200", children: /* @__PURE__ */ jsx("span", { className: "text-[14px] font-semibold tracking-wide", children: tierLabel }) }),
+                    tierLabel && /* @__PURE__ */ jsx("div", { className: "inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-slate-800 shadow-sm ring-1 ring-slate-100", children: /* @__PURE__ */ jsx("span", { className: "text-[14px] font-semibold tracking-wide", children: tierLabel }) }),
                     /* @__PURE__ */ jsx("div", { className: "text-right", children: /* @__PURE__ */ jsxs("span", { className: "text-[14px] font-bold uppercase tracking-wider text-slate-600", children: [
                       product.kw,
                       " kW"
@@ -13575,7 +13963,7 @@ function QuoteResultsPage({ answers }) {
                         "kW"
                       ] })
                     ] }) }),
-                    brandLogo && /* @__PURE__ */ jsxs("div", { className: "mt-3 rounded-lg border border-slate-200 bg-white px-3 py-2 inline-flex items-center", children: [
+                    brandLogo && /* @__PURE__ */ jsxs("div", { className: "mt-3 rounded-lg bg-white px-3 py-2 inline-flex items-center ring-1 ring-slate-100", children: [
                       /* @__PURE__ */ jsx(
                         "img",
                         {
@@ -13601,11 +13989,11 @@ function QuoteResultsPage({ answers }) {
                     ] }),
                     /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm text-slate-600 leading-relaxed", children: confidenceLine }),
                     /* @__PURE__ */ jsxs("div", { className: "mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2", children: [
-                      /* @__PURE__ */ jsxs("div", { className: "rounded-xl border border-slate-200 bg-slate-50 px-3 py-2", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "rounded-xl bg-slate-50 px-3 py-2", children: [
                         /* @__PURE__ */ jsx("div", { className: "text-[10px] uppercase tracking-wider text-slate-500 font-semibold", children: "Best for" }),
                         /* @__PURE__ */ jsx("div", { className: "mt-1 text-sm font-semibold text-slate-800", children: bestFor })
                       ] }),
-                      /* @__PURE__ */ jsxs("div", { className: "rounded-xl border border-slate-200 bg-slate-50 px-3 py-2", children: [
+                      /* @__PURE__ */ jsxs("div", { className: "rounded-xl bg-slate-50 px-3 py-2", children: [
                         /* @__PURE__ */ jsx("div", { className: "text-[10px] uppercase tracking-wider text-slate-500 font-semibold", children: "Warranty cover" }),
                         /* @__PURE__ */ jsxs("div", { className: "mt-1 text-sm font-semibold text-slate-800", children: [
                           product.warrantyYears,
@@ -13613,7 +14001,7 @@ function QuoteResultsPage({ answers }) {
                         ] })
                       ] })
                     ] }),
-                    /* @__PURE__ */ jsxs("div", { className: "mt-5 flex items-center gap-3 p-3 rounded-2xl border border-slate-200 bg-slate-50", children: [
+                    /* @__PURE__ */ jsxs("div", { className: "mt-5 flex items-center gap-3 p-3 rounded-2xl bg-slate-50", children: [
                       /* @__PURE__ */ jsx("div", { className: "h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center", children: /* @__PURE__ */ jsx(FiShield, { className: "text-primary" }) }),
                       /* @__PURE__ */ jsxs("div", { children: [
                         /* @__PURE__ */ jsxs("div", { className: "font-semibold text-dark", children: [
@@ -13627,7 +14015,7 @@ function QuoteResultsPage({ answers }) {
                       product.includes.slice(0, 2).map((item, i) => /* @__PURE__ */ jsxs(
                         "span",
                         {
-                          className: "inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700",
+                          className: "inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700",
                           children: [
                             /* @__PURE__ */ jsx(FiCheck, { className: "h-3.5 w-3.5 text-primary" }),
                             /* @__PURE__ */ jsx("span", { className: "truncate max-w-[220px]", children: item })
@@ -13640,7 +14028,7 @@ function QuoteResultsPage({ answers }) {
                           "button",
                           {
                             type: "button",
-                            className: "inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition",
+                            className: "inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition",
                             children: [
                               "+",
                               remainingIncludes.length,
@@ -13669,7 +14057,7 @@ function QuoteResultsPage({ answers }) {
                         ) }) })
                       ] })
                     ] }),
-                    Array.isArray(product.notes) && product.notes.length > 0 && /* @__PURE__ */ jsx("div", { className: "mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4", children: /* @__PURE__ */ jsxs("div", { className: "flex gap-3", children: [
+                    Array.isArray(product.notes) && product.notes.length > 0 && /* @__PURE__ */ jsx("div", { className: "mt-5 rounded-2xl bg-slate-50 p-4", children: /* @__PURE__ */ jsxs("div", { className: "flex gap-3", children: [
                       /* @__PURE__ */ jsx("div", { className: "h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsx(FiInfo, { className: "text-primary" }) }),
                       /* @__PURE__ */ jsxs("div", { children: [
                         /* @__PURE__ */ jsx("div", { className: "font-semibold text-dark", children: "Expert Opinion" }),
@@ -13684,7 +14072,7 @@ function QuoteResultsPage({ answers }) {
                         ) })
                       ] })
                     ] }) }),
-                    /* @__PURE__ */ jsxs("div", { className: "mt-6 rounded-2xl bg-slate-50 text-slate-900 p-5 relative overflow-hidden border border-slate-200", children: [
+                    /* @__PURE__ */ jsxs("div", { className: "mt-6 rounded-2xl bg-slate-50 text-slate-900 p-5 relative overflow-hidden ring-1 ring-slate-100", children: [
                       /* @__PURE__ */ jsx("div", { className: "absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -translate-y-16 translate-x-16" }),
                       /* @__PURE__ */ jsxs("div", { className: "absolute top-2 right-2 group z-30", children: [
                         /* @__PURE__ */ jsx(
@@ -13745,7 +14133,7 @@ function QuoteResultsPage({ answers }) {
                               )
                             });
                           },
-                          className: "w-full rounded-xl border-2 cursor-pointer border-primary/25 hover:border-primary hover:bg-primary/5 active:scale-[0.99] py-3.5 text-primary font-semibold transition-all duration-200 flex items-center justify-center gap-2 group",
+                          className: "w-full rounded-xl cursor-pointer bg-primary/10 hover:bg-primary/15 active:scale-[0.99] py-3.5 text-primary font-semibold transition-all duration-200 flex items-center justify-center gap-2 group",
                           children: [
                             "See Full Specification",
                             /* @__PURE__ */ jsx(FiChevronRight, { className: "group-hover:translate-x-1 transition-transform" })
@@ -13794,29 +14182,6 @@ function QuoteResultsPage({ answers }) {
         }
       )
     ] }),
-    products.length > 3 && /* @__PURE__ */ jsx(
-      "div",
-      {
-        className: "max-w-7xl mx-auto mt-12 hidden justify-center transition-all duration-300 ease-out lg:flex\n",
-        children: visibleCount < products.length ? /* @__PURE__ */ jsx(
-          "button",
-          {
-            onClick: () => setVisibleCount(
-              (prev) => Math.min(prev + 3, products.length)
-            ),
-            className: "px-8 py-3 rounded-xl border border-primary/20 bg-white cursor-pointer text-primary font-semibold hover:bg-primary/5 transition-all shadow",
-            children: "Show more packages"
-          }
-        ) : /* @__PURE__ */ jsx(
-          "button",
-          {
-            onClick: () => setVisibleCount(3),
-            className: "px-8 py-3 rounded-xl bg-slate-200 cursor-pointer text-dark font-semibold hover:bg-slate-300 transition-all shadow",
-            children: "Show fewer packages"
-          }
-        )
-      }
-    ),
     activeQuote && /* @__PURE__ */ jsxs(Fragment, { children: [
       /* @__PURE__ */ jsx("style", { children: `
                         .question-include-sidebar {
@@ -14030,9 +14395,9 @@ function ServiceResults() {
   console.log("ServiceResults answers:", answers);
   return /* @__PURE__ */ jsxs(Fragment, { children: [
     /* @__PURE__ */ jsx(Head, { title }),
-    /* @__PURE__ */ jsxs(BlueQuoteSkin, { children: [
-      /* @__PURE__ */ jsx(PageHeader, {}),
-      /* @__PURE__ */ jsx(QuoteResultsPage, { answers })
+    /* @__PURE__ */ jsxs("div", { className: "relative min-h-screen overflow-hidden bg-gradient-to-b from-[#eaf3fb] via-[#edf4fb] to-[#e4ecf6]", children: [
+      /* @__PURE__ */ jsx("div", { className: "absolute inset-x-0 top-4 z-30", children: /* @__PURE__ */ jsx(PageHeader, { theme: "blue" }) }),
+      /* @__PURE__ */ jsx("div", { className: "pt-24", children: /* @__PURE__ */ jsx(QuoteResultsPage, { answers }) })
     ] })
   ] });
 }
@@ -14464,7 +14829,7 @@ function HeroServices() {
   const featuredService = services.find((service) => service.featured);
   const otherServices = services.filter((service) => !service.featured);
   return /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
-    featuredService && /* @__PURE__ */ jsxs(Card, { className: "group relative flex flex-col overflow-hidden rounded-[28px] border border-emerald-200 bg-white p-7 text-center shadow-[0_22px_55px_rgba(15,23,42,0.12)]", children: [
+    featuredService && /* @__PURE__ */ jsxs(Card, { className: "group relative flex flex-col overflow-hidden rounded-[28px] border-0 bg-white p-7 text-center shadow-[0_22px_55px_rgba(15,23,42,0.12)]", children: [
       /* @__PURE__ */ jsx("div", { className: "text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 mx-auto", children: featuredService.highlight }),
       /* @__PURE__ */ jsxs("div", { className: "mt-4 grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center", children: [
         /* @__PURE__ */ jsxs("div", { className: "space-y-4 flex flex-col items-center lg:items-start", children: [
@@ -14475,7 +14840,7 @@ function HeroServices() {
               Link,
               {
                 href: featuredService.href,
-                className: "mt-3 inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[16px] font-bold text-emerald-800 transition hover:bg-emerald-100",
+                className: "mt-3 inline-flex items-center rounded-full bg-emerald-50 px-4 py-2 text-[16px] font-bold text-emerald-800 transition hover:bg-emerald-100",
                 children: featuredService.priceLine
               }
             ),
@@ -14484,7 +14849,7 @@ function HeroServices() {
               /* @__PURE__ */ jsx("div", { className: "mt-2 flex flex-wrap items-center justify-center gap-3 lg:justify-start", children: featuredService.brands.map((brand) => /* @__PURE__ */ jsxs(
                 "div",
                 {
-                  className: "flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5",
+                  className: "flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-[0_1px_6px_rgba(15,23,42,0.06)]",
                   children: [
                     brand.logo ? /* @__PURE__ */ jsx(
                       "img",
@@ -14521,7 +14886,7 @@ function HeroServices() {
         /* @__PURE__ */ jsx("div", { className: "relative grid h-56 grid-cols-3 gap-3 rounded-2xl bg-slate-50 p-3", children: (featuredService.boilerImages?.length ? featuredService.boilerImages : [featuredService.image]).map((imgSrc, idx) => /* @__PURE__ */ jsx(
           "div",
           {
-            className: "flex items-center justify-center rounded-xl bg-white border border-slate-200 p-2",
+            className: "flex items-center justify-center rounded-xl bg-white p-2 shadow-[0_1px_6px_rgba(15,23,42,0.06)]",
             children: /* @__PURE__ */ jsx(
               "img",
               {
@@ -14538,7 +14903,7 @@ function HeroServices() {
     /* @__PURE__ */ jsx("div", { className: "grid gap-6 md:grid-cols-2 xl:grid-cols-3", children: otherServices.map((service) => /* @__PURE__ */ jsxs(
       Card,
       {
-        className: "group relative flex flex-col items-center text-center overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]",
+        className: "group relative flex flex-col items-center text-center overflow-hidden rounded-[26px] border-0 bg-white p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]",
         children: [
           /* @__PURE__ */ jsx("div", { className: "text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700", children: service.highlight }),
           /* @__PURE__ */ jsx("div", { className: "relative mt-4 flex h-32 w-full items-center justify-center rounded-2xl bg-slate-50", children: /* @__PURE__ */ jsx(
@@ -14556,7 +14921,7 @@ function HeroServices() {
               Link,
               {
                 href: service.href,
-                className: "inline-flex items-center gap-2 rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:border-slate-400",
+                className: "inline-flex items-center gap-2 rounded-full bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-200",
                 children: [
                   "Book now",
                   /* @__PURE__ */ jsx(ArrowRight, { className: "h-4 w-4" })
@@ -14588,7 +14953,7 @@ function HeroSection() {
           /* @__PURE__ */ jsxs("div", { className: "grid items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]", children: [
             /* @__PURE__ */ jsxs("div", { className: "space-y-6 text-center flex flex-col items-center", children: [
               /* @__PURE__ */ jsxs("h2", { className: "text-4xl sm:text-[40px] lg:text-[52px] font-semibold tracking-tight text-slate-900", children: [
-                /* @__PURE__ */ jsx("span", { className: "uppercase", children: "Boiler, heating & gas services in Leeds & Surrounding" }),
+                /* @__PURE__ */ jsx("span", { className: "font-sans normal-case tracking-[-0.015em]", children: "Boiler, heating & gas services in Leeds & Surrounding" }),
                 /* @__PURE__ */ jsx("span", { className: "mt-3 block text-xl sm:text-2xl font-medium text-slate-600", children: "Booking slots are available seven days a week for installations, servicing and repairs." })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-center justify-center gap-3", children: [
@@ -14605,14 +14970,14 @@ function HeroSection() {
                   {
                     type: "button",
                     onClick: scrollToServices,
-                    className: "inline-flex items-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100",
+                    className: "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100",
                     children: "See services below"
                   }
                 )
               ] }),
               /* @__PURE__ */ jsx("p", { className: "text-xs text-slate-500 mx-auto", children: "Big blue prices? Not here. Local engineers, fixed quotes." })
             ] }),
-            /* @__PURE__ */ jsxs("div", { className: "relative overflow-hidden rounded-[24px] border border-slate-200/70 bg-white no-auto-dark-card p-4 sm:p-5 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)]", children: [
+            /* @__PURE__ */ jsxs("div", { className: "relative overflow-hidden rounded-[24px] bg-white no-auto-dark-card p-4 sm:p-5 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)]", children: [
               /* @__PURE__ */ jsx("div", { className: "pointer-events-none absolute -right-16 -top-16 h-32 w-32 rounded-full bg-emerald-200/40 blur-2xl" }),
               /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-2 text-center", children: [
                 /* @__PURE__ */ jsx(
@@ -14628,23 +14993,23 @@ function HeroSection() {
                   /* @__PURE__ */ jsx("div", { className: "text-lg font-semibold text-slate-900", children: "Certified local engineers" })
                 ] })
               ] }),
-              /* @__PURE__ */ jsxs("div", { className: "mt-3 rounded-2xl border border-emerald-200/70 bg-emerald-50/70 no-auto-dark-card px-3 py-2", children: [
+              /* @__PURE__ */ jsxs("div", { className: "mt-3 rounded-2xl bg-emerald-50/70 no-auto-dark-card px-3 py-2", children: [
                 /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1", children: [
-                  /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold text-slate-900", children: "Order before 3pm" }),
+                  /* @__PURE__ */ jsx("span", { className: "text-sm font-semibold text-slate-900", children: "Order before 4pm" }),
                   /* @__PURE__ */ jsx("span", { className: "text-xs font-semibold text-emerald-700", children: "Next‑day installs available" })
                 ] }),
                 /* @__PURE__ */ jsx("div", { className: "mt-2 text-xs text-slate-600", children: "We will contact you with confirmation." })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "mt-3 grid gap-2", children: [
                 /* @__PURE__ */ jsxs("div", { className: "grid gap-2 sm:grid-cols-2", children: [
-                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5", children: [
                     /* @__PURE__ */ jsx(ShieldCheck, { className: "h-5 w-5 text-emerald-600" }),
                     /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-slate-900", children: "Fully insured workmanship" }),
                       /* @__PURE__ */ jsx("div", { className: "text-xs text-slate-500", children: "Public liability & workmanship protection on every job." })
                     ] })
                   ] }),
-                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5", children: [
                     /* @__PURE__ */ jsx(BadgeCheck, { className: "h-5 w-5 text-emerald-600" }),
                     /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-slate-900", children: "Approved brand installer" }),
@@ -14663,14 +15028,14 @@ function HeroSection() {
                   ] })
                 ] }),
                 /* @__PURE__ */ jsxs("div", { className: "grid gap-2 sm:grid-cols-2", children: [
-                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5", children: [
                     /* @__PURE__ */ jsx(Clock4, { className: "h-5 w-5 text-emerald-600" }),
                     /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-slate-900", children: "Fast booking" }),
                       /* @__PURE__ */ jsx("div", { className: "text-xs text-slate-500", children: "Slots for this week with real‑time availability." })
                     ] })
                   ] }),
-                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white no-auto-dark-card px-3 py-2.5", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center gap-1.5 rounded-2xl bg-white no-auto-dark-card px-3 py-2.5", children: [
                     /* @__PURE__ */ jsx(PhoneCall, { className: "h-5 w-5 text-emerald-600" }),
                     /* @__PURE__ */ jsxs("div", { children: [
                       /* @__PURE__ */ jsx("div", { className: "text-sm font-semibold text-slate-900", children: "Engineer support" }),
@@ -14688,171 +15053,27 @@ function HeroSection() {
     }
   );
 }
-const homeTypes = [
-  {
-    name: "Terrace",
-    icon: Home$2,
-    tag: "Home type",
-    description: "Compact, efficient boilers for Leeds terrace homes."
-  },
-  {
-    name: "Semi-detached",
-    icon: Building2,
-    tag: "Home type",
-    description: "Balanced options for everyday family heating."
-  },
-  {
-    name: "Detached",
-    icon: Castle,
-    tag: "Home type",
-    description: "High-capacity systems for larger Leeds properties."
-  },
-  {
-    name: "Flat",
-    icon: Building,
-    tag: "Home type",
-    description: "Space‑saving installs for flats and apartments."
-  }
-];
-function HomeTypesStrip() {
-  const scrollRef = useRef(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const startScrollLeft = useRef(0);
-  const scrollByStep = (direction) => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const step = container.clientWidth / 2;
-    const delta = direction === "left" ? -step : step;
-    container.scrollBy({
-      left: delta,
-      behavior: "smooth"
+function Home() {
+  useEffect(() => {
+    const existingScript = document.getElementById("EmbedSocialHashtagScript");
+    if (existingScript) {
+      existingScript.remove();
+    }
+    const widgets = document.querySelectorAll(".embedsocial-hashtag");
+    widgets.forEach((widget) => {
+      widget.innerHTML = "";
     });
-  };
-  const handlePrev = () => scrollByStep("left");
-  const handleNext = () => scrollByStep("right");
-  const onMouseDown = (e) => {
-    const container = scrollRef.current;
-    if (!container) return;
-    isDragging.current = true;
-    container.classList.add("cursor-grabbing");
-    startX.current = e.clientX;
-    startScrollLeft.current = container.scrollLeft;
-  };
-  const onMouseMove = (e) => {
-    const container = scrollRef.current;
-    if (!container || !isDragging.current) return;
-    e.preventDefault();
-    const dx = e.clientX - startX.current;
-    container.scrollLeft = startScrollLeft.current - dx;
-  };
-  const endDrag = () => {
-    const container = scrollRef.current;
-    if (!container) return;
-    isDragging.current = false;
-    container.classList.remove("cursor-grabbing");
-  };
-  useEffect(() => {
-    const end = () => endDrag();
-    window.addEventListener("mouseup", end);
-    return () => window.removeEventListener("mouseup", end);
-  }, []);
-  return /* @__PURE__ */ jsx("section", { className: "bg-white py-20", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-7xl px-4 sm:px-6 lg:px-0 lg:flex lg:items-center lg:gap-16", children: [
-    /* @__PURE__ */ jsxs("div", { className: "w-full lg:w-[40%] flex flex-col items-center text-center justify-between gap-10 mb-12 lg:mb-0", children: [
-      /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsx("p", { className: "mb-4 text-sm font-semibold tracking-wide text-emerald-600", children: "Tailored for Leeds & Surrounding homes" }),
-        /* @__PURE__ */ jsx("h2", { className: "text-3xl font-bold leading-tight text-slate-900 sm:text-4xl lg:text-5xl", children: "The right boiler for every home in Leeds & Surrounding." }),
-        /* @__PURE__ */ jsx("p", { className: "mt-5 max-w-xl mx-auto text-sm leading-relaxed text-slate-600", children: "We match your home size, usage and budget with a fixed‑price quote and a clean install." })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-center gap-4", children: [
-        /* @__PURE__ */ jsx(
-          "button",
-          {
-            onClick: handlePrev,
-            className: "flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white",
-            children: /* @__PURE__ */ jsx(ArrowLeft, { className: "h-5 w-5" })
-          }
-        ),
-        /* @__PURE__ */ jsx(
-          "button",
-          {
-            onClick: handleNext,
-            className: "flex h-11 w-11 items-center cursor-pointer justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-900 hover:text-white",
-            children: /* @__PURE__ */ jsx(ArrowRight, { className: "h-5 w-5" })
-          }
-        )
-      ] })
-    ] }),
-    /* @__PURE__ */ jsx("div", { className: "w-full lg:w-[60%] relative", children: /* @__PURE__ */ jsx("div", { className: "overflow-hidden", children: /* @__PURE__ */ jsx(
-      "div",
-      {
-        ref: scrollRef,
-        className: "\n                                flex gap-6 \n                                overflow-x-auto \n                                scroll-smooth \n                                snap-x snap-mandatory \n                                cursor-grab \n                                no-scrollbar\n                            ",
-        onMouseDown,
-        onMouseMove,
-        onMouseLeave: endDrag,
-        children: homeTypes.map((type) => /* @__PURE__ */ jsx(
-          "article",
-          {
-            className: "\n                                        snap-center\n                                        shrink-0\n                                        basis-[85%]\n                                        sm:basis-[70%]\n                                        lg:basis-1/2\n                                        xl:basis-[45%]\n                                    ",
-            children: /* @__PURE__ */ jsx("div", { className: "flex h-full relative flex-col items-center text-center justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm", children: /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx("div", { className: "absolute top-4 right-4 z-50 w-12 text-center h-12 inline-flex items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[8px] font-medium text-emerald-700 leading-2.5", children: type.tag }),
-              /* @__PURE__ */ jsxs("div", { className: "mb-5 flex flex-col items-center gap-3 text-center", children: [
-                /* @__PURE__ */ jsx("div", { className: "flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 shrink-0", children: /* @__PURE__ */ jsx(type.icon, { className: "h-6 w-6 text-emerald-700" }) }),
-                /* @__PURE__ */ jsxs("h3", { className: "text-2xl font-bold leading-7 max-w-xs text-slate-900 sm:text-3xl", children: [
-                  type.name,
-                  " homes"
-                ] })
-              ] }),
-              /* @__PURE__ */ jsx("p", { className: "max-w-md mx-auto text-sm leading-relaxed text-slate-600", children: type.description })
-            ] }) })
-          },
-          type.name
-        ))
-      }
-    ) }) })
-  ] }) });
-}
-function InstagramFeed() {
-  useEffect(() => {
-    if (document.getElementById("EmbedSocialHashtagScript")) return;
     const script = document.createElement("script");
     script.id = "EmbedSocialHashtagScript";
+    script.src = `https://embedsocial.com/cdn/ht.js?v=${Date.now()}`;
     script.async = true;
-    script.src = "https://embedsocial.com/cdn/ht.js";
-    document.head.appendChild(script);
-    return () => {
-    };
+    document.body.appendChild(script);
   }, []);
-  return /* @__PURE__ */ jsx("section", { className: "bg-white py-20", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-7xl px-4 sm:px-6 lg:px-0", children: [
-    /* @__PURE__ */ jsx("div", { className: "flex flex-col items-center text-center gap-6", children: /* @__PURE__ */ jsxs("div", { children: [
-      /* @__PURE__ */ jsx("p", { className: "text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600", children: "Recent work" }),
-      /* @__PURE__ */ jsx("h2", { className: "mt-3 text-3xl sm:text-4xl font-semibold text-slate-900", children: "Leeds installs, call-outs & behind-the-scenes" }),
-      /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm sm:text-base text-slate-600", children: "Expect everything from installs to fixes and day‑to‑day updates — all real, all local." })
-    ] }) }),
-    /* @__PURE__ */ jsxs("div", { className: "mt-10 rounded-3xl border border-slate-200 bg-white p-4", children: [
-      /* @__PURE__ */ jsx("style", { children: `
-                        .embedsocial-hashtag .feed-powered-by-es {
-                            display: none !important;
-                        }
-                    ` }),
-      /* @__PURE__ */ jsx(
-        "div",
-        {
-          className: "embedsocial-hashtag",
-          "data-ref": "98d397d59cef083016e0312428376fe3ae4f8fe1"
-        }
-      )
-    ] })
-  ] }) });
-}
-function Home() {
   return /* @__PURE__ */ jsxs(Fragment, { children: [
     /* @__PURE__ */ jsx(Head, { title: "Home" }),
     /* @__PURE__ */ jsx("main", { className: "min-h-screen", children: /* @__PURE__ */ jsxs(GuestLayout, { children: [
       /* @__PURE__ */ jsx(HeroSection, {}),
       /* @__PURE__ */ jsx(InstagramFeed, {}),
-      /* @__PURE__ */ jsx(HomeTypesStrip, {}),
       /* @__PURE__ */ jsx(ServiceCards, {}),
       /* @__PURE__ */ jsx(WhyChooseUs, {}),
       /* @__PURE__ */ jsx(Faq, {})
@@ -16856,6 +17077,83 @@ const __vite_glob_0_37 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: AdviceArticlePage
 }, Symbol.toStringTag, { value: "Module" }));
+const STOP_WORDS = /* @__PURE__ */ new Set(["guide"]);
+function formatAdviceTitle(slug = "") {
+  return slug.split("-").filter((word) => word && !STOP_WORDS.has(word.toLowerCase())).map((word) => {
+    if (/^[a-z]*\d+[a-z\d]*$/i.test(word)) {
+      return word.toUpperCase();
+    }
+    const lower = word.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }).join(" ").replace(/\s+/g, " ").trim();
+}
+function AdviceIndexPage({ adviceSlugs = [], adviceCount = 0 }) {
+  const [query, setQuery] = useState("");
+  const adviceItems = useMemo(
+    () => adviceSlugs.map((slug) => ({
+      slug,
+      title: formatAdviceTitle(slug)
+    })),
+    [adviceSlugs]
+  );
+  const filteredAdviceItems = useMemo(() => {
+    const normalisedQuery = query.trim().toLowerCase();
+    if (!normalisedQuery) return adviceItems;
+    return adviceItems.filter(
+      ({ slug, title }) => slug.toLowerCase().includes(normalisedQuery) || title.toLowerCase().includes(normalisedQuery)
+    );
+  }, [adviceItems, query]);
+  const roundedCount = Math.floor(Number(adviceCount || 0) / 10) * 10;
+  const displayCount = roundedCount >= 100 ? `${roundedCount}+` : `${roundedCount}`;
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: "Help & Advice Hub" }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-white text-gray-900 rounded-b-3xl", children: [
+      /* @__PURE__ */ jsx(Header, { title: "Help & Advice" }),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-16", children: [
+        /* @__PURE__ */ jsxs("section", { className: "text-center max-w-3xl mx-auto", children: [
+          /* @__PURE__ */ jsx("h1", { className: "text-3xl sm:text-5xl font-extrabold tracking-tight", children: "Help & Advice for Homeowners" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-4 text-lg text-gray-600", children: "Find straightforward answers for boiler faults, error codes, pressure problems, and brand-specific issues." }),
+          /* @__PURE__ */ jsxs("p", { className: "mt-3 inline-flex rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-sm font-semibold text-slate-700", children: [
+            displayCount,
+            " help articles"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "mt-10 rounded-2xl border border-slate-200 p-6 sm:p-8", children: [
+          /* @__PURE__ */ jsxs("div", { className: "mb-5", children: [
+            /* @__PURE__ */ jsx("label", { htmlFor: "advice-search", className: "sr-only", children: "Search help articles" }),
+            /* @__PURE__ */ jsx(
+              "input",
+              {
+                id: "advice-search",
+                type: "search",
+                value: query,
+                onChange: (event) => setQuery(event.target.value),
+                placeholder: "Search by fault code, brand, or problem",
+                className: "w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              }
+            )
+          ] }),
+          filteredAdviceItems.length === 0 ? /* @__PURE__ */ jsx("p", { className: "rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700", children: "No matches yet. Try a fault code (like F75), a boiler brand, or a common problem." }) : null,
+          /* @__PURE__ */ jsx("div", { className: "grid gap-2 sm:grid-cols-2 lg:grid-cols-3", children: filteredAdviceItems.map(({ slug, title }) => /* @__PURE__ */ jsx(
+            Link,
+            {
+              href: `/advice/${slug}`,
+              className: "rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900",
+              children: title
+            },
+            slug
+          )) })
+        ] }),
+        /* @__PURE__ */ jsx(NewBoilerQuoteCta, {})
+      ] }),
+      /* @__PURE__ */ jsx(Footer, {})
+    ] })
+  ] });
+}
+const __vite_glob_0_38 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: AdviceIndexPage
+}, Symbol.toStringTag, { value: "Module" }));
 function BoilerPressureDroppingPage() {
   return /* @__PURE__ */ jsxs(Fragment, { children: [
     /* @__PURE__ */ jsx(Head, { title: "Boiler Pressure Keeps Dropping" }),
@@ -16887,7 +17185,7 @@ function BoilerPressureDroppingPage() {
     ] })
   ] });
 }
-const __vite_glob_0_38 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_39 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: BoilerPressureDroppingPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -16922,7 +17220,7 @@ function BoilerPressureIncreasingPage() {
     ] })
   ] });
 }
-const __vite_glob_0_39 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_40 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: BoilerPressureIncreasingPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17000,7 +17298,7 @@ function BoilerProblemsHubPage() {
     ] })
   ] });
 }
-const __vite_glob_0_40 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_41 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: BoilerProblemsHubPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17041,7 +17339,7 @@ function IdealBoilerHelpPage() {
     ] })
   ] });
 }
-const __vite_glob_0_41 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_42 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: IdealBoilerHelpPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17077,7 +17375,7 @@ function IdealBoilerNoisePage() {
     ] })
   ] });
 }
-const __vite_glob_0_42 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_43 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: IdealBoilerNoisePage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17128,7 +17426,7 @@ function IdealFaultCodesPage() {
     ] })
   ] });
 }
-const __vite_glob_0_43 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_44 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: IdealFaultCodesPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17159,7 +17457,7 @@ function VaillantBoilerHelpPage() {
     ] })
   ] });
 }
-const __vite_glob_0_44 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_45 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: VaillantBoilerHelpPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17223,7 +17521,7 @@ function VaillantFaultCodesPage() {
     ] })
   ] });
 }
-const __vite_glob_0_45 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_46 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: VaillantFaultCodesPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17254,7 +17552,7 @@ function WorcesterBoilerHelpPage() {
     ] })
   ] });
 }
-const __vite_glob_0_46 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_47 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: WorcesterBoilerHelpPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17310,7 +17608,7 @@ function WorcesterFaultCodesPage() {
     ] })
   ] });
 }
-const __vite_glob_0_47 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_48 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: WorcesterFaultCodesPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17528,7 +17826,7 @@ function TermsConditionsPage() {
                 isActive: activeSectionId === "next-day",
                 children: /* @__PURE__ */ jsxs("ul", { className: "list-disc pl-5 space-y-2", children: [
                   /* @__PURE__ */ jsx("li", { children: "Next-day installation refers to the next available appointment window, not a guaranteed time slot." }),
-                  /* @__PURE__ */ jsx("li", { children: "Applies to eligible, in-stock products ordered and paid before 3:00pm Monday to Friday." }),
+                  /* @__PURE__ */ jsx("li", { children: "Applies to eligible, in-stock products ordered and paid before 4:00pm Monday to Friday." }),
                   /* @__PURE__ */ jsx("li", { children: "Subject to final technical review, engineer and supplier availability, service-area coverage, and safe site access." }),
                   /* @__PURE__ */ jsx("li", { children: "Excludes bank holidays, weekends, special-order materials, and complex upgrade or remedial works." }),
                   /* @__PURE__ */ jsx("li", { children: "We may reschedule where required for safety, compliance, access, weather, or third-party delays." })
@@ -17578,7 +17876,7 @@ const TermsSection = ({
   ),
   /* @__PURE__ */ jsx("div", { className: "space-y-4 text-base text-gray-700 leading-relaxed", children })
 ] });
-const __vite_glob_0_48 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_49 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: TermsConditionsPage
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17967,7 +18265,7 @@ function Welcome({ auth, laravelVersion, phpVersion }) {
     ] })
   ] });
 }
-const __vite_glob_0_49 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const __vite_glob_0_50 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: Welcome
 }, Symbol.toStringTag, { value: "Module" }));
@@ -17976,7 +18274,7 @@ createServer(
     page,
     render: renderToString,
     resolve: (name) => {
-      const pages = /* @__PURE__ */ Object.assign({ "./Pages/About/AboutPage.jsx": __vite_glob_0_0, "./Pages/Admin/BasePrice.jsx": __vite_glob_0_1, "./Pages/Admin/BoilerCatalog.jsx": __vite_glob_0_2, "./Pages/Admin/CheckoutCoupons.jsx": __vite_glob_0_3, "./Pages/Admin/Orders/Management.jsx": __vite_glob_0_4, "./Pages/Admin/PricingOverrides.jsx": __vite_glob_0_5, "./Pages/Admin/RadiatorPrice.jsx": __vite_glob_0_6, "./Pages/Admin/Scheduling.jsx": __vite_glob_0_7, "./Pages/Auth/ConfirmPassword.jsx": __vite_glob_0_8, "./Pages/Auth/ForgotPassword.jsx": __vite_glob_0_9, "./Pages/Auth/Login.jsx": __vite_glob_0_10, "./Pages/Auth/Register.jsx": __vite_glob_0_11, "./Pages/Auth/ResetPassword.jsx": __vite_glob_0_12, "./Pages/Auth/VerifyEmail.jsx": __vite_glob_0_13, "./Pages/Book/Home.jsx": __vite_glob_0_14, "./Pages/Book/InstallPage.jsx": __vite_glob_0_15, "./Pages/Book/NewBoilerPage.jsx": __vite_glob_0_16, "./Pages/Book/Payment/Cancelled.jsx": __vite_glob_0_17, "./Pages/Book/Payment/Confirmed.jsx": __vite_glob_0_18, "./Pages/Book/Payment/Failed.jsx": __vite_glob_0_19, "./Pages/Book/PowerFlushPage.jsx": __vite_glob_0_20, "./Pages/Book/QuotePage.jsx": __vite_glob_0_21, "./Pages/Book/RepairCheckout.jsx": __vite_glob_0_22, "./Pages/Book/RepairPage.jsx": __vite_glob_0_23, "./Pages/Book/ServiceCheckout.jsx": __vite_glob_0_24, "./Pages/Book/ServicePage.jsx": __vite_glob_0_25, "./Pages/Book/ServiceResults.jsx": __vite_glob_0_26, "./Pages/ComingSoon/ComingSoon.jsx": __vite_glob_0_27, "./Pages/Dashboard.jsx": __vite_glob_0_28, "./Pages/Home.jsx": __vite_glob_0_29, "./Pages/OrderSummary/OrderSummary.jsx": __vite_glob_0_30, "./Pages/PrivacyPolicyPage.jsx": __vite_glob_0_31, "./Pages/Profile/Edit.jsx": __vite_glob_0_32, "./Pages/Profile/Partials/DeleteUserForm.jsx": __vite_glob_0_33, "./Pages/Profile/Partials/UpdatePasswordForm.jsx": __vite_glob_0_34, "./Pages/Profile/Partials/UpdateProfileInformationForm.jsx": __vite_glob_0_35, "./Pages/Quotation.jsx": __vite_glob_0_36, "./Pages/Seo/AdviceArticlePage.jsx": __vite_glob_0_37, "./Pages/Seo/BoilerPressureDroppingPage.jsx": __vite_glob_0_38, "./Pages/Seo/BoilerPressureIncreasingPage.jsx": __vite_glob_0_39, "./Pages/Seo/BoilerProblemsHubPage.jsx": __vite_glob_0_40, "./Pages/Seo/IdealBoilerHelpPage.jsx": __vite_glob_0_41, "./Pages/Seo/IdealBoilerNoisePage.jsx": __vite_glob_0_42, "./Pages/Seo/IdealFaultCodesPage.jsx": __vite_glob_0_43, "./Pages/Seo/VaillantBoilerHelpPage.jsx": __vite_glob_0_44, "./Pages/Seo/VaillantFaultCodesPage.jsx": __vite_glob_0_45, "./Pages/Seo/WorcesterBoilerHelpPage.jsx": __vite_glob_0_46, "./Pages/Seo/WorcesterFaultCodesPage.jsx": __vite_glob_0_47, "./Pages/TermsConditionsPage.jsx": __vite_glob_0_48, "./Pages/Welcome.jsx": __vite_glob_0_49 });
+      const pages = /* @__PURE__ */ Object.assign({ "./Pages/About/AboutPage.jsx": __vite_glob_0_0, "./Pages/Admin/BasePrice.jsx": __vite_glob_0_1, "./Pages/Admin/BoilerCatalog.jsx": __vite_glob_0_2, "./Pages/Admin/CheckoutCoupons.jsx": __vite_glob_0_3, "./Pages/Admin/Orders/Management.jsx": __vite_glob_0_4, "./Pages/Admin/PricingOverrides.jsx": __vite_glob_0_5, "./Pages/Admin/RadiatorPrice.jsx": __vite_glob_0_6, "./Pages/Admin/Scheduling.jsx": __vite_glob_0_7, "./Pages/Auth/ConfirmPassword.jsx": __vite_glob_0_8, "./Pages/Auth/ForgotPassword.jsx": __vite_glob_0_9, "./Pages/Auth/Login.jsx": __vite_glob_0_10, "./Pages/Auth/Register.jsx": __vite_glob_0_11, "./Pages/Auth/ResetPassword.jsx": __vite_glob_0_12, "./Pages/Auth/VerifyEmail.jsx": __vite_glob_0_13, "./Pages/Book/Home.jsx": __vite_glob_0_14, "./Pages/Book/InstallPage.jsx": __vite_glob_0_15, "./Pages/Book/NewBoilerPage.jsx": __vite_glob_0_16, "./Pages/Book/Payment/Cancelled.jsx": __vite_glob_0_17, "./Pages/Book/Payment/Confirmed.jsx": __vite_glob_0_18, "./Pages/Book/Payment/Failed.jsx": __vite_glob_0_19, "./Pages/Book/PowerFlushPage.jsx": __vite_glob_0_20, "./Pages/Book/QuotePage.jsx": __vite_glob_0_21, "./Pages/Book/RepairCheckout.jsx": __vite_glob_0_22, "./Pages/Book/RepairPage.jsx": __vite_glob_0_23, "./Pages/Book/ServiceCheckout.jsx": __vite_glob_0_24, "./Pages/Book/ServicePage.jsx": __vite_glob_0_25, "./Pages/Book/ServiceResults.jsx": __vite_glob_0_26, "./Pages/ComingSoon/ComingSoon.jsx": __vite_glob_0_27, "./Pages/Dashboard.jsx": __vite_glob_0_28, "./Pages/Home.jsx": __vite_glob_0_29, "./Pages/OrderSummary/OrderSummary.jsx": __vite_glob_0_30, "./Pages/PrivacyPolicyPage.jsx": __vite_glob_0_31, "./Pages/Profile/Edit.jsx": __vite_glob_0_32, "./Pages/Profile/Partials/DeleteUserForm.jsx": __vite_glob_0_33, "./Pages/Profile/Partials/UpdatePasswordForm.jsx": __vite_glob_0_34, "./Pages/Profile/Partials/UpdateProfileInformationForm.jsx": __vite_glob_0_35, "./Pages/Quotation.jsx": __vite_glob_0_36, "./Pages/Seo/AdviceArticlePage.jsx": __vite_glob_0_37, "./Pages/Seo/AdviceIndexPage.jsx": __vite_glob_0_38, "./Pages/Seo/BoilerPressureDroppingPage.jsx": __vite_glob_0_39, "./Pages/Seo/BoilerPressureIncreasingPage.jsx": __vite_glob_0_40, "./Pages/Seo/BoilerProblemsHubPage.jsx": __vite_glob_0_41, "./Pages/Seo/IdealBoilerHelpPage.jsx": __vite_glob_0_42, "./Pages/Seo/IdealBoilerNoisePage.jsx": __vite_glob_0_43, "./Pages/Seo/IdealFaultCodesPage.jsx": __vite_glob_0_44, "./Pages/Seo/VaillantBoilerHelpPage.jsx": __vite_glob_0_45, "./Pages/Seo/VaillantFaultCodesPage.jsx": __vite_glob_0_46, "./Pages/Seo/WorcesterBoilerHelpPage.jsx": __vite_glob_0_47, "./Pages/Seo/WorcesterFaultCodesPage.jsx": __vite_glob_0_48, "./Pages/TermsConditionsPage.jsx": __vite_glob_0_49, "./Pages/Welcome.jsx": __vite_glob_0_50 });
       return pages[`./Pages/${name}.jsx`];
     },
     setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props })

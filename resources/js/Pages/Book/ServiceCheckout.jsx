@@ -3,6 +3,7 @@ import { PageHeader } from "@/Components/ui/page-header";
 import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
 import { Head, usePage } from "@inertiajs/react";
 import { GoogleReview } from "@/Components/GoogleReviewPremium";
+import { InstagramFeed } from "@/Components/boiler/InstagramFeed";
 import { useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -532,15 +533,11 @@ export default function ServiceCheckout() {
             <BlueQuoteSkin>
                 <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-emerald-50 quote-page-bg" />
                 <div className="min-h-screen quote-page-bg">
-                    <PageHeader />
+                    <PageHeader theme="blue" />
                 
 
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
                     <div className="flex flex-col gap-2">
-                        <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3 py-1 text-[12px] font-semibold text-emerald-800">
-                            <FiShield className="h-3.5 w-3.5" />
-                            Secure checkout
-                        </div>
                         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">{title}</h1>
                         <p className="text-base text-slate-600 max-w-2xl">
                             Confirm your visit time and details. Your service is fixed price—no surprises when the engineer arrives.
@@ -829,6 +826,7 @@ export default function ServiceCheckout() {
                 </div>
 
                 <GoogleReview />
+                <InstagramFeed />
                 </div>
             </BlueQuoteSkin>
         </>

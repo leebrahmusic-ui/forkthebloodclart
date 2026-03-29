@@ -42,7 +42,7 @@ export function ServiceCards() {
             <div className="pointer-events-none absolute -left-32 top-0 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl" />
             <div className="pointer-events-none absolute -right-40 bottom-0 h-72 w-72 rounded-full bg-emerald-100/40 blur-3xl" />
 
-            <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+            <div className="relative mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                 <div className="grid gap-10 justify-items-center lg:grid-cols-1 lg:items-start">
                     {/* LEFT COLUMN */}
                     <div className="flex flex-col items-center gap-5 text-center">
@@ -56,7 +56,7 @@ export function ServiceCards() {
                                 </span>
                             </h2>
                             <p className="mt-3 text-lg text-slate-600">
-                                Book this week. Next‑day installs available when ordered before 3pm.
+                                Book this week. Next‑day installs available when ordered before 4pm.
                             </p>
                         </div>
 
@@ -94,7 +94,7 @@ export function ServiceCards() {
 
                                             {/* footer: centered pill + short line */}
                                             <div className="mt-4 flex items-center justify-center gap-3">
-                                                <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-[5px] text-[11px] font-medium tracking-[0.16em] text-slate-600 uppercase">
+                                                <span className="inline-flex rounded-full bg-slate-50 px-3 py-[5px] text-[11px] font-medium tracking-[0.16em] text-slate-600 uppercase">
                                                     {step.step}
                                                 </span>
                                                 <span className="h-[2px] w-16 rounded-full bg-gradient-to-r from-emerald-400/60 via-emerald-300/40 to-transparent" />

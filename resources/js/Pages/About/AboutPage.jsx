@@ -28,7 +28,7 @@ const VALUES = [
         icon: Clock,
         title: "Faster installs",
         description:
-            "Book this week. Next‑day installs available when ordered before 3pm.",
+            "Book this week. Next‑day installs available when ordered before 4pm.",
     },
 ];
 
@@ -102,7 +102,7 @@ export default function AboutPage() {
                                             "WhatsApp or callback only",
                                             "Fixed‑price quotes online",
                                             "All prices include VAT",
-                                            "Next‑day installs before 3pm",
+                                            "Next‑day installs before 4pm",
                                         ].map((item) => (
                                             <div
                                                 key={item}

@@ -1,21 +1,36 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 export function InstagramFeed() {
+    const embedRef = useRef(null);
+
     useEffect(() => {
-        if (document.getElementById("EmbedSocialHashtagScript")) return;
+        const scriptId = "EmbedSocialHashtagScript";
+        const existingScript = document.getElementById(scriptId);
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        if (embedRef.current) {
+            embedRef.current.innerHTML = "";
+        }
 
         const script = document.createElement("script");
-        script.id = "EmbedSocialHashtagScript";
+        script.id = scriptId;
         script.async = true;
-        script.src = "https://embedsocial.com/cdn/ht.js";
+        script.src = `https://embedsocial.com/cdn/ht.js?cb=${Date.now()}`;
         document.head.appendChild(script);
 
-        return () => {};
+        return () => {
+            script.remove();
+            if (embedRef.current) {
+                embedRef.current.innerHTML = "";
+            }
+        };
     }, []);
 
     return (
         <section className="bg-white py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+            <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                 <div className="flex flex-col items-center text-center gap-6">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600">
@@ -30,13 +45,14 @@ export function InstagramFeed() {
                     </div>
                 </div>
 
-                <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-4">
+                <div className="mt-10 rounded-3xl bg-white p-4 shadow-sm">
                     <style>{`
                         .embedsocial-hashtag .feed-powered-by-es {
                             display: none !important;
                         }
                     `}</style>
                     <div
+                        ref={embedRef}
                         className="embedsocial-hashtag"
                         data-ref="98d397d59cef083016e0312428376fe3ae4f8fe1"
                     />

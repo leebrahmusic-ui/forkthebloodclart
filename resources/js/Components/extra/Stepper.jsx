@@ -404,7 +404,7 @@ export default function Stepper({
                         "radial-gradient(circle at top, rgba(16,185,129,0.30), transparent 45%)",
                 }}
             >
-                <PageHeader />
+                <PageHeader theme="blue" />
 
                 {/* Hidden service identifiers */}
                 <input type="hidden" name="service_key" value={serviceKey} />

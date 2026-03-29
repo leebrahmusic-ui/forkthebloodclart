@@ -272,7 +272,7 @@ export default function TermsConditionsPage() {
                                     </li>
                                     <li>
                                         Applies to eligible, in-stock products
-                                        ordered and paid before 3:00pm Monday to
+                                        ordered and paid before 4:00pm Monday to
                                         Friday.
                                     </li>
                                     <li>

@@ -3,7 +3,7 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import { PageHeader } from "@/Components/ui/page-header";
 import { GoogleReview } from "@/Components/GoogleReviewPremium";
 import { TechnicianButton } from "@/Components/TechnicianButton";
-import BlueQuoteSkin from "@/Components/extra/BlueQuoteSkin";
+import { InstagramFeed } from "@/Components/boiler/InstagramFeed";
 
 const pageTitle = "Get a Quote";
 
@@ -73,7 +73,7 @@ const SERVICE_CONTENT = {
 
     [SERVICE_KEYS.SERVICE]: {
         slug: SERVICE_KEYS.SERVICE,
-        heroTitle: "Boiler Servicing in Leeds & Surrounding",
+        heroTitle: "Professional Boiler Servicing in Leeds & Surrounding",
         heroDesc:
             "Full strip-down service with safety checks, combustion analysis, and clean. If strip-down shows worn seals, gaskets, or electrodes, we’ll show you and price the required service parts for your boiler model before fitting.",
         badge: "Boiler Service",
@@ -83,7 +83,7 @@ const SERVICE_CONTENT = {
         parts: "—",
         gaugeLabel: "Pass rate",
         gaugeValueText: "99%",
-        cta: "Book a service",
+        cta: "Check availability & book",
         pricingType: "estimate",
 
         // ✅ CORRECT PLACE
@@ -159,21 +159,15 @@ export default function QuotePage() {
         <>
             <Head title={title} />
 
-            <BlueQuoteSkin>
             {/* ✅ FIXED: no black bottom gap */}
-            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-white overflow-x-hidden quote-page-bg">
-                <PageHeader title={pageTitle} />
+            <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/50 overflow-x-hidden quote-page-bg">
+                <PageHeader title={pageTitle} theme="blue" />
 
-                <main className="mx-auto max-w-7xl px-4 sm:px-6 mt-16">
+                <main className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0 mt-16">
                     <section className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
                         {/* LEFT */}
                         <div className="md:col-span-7">
-                            {content.slug === SERVICE_KEYS.SERVICE ? (
-                                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-800 border border-slate-200 shadow-sm">
-                                    <span className="h-2 w-2 rounded-full bg-slate-500" />
-                                    Boiler service • {content.sampleJobLabel.replace("Boiler Service • ", "")}
-                                </div>
-                            ) : (
+                            {content.slug !== SERVICE_KEYS.SERVICE && (
                                 <div className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-white border border-slate-200 shadow-sm">
                                     <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
                                     <span className="text-sm font-medium text-slate-800">
@@ -198,7 +192,11 @@ export default function QuotePage() {
                             <div className="mt-10 flex flex-col sm:flex-row gap-4">
                                 <Link
                                     href={route(`book.quote.${content.slug}`)}
-                                    className="group/primary relative inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-7 py-4 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 hover:scale-[1.02]"
+                                    className="group/primary relative inline-flex items-center justify-center gap-3 rounded-xl bg-[#ff5a00] px-7 py-4 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(255,90,0,0.48)] transition-all duration-300 hover:scale-[1.02] hover:bg-[#ff4a00] hover:shadow-[0_18px_40px_rgba(255,74,0,0.58)]"
+                                    style={{
+                                        backgroundColor: "#ff5a00",
+                                        border: "1px solid #ff4a00",
+                                    }}
                                 >
                                     <span className="relative z-10">
                                         {content.cta}
@@ -206,16 +204,19 @@ export default function QuotePage() {
                                     <span className="relative z-10 transition-transform group-hover/primary:translate-x-1">
                                         →
                                     </span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-emerald-700 rounded-xl opacity-0 group-hover/primary:opacity-100 transition-opacity duration-300"></div>
+                                    <span
+                                        aria-hidden
+                                        className="pointer-events-none absolute inset-0 rounded-xl bg-[linear-gradient(180deg,rgba(255,255,255,0.38)_0%,rgba(255,255,255,0)_45%)]"
+                                    />
                                 </Link>
 
                                 <TechnicianButton />
                             </div>
 
                             {/* Klarna banner */}
-                            <div className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm p-4 sm:p-5 flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-400 to-pink-500 text-white font-black text-xl flex items-center justify-center">
-                                    K
+                            <div className="mt-6 rounded-2xl bg-white/90 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-slate-100/70 p-4 sm:p-5 flex items-center gap-4 backdrop-blur-sm">
+                                <div className="h-10 min-w-[72px] rounded-xl bg-[#ffb3c7] px-3 text-[#111] font-bold text-sm flex items-center justify-center">
+                                    Klarna.
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-sm font-semibold text-slate-900">Spread the cost with Klarna</p>
@@ -224,50 +225,34 @@ export default function QuotePage() {
                             </div>
 
                             {/* Trust indicators */}
-                            {content.slug === SERVICE_KEYS.SERVICE ? (
-                                <div className="mt-12 grid gap-4 sm:grid-cols-2">
-                                    {["Full clean and combustion safety checks", "Strip-down inspection; service parts priced if worn", "Expansion vessel set and leak-checked", "Gas Safe engineers, tidy work"].map((item) => (
-                                        <div
-                                            key={item}
-                                            className="flex items-start gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-sm"
-                                        >
-                                            <span className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500" />
-                                            <p className="text-sm font-semibold text-slate-900 leading-snug">
-                                                {item}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="mt-12 flex flex-wrap items-center gap-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-                                            <span className="text-emerald-600">✓</span>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-900">
-                                                Same-day service
-                                            </p>
-                                            <p className="text-xs text-slate-500">
-                                                Emergency response
-                                            </p>
-                                        </div>
+                            <div className="mt-12 flex flex-wrap items-center gap-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                                        <span className="text-emerald-600">✓</span>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-                                            <span className="text-emerald-600">💷</span>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-900">
-                                                Fixed pricing
-                                            </p>
-                                            <p className="text-xs text-slate-500">
-                                                No hidden fees
-                                            </p>
-                                        </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-slate-900">
+                                            Next-day service
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                            Emergency response
+                                        </p>
                                     </div>
                                 </div>
-                            )}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                                        <span className="text-emerald-600">💷</span>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-slate-900">
+                                            Fixed pricing
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                            No hidden fees
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* RIGHT */}
@@ -360,91 +345,96 @@ export default function QuotePage() {
                                     </div>
                                 </div>
                             ) : content.slug === SERVICE_KEYS.SERVICE ? (
-                                <div className="relative rounded-2xl bg-white border border-slate-100 shadow-lg overflow-hidden">
-                                    <div className="px-6 pt-6 pb-4">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div>
-                                                <h3 className="text-xl font-bold text-slate-900">
-                                                    How boiler servicing works
-                                                </h3>
-                                                <p className="text-slate-600 text-sm mt-1">
-                                                    Strip-down service; if service parts are needed, we price them clearly before fitting.
-                                                </p>
-                                            </div>
-                                            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-                                                <span className="text-emerald-600 animate-[spin_8s_linear_infinite]">🧰</span>
-                                            </div>
+                                <div className="relative overflow-hidden rounded-[28px] bg-white/85 p-7 shadow-[0_20px_55px_rgba(15,23,42,0.10)] ring-1 ring-slate-100/70 backdrop-blur-sm">
+                                    <div className="pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-emerald-100/50 blur-3xl" />
 
-                                            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
-                                                <p className="font-semibold text-emerald-800">What we actually do on the strip-down:</p>
-                                                <ul className="mt-2 list-disc space-y-1 pl-5">
-                                                    <li>Pump and set the expansion vessel, checking the Schrader valve</li>
-                                                    <li>Clean the combustion chamber and burner area</li>
-                                                    <li>Clean and flush the condensate trap</li>
-                                                    <li>Check and replace worn service parts (gaskets/electrodes) if needed</li>
-                                                </ul>
-                                            </div>
+                                    <div className="relative flex items-start justify-between gap-4">
+                                        <div>
+                                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                                                Boiler Service
+                                            </p>
+                                            <h3 className="mt-2 text-2xl font-semibold text-slate-900">
+                                                Trusted annual service, done properly
+                                            </h3>
+                                            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                                                Local Gas Safe engineers, proper strip-down process, and clear communication if any service parts are required.
+                                            </p>
+                                        </div>
+
+                                        <div className="shrink-0 rounded-2xl bg-emerald-50/80 px-4 py-3 text-right ring-1 ring-emerald-100/70">
+                                            <p className="text-2xl font-bold text-slate-900">{content.labour}</p>
+                                            <p className="text-xs text-slate-500">inc VAT</p>
                                         </div>
                                     </div>
 
-                                    <div className="px-6 pb-6">
-                                        <div className="grid gap-4 sm:grid-cols-3">
+                                    <div className="relative mt-6">
+                                        <p className="text-sm font-semibold text-slate-900">What’s included:</p>
+                                        <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-sm text-slate-700">
                                             {[
-                                                {
-                                                    step: "STEP 01",
-                                                    title: "Book online in minutes",
-                                                    text: "Answer the short questions and lock in your strip-down service instantly — no calls or back-and-forth.",
-                                                },
-                                                {
-                                                    step: "STEP 02",
-                                                    title: "We confirm your slot",
-                                                    text: "You get the appointment time and a reminder. If anything needs tweaking, we’ll message you straight away.",
-                                                },
-                                                {
-                                                    step: "STEP 03",
-                                                    title: "Service + sign-off",
-                                                    text: "We carry out the strip-down. If service parts are required, we’ll show you and price them before fitting; if your boiler has faults, we’ll recommend a repair visit instead.",
-                                                },
+                                                "Combustion and gas safety checks",
+                                                "Burner/chamber and condensate trap clean",
+                                                "Expansion vessel pressure check/reset",
+                                                "Service report and clear engineer advice",
                                             ].map((item) => (
-                                                <div
-                                                    key={item.step}
-                                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm"
+                                                <li
+                                                    key={item}
+                                                    className="flex items-start gap-2 rounded-xl bg-white px-3.5 py-2.5 shadow-[0_8px_18px_rgba(15,23,42,0.06)] ring-1 ring-slate-100"
                                                 >
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-600">
-                                                            {item.step}
-                                                        </span>
-                                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                                                    </div>
-                                                    <h4 className="mt-4 text-base font-semibold text-slate-900">
-                                                        {item.title}
-                                                    </h4>
-                                                    <p className="mt-2 text-sm text-slate-600">
-                                                        {item.text}
-                                                    </p>
-                                                </div>
+                                                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                    <span>{item}</span>
+                                                </li>
                                             ))}
-                                        </div>
+                                        </ul>
                                     </div>
 
-                                    <div className="px-6 py-5 bg-slate-50 border-t border-slate-100">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                            <div className="space-y-1">
-                                                <p className="text-sm text-slate-600">
-                                                    Fixed-price strip-down service. If worn service parts are needed, we price them clearly by boiler model before fitting.
-                                                </p>
-                                                <p className="text-sm text-slate-600">
-                                                    Service is for healthy or routine maintenance. If your boiler is showing faults or not working, please book a repair/diagnosis instead.
-                                                </p>
-                                            </div>
-                                            <Link
-                                                href={route(`book.quote.${content.slug}`)}
-                                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity sm:w-auto w-full"
+                                    <div className="relative mt-6 grid gap-3">
+                                        {[
+                                            {
+                                                step: "01",
+                                                title: "Answer quick questions",
+                                                text: "Takes about a minute. We use this to match engineer time and access needs.",
+                                            },
+                                            {
+                                                step: "02",
+                                                title: "Pick your slot",
+                                                text: "Choose a booking window that works for you. You’ll get confirmation straight away.",
+                                            },
+                                            {
+                                                step: "03",
+                                                title: "Engineer visit + sign-off",
+                                                text: "If worn service parts are needed, we confirm and price them before fitting.",
+                                            },
+                                        ].map((item) => (
+                                            <div
+                                                key={item.step}
+                                                className="flex items-start gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.08)] ring-1 ring-slate-100"
                                             >
-                                                Book a service
-                                                <span>→</span>
-                                            </Link>
-                                        </div>
+                                                <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
+                                                    {item.step}
+                                                </span>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                                                    <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.text}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="relative mt-6 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                                        <p className="text-sm text-slate-600">
+                                            If your boiler is faulty or not working, we’ll advise a repair/diagnosis booking instead of charging for the wrong visit.
+                                        </p>
+                                        <Link
+                                            href={route(`book.quote.${content.slug}`)}
+                                            className="group/primary relative inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff5a00] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(255,90,0,0.45)] transition-all duration-300 hover:scale-[1.02] hover:bg-[#ff4a00] hover:shadow-[0_16px_36px_rgba(255,74,0,0.55)] sm:w-auto w-full"
+                                        >
+                                            <span
+                                                aria-hidden
+                                                className="pointer-events-none absolute inset-0 rounded-xl bg-[linear-gradient(180deg,rgba(255,255,255,0.38)_0%,rgba(255,255,255,0)_45%)]"
+                                            />
+                                            <span className="relative z-10">Book a service</span>
+                                            <span className="relative z-10">→</span>
+                                        </Link>
                                     </div>
                                 </div>
                             ) : content.slug === SERVICE_KEYS.POWERFLUSH ? (
@@ -741,9 +731,12 @@ export default function QuotePage() {
                     <div className="mt-20 pb-12">
                         <GoogleReview />
                     </div>
+
+                    <div className="pb-10">
+                        <InstagramFeed />
+                    </div>
                 </main>
             </div>
-            </BlueQuoteSkin>
         </>
     );
 }

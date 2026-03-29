@@ -569,10 +569,6 @@ export default function RepairCheckout() {
 
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
                     <div className="flex flex-col gap-2">
-                        <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3 py-1 text-[12px] font-semibold text-emerald-800">
-                            <FiShield className="h-3.5 w-3.5" />
-                            Secure checkout
-                        </div>
                         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">{title}</h1>
                         <p className="text-base text-slate-600 max-w-2xl">
                             Confirm your visit time and details. Repairs include diagnosis and the first hour on site; we agree any parts and extra labour with you before fitting.

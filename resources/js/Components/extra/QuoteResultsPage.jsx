@@ -245,15 +245,15 @@ export default function QuoteResultsPage({ answers }) {
     };
 
     return (
-        <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50/40 px-4 py-8 md:px-6 md:py-10 overflow-hidden quote-page-bg">
+        <div className="relative min-h-screen bg-transparent px-4 py-8 md:px-6 md:py-10 overflow-hidden">
             <div className="pointer-events-none absolute -top-24 -left-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-12 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" />
             {/* HEADER */}
             <div className="relative max-w-7xl mx-auto mb-8">
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+                <div className="rounded-3xl bg-white/85 p-6 md:p-8 shadow-[0_18px_48px_rgba(15,23,42,0.10)] ring-1 ring-slate-100/70 backdrop-blur-sm">
                     <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-stretch">
                         <div className="space-y-3">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
                                 <FiStar className="h-3.5 w-3.5" />
                                 Personalised results
                             </div>
@@ -267,10 +267,10 @@ export default function QuoteResultsPage({ answers }) {
                             </p>
 
                             <div className="flex flex-wrap items-center gap-2 pt-1">
-                                <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700">
+                                <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700">
                                     {getResultsContextLine()}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800">
                                     <FiCheck className="h-3.5 w-3.5" />
                                     Installation included
                                 </span>
@@ -284,7 +284,7 @@ export default function QuoteResultsPage({ answers }) {
                                     href="https://wa.me/447454796398"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
+                                    className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
                                 >
                                     WhatsApp 24/7
                                 </a>
@@ -292,7 +292,7 @@ export default function QuoteResultsPage({ answers }) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group flex items-center justify-center text-center">
+                            <div className="relative rounded-2xl bg-white/75 p-3 ring-1 ring-slate-100 group flex items-center justify-center text-center">
                                 <div className="flex items-center justify-center gap-2">
                                 <img
                                     src="/images/gas%20safe%20logo%20mega.png"
@@ -343,7 +343,7 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
                             </div>
 
-                            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group">
+                            <div className="relative rounded-2xl bg-white/75 p-3 ring-1 ring-slate-100 group">
                                 <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
                                     Estimated install time
                                     <button
@@ -375,12 +375,12 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
                             </div>
 
-                            <div className="relative rounded-2xl border border-emerald-200 bg-gradient-to-r from-white to-emerald-50 p-3 group">
+                            <div className="relative rounded-2xl bg-gradient-to-r from-white/90 to-emerald-50 p-3 ring-1 ring-emerald-100 group">
                                 <div className="text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">
                                     Delivery priority
                                 </div>
                                 <div className="mt-1 text-sm font-semibold text-slate-900 leading-snug">
-                                    Next day installation when ordered before 3pm
+                                                    Next day installation when ordered before 4pm
                                 </div>
                                 <button
                                     type="button"
@@ -401,7 +401,7 @@ export default function QuoteResultsPage({ answers }) {
                                             : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
                                     }`}
                                 >
-                                    Next-day order slots apply to standard, in-stock products confirmed and paid before 3:00pm Monday to Friday. Subject to final survey checks, engineer availability, postcode coverage, and supplier cut-off times. Excludes weekends, bank holidays, special-order items, and complex upgrade works. Installation dates may be adjusted for safety, access, weather, or third-party supply delays.
+                                    Next-day order slots apply to standard, in-stock products confirmed and paid before 4:00pm Monday to Friday. Subject to final survey checks, engineer availability, postcode coverage, and supplier cut-off times. Excludes weekends, bank holidays, special-order items, and complex upgrade works. Installation dates may be adjusted for safety, access, weather, or third-party supply delays.
                                     <a
                                         href="/terms-conditions#next-day"
                                         target="_blank"
@@ -413,7 +413,7 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
                             </div>
 
-                            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 p-3 group">
+                            <div className="relative rounded-2xl bg-white/75 p-3 ring-1 ring-slate-100 group">
                                 <div className="flex items-center gap-2 text-sm text-slate-900 font-semibold leading-snug">
                                     Warranty & workmanship cover
                                     <button
@@ -445,7 +445,7 @@ export default function QuoteResultsPage({ answers }) {
 
             {/* QUOTE CARDS GRID */}
             <div className="max-w-7xl mx-auto">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-slate-100">
                     <div>
                         <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">
                             Packages
@@ -491,7 +491,7 @@ export default function QuoteResultsPage({ answers }) {
                     ))}
                 </div>
 
-                <div className="mb-4 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/95 px-3 py-2.5 shadow-sm lg:hidden">
+                <div className="mb-4 flex items-center justify-between rounded-2xl bg-white/90 px-3 py-2.5 shadow-sm ring-1 ring-slate-100 lg:hidden">
                     <button
                         type="button"
                         onClick={() => scrollToProductCard(Math.max(0, activeCardIndex - 1))}
@@ -545,7 +545,7 @@ export default function QuoteResultsPage({ answers }) {
                             key={cardKey}
                             id={`quote-product-card-${index}`}
                             data-card-index={index}
-                            className="relative min-w-[88%] snap-center rounded-3xl bg-slate-50 shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden border border-slate-200 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0"
+                            className="relative min-w-[88%] snap-center rounded-3xl bg-white/92 shadow-[0_16px_40px_rgba(15,23,42,0.10)] overflow-hidden ring-1 ring-slate-100 transition-all duration-300 hover:shadow-[0_26px_70px_rgba(15,23,42,0.16)] hover:-translate-y-1 sm:min-w-[72%] lg:min-w-0"
                         >
                             <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary to-secondary" />
                             {/* Header Section */}
@@ -553,7 +553,7 @@ export default function QuoteResultsPage({ answers }) {
 
                                 <div className="relative p-6 flex justify-between items-start">
                                     {tierLabel && (
-                                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-slate-800 shadow-sm border border-slate-200">
+                                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-slate-800 shadow-sm ring-1 ring-slate-100">
                                             <span className="text-[14px] font-semibold tracking-wide">
                                                 {tierLabel}
                                             </span>
@@ -601,7 +601,7 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
 
                                 {brandLogo && (
-                                    <div className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-2 inline-flex items-center">
+                                    <div className="mt-3 rounded-lg bg-white px-3 py-2 inline-flex items-center ring-1 ring-slate-100">
                                         <img
                                             src={brandLogo}
                                             alt={`${product.brand} logo`}
@@ -627,7 +627,7 @@ export default function QuoteResultsPage({ answers }) {
                                 </p>
 
                                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                    <div className="rounded-xl bg-slate-50 px-3 py-2">
                                         <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
                                             Best for
                                         </div>
@@ -635,7 +635,7 @@ export default function QuoteResultsPage({ answers }) {
                                             {bestFor}
                                         </div>
                                     </div>
-                                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                    <div className="rounded-xl bg-slate-50 px-3 py-2">
                                         <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
                                             Warranty cover
                                         </div>
@@ -646,7 +646,7 @@ export default function QuoteResultsPage({ answers }) {
                                 </div>
 
                                 {/* Warranty */}
-                                <div className="mt-5 flex items-center gap-3 p-3 rounded-2xl border border-slate-200 bg-slate-50">
+                                <div className="mt-5 flex items-center gap-3 p-3 rounded-2xl bg-slate-50">
                                     <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center">
                                         <FiShield className="text-primary" />
                                     </div>
@@ -669,7 +669,7 @@ export default function QuoteResultsPage({ answers }) {
                                                 .map((item, i) => (
                                                     <span
                                                         key={`${product.id}-inc-${i}`}
-                                                        className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700"
+                                                        className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700"
                                                     >
                                                         <FiCheck className="h-3.5 w-3.5 text-primary" />
                                                         <span className="truncate max-w-[220px]">
@@ -682,7 +682,7 @@ export default function QuoteResultsPage({ answers }) {
                                                 <div className="relative group/moreIncludes">
                                                     <button
                                                         type="button"
-                                                        className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                                                        className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
                                                     >
                                                         +{remainingIncludes.length} more included
                                                         <FiChevronDown
@@ -720,7 +720,7 @@ export default function QuoteResultsPage({ answers }) {
                                 {/* Expert Opinion (Generic or from notes if available) */}
                                 {Array.isArray(product.notes) &&
                                     product.notes.length > 0 && (
-                                        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
                                             <div className="flex gap-3">
                                                 <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
                                                     <FiInfo className="text-primary" />
@@ -752,7 +752,7 @@ export default function QuoteResultsPage({ answers }) {
                                     )}
 
                                 {/* Pricing Section */}
-                                <div className="mt-6 rounded-2xl bg-slate-50 text-slate-900 p-5 relative overflow-hidden border border-slate-200">
+                                <div className="mt-6 rounded-2xl bg-slate-50 text-slate-900 p-5 relative overflow-hidden ring-1 ring-slate-100">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -translate-y-16 translate-x-16" />
 
                                     {/* 'What's Included' Button */}
@@ -841,7 +841,7 @@ export default function QuoteResultsPage({ answers }) {
                                         }
 
                                         }
-                                        className="w-full rounded-xl border-2 cursor-pointer border-primary/25 hover:border-primary hover:bg-primary/5 active:scale-[0.99] py-3.5 text-primary font-semibold transition-all duration-200 flex items-center justify-center gap-2 group"
+                                        className="w-full rounded-xl cursor-pointer bg-primary/10 hover:bg-primary/15 active:scale-[0.99] py-3.5 text-primary font-semibold transition-all duration-200 flex items-center justify-center gap-2 group"
                                     >
                                         See Full Specification
                                         <FiChevronRight className="group-hover:translate-x-1 transition-transform" />

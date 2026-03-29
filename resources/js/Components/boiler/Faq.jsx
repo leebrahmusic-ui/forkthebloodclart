@@ -41,7 +41,7 @@ export default function Faq() {
 
     return (
         <section className="bg-slate-50 py-20 rounded-b-[45px]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+            <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-0">
                 {/* Header */}
                 <div className="mb-16 max-w-3xl mx-auto text-center">
                     <span className="text-xs uppercase tracking-[0.3em] text-emerald-600">
@@ -82,15 +82,14 @@ export default function Faq() {
                                         }
                                         className={`
                                             group relative w-full cursor-pointer
-                                            border
                                             px-8 pt-9 pb-6
                                             flex flex-col items-center gap-3
                                             text-center
                                             transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]
                                             ${
                                                 isOpen
-                                                    ? "bg-white border-emerald-200 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)]"
-                                                    : "bg-white border-slate-200 hover:border-emerald-200 hover:shadow-md"
+                                                    ? "bg-white shadow-[0_22px_50px_-30px_rgba(0,0,0,0.2)]"
+                                                    : "bg-white hover:shadow-md"
                                             }
                                         `}
                                     >
@@ -150,7 +149,7 @@ export default function Faq() {
                                             }
                                         `}
                                     >
-                                        <div className="mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 text-center border border-slate-200 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]">
+                                        <div className="mt-3 rounded-sm bg-white px-6 py-5 text-[15px] leading-relaxed text-slate-600 text-center shadow-[0_10px_30px_-20px_rgba(0,0,0,0.2)]">
                                             {item.a}
                                         </div>
                                     </div>
@@ -170,12 +169,11 @@ export default function Faq() {
                         className="
                             inline-flex items-center gap-3 cursor-pointer
                             rounded-full
-                            border border-slate-300
                             bg-white
                             px-6 py-3
                             text-sm font-semibold text-slate-900
                             transition-all duration-300
-                            hover:border-emerald-300 hover:shadow-md
+                            hover:shadow-md
                         "
                     >
                         {showAll ? "Show less questions" : "View all questions"}

@@ -58,10 +58,10 @@ export default function WhyChooseUs() {
             {/* background fade */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-100/40 via-transparent to-transparent" />
 
-            <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+            <div className="relative mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-0">
                 {/* heading */}
                 <header className="mx-auto max-w-3xl text-center">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-700">
                             Why choose us
@@ -85,12 +85,12 @@ export default function WhyChooseUs() {
                                 key={item.title}
                                 className="
                                     relative flex h-full flex-col items-center gap-4 text-center
-                                    rounded-2xl border border-slate-200 
+                                    rounded-2xl
                                     bg-white
                                     p-5 sm:p-6 
                                     shadow-[0_10px_30px_rgba(15,23,42,0.08)] 
                                     transition-colors duration-300 
-                                    hover:border-emerald-300
+                                    hover:bg-emerald-50/40
                                 "
                             >
                                 {/* Accent bar that always matches card height */}
@@ -107,7 +107,7 @@ export default function WhyChooseUs() {
 
                                 {/* Icon tile */}
                                 <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-emerald-100">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white">
                                         <Icon
                                             className={`h-6 w-6 ${item.iconColor}`}
                                         />

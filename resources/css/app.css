@@ -793,27 +793,41 @@ body.force-purple-theme,
 }
 
 /* Keep internal booking/service header clean like landing */
-.force-purple-theme .page-header-clean,
-.force-purple-theme .page-header-clean [class*="bg-white"] {
+.force-purple-theme .page-header-clean:not(.page-header-blue),
+.force-purple-theme .page-header-clean:not(.page-header-blue) [class*="bg-white"] {
     background-color: #ffffff !important;
     background-image: none !important;
     opacity: 1 !important;
 }
 
-.force-purple-theme .page-header-clean {
+.force-purple-theme .page-header-clean:not(.page-header-blue) {
     border-color: #e2e8f0 !important;
     box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04) !important;
 }
 
-.force-purple-theme .page-header-clean a,
-.force-purple-theme .page-header-clean span,
-.force-purple-theme .page-header-clean svg {
+.force-purple-theme .page-header-clean:not(.page-header-blue) a,
+.force-purple-theme .page-header-clean:not(.page-header-blue) span,
+.force-purple-theme .page-header-clean:not(.page-header-blue) svg {
     color: #0f172a;
 }
 
 .force-purple-theme .page-header-clean a.bg-primary,
 .force-purple-theme .page-header-clean .bg-primary {
     background-color: #36c1ff !important;
+    color: #ffffff !important;
+}
+
+/* Blue quote header variant */
+.force-purple-theme .page-header-clean.page-header-blue {
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.force-purple-theme .page-header-clean.page-header-blue a,
+.force-purple-theme .page-header-clean.page-header-blue span,
+.force-purple-theme .page-header-clean.page-header-blue svg {
     color: #ffffff !important;
 }
 

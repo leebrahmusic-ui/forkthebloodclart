@@ -11,24 +11,31 @@ export default function BlueQuoteSkin({ children }) {
                 }
 
                 .quote-blue-skin {
-                    --qb-base: #00ABDB;
-                    --qb-mid: #0098c4;
-                    --qb-deep: #007ea3;
-                    --qb-panel: #0089b2;
-                    --qb-panel-dark: #00779b;
-                    --qb-option: #0082a8;
-                    --qb-option-active: #006f91;
+                    --qb-base: #06263f;
+                    --qb-mid: #0b3654;
+                    --qb-deep: #114c73;
+                    --qb-panel: #0b3654;
+                    --qb-panel-dark: #114c73;
+                    --qb-option: #114c73;
+                    --qb-option-active: #0b3654;
                 }
 
                 .quote-blue-skin .quote-page-bg {
                     background: var(--qb-base) !important;
-                    background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
+                    background-image: radial-gradient(circle at top, rgba(54, 193, 255, 0.22), rgba(255, 255, 255, 0.00) 45%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
                 }
 
-                .quote-blue-skin .page-header-clean {
+                .quote-blue-skin .page-header-clean:not(.page-header-blue) {
                     background: var(--qb-panel) !important;
                     border-color: rgba(255, 255, 255, 0.30) !important;
                     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+                }
+
+                .quote-blue-skin .page-header-clean.page-header-blue {
+                    background: transparent !important;
+                    background-image: none !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
                 }
 
                 .quote-blue-skin .quote-trust-card {
@@ -179,13 +186,13 @@ export default function BlueQuoteSkin({ children }) {
                         background-image: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.00) 44%), linear-gradient(180deg, var(--qb-mid) 0%, var(--qb-deep) 100%) !important;
                     }
 
-                    .quote-blue-skin .page-header-clean,
+                    .quote-blue-skin .page-header-clean:not(.page-header-blue),
                     .quote-blue-skin .quote-trust-card,
                     .quote-blue-skin .quote-question-shell {
                         background-color: var(--qb-panel) !important;
                     }
 
-                    .quote-blue-skin .page-header-clean,
+                    .quote-blue-skin .page-header-clean:not(.page-header-blue),
                     .quote-blue-skin .quote-trust-card,
                     .quote-blue-skin .quote-question-shell,
                     .quote-blue-skin .quote-question-shell [class*="bg-slate"],
