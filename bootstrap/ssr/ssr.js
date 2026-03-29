@@ -12484,8 +12484,7 @@ function ServiceCheckout() {
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ jsx(GoogleReview, {}),
-        /* @__PURE__ */ jsx(InstagramFeed, { theme: "blue" })
+        /* @__PURE__ */ jsx(GoogleReview, {})
       ] })
     ] })
   ] });
