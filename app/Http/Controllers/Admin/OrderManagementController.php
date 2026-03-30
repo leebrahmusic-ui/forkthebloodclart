@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Booking;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
@@ -107,6 +109,35 @@ class OrderManagementController extends Controller
             $booking->loadMissing(['customer','appointment','details','transactions']);
 
             return back()->with('success', 'Status updated.');
+        });
+    }
+
+    public function destroy(Booking $booking)
+    {
+        return DB::transaction(function () use ($booking) {
+            $bookingId = $booking->id;
+            $appointmentId = $booking->appointment_id;
+            $customerId = $booking->customer_id;
+
+            $booking->productAddOns()->delete();
+            $booking->products()->delete();
+            $booking->details()->delete();
+            $booking->transactions()->delete();
+
+            $booking->delete();
+
+            if ($appointmentId) {
+                Appointment::whereKey($appointmentId)->delete();
+            }
+
+            if ($customerId) {
+                $hasOtherBookings = Booking::where('customer_id', $customerId)->exists();
+                if (! $hasOtherBookings) {
+                    Customer::whereKey($customerId)->delete();
+                }
+            }
+
+            return back()->with('success', "Booking #{$bookingId} permanently deleted.");
         });
     }
 

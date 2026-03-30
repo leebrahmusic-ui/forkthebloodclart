@@ -259,6 +259,7 @@ export default function Management() {
 
     // saving state (row-level)
     const [saving, setSaving] = useState({ id: null, field: null });
+    const [deletingId, setDeletingId] = useState(null);
 
     const rows = useMemo(() => bookings?.data || [], [bookings]);
 
@@ -284,6 +285,25 @@ export default function Management() {
             preserveScroll: true,
             preserveState: true,
             onFinish: () => setSaving({ id: null, field: null }),
+        });
+    };
+
+    const deleteBooking = (bookingId) => {
+        const ok = window.confirm(
+            `Permanently delete booking #${bookingId}? This will remove related appointment, transactions, and booking details from the database.`
+        );
+
+        if (!ok) return;
+
+        setDeletingId(bookingId);
+
+        router.delete(route("admin.orders.management.destroy", bookingId), {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                if (openId === bookingId) setOpenId(null);
+            },
+            onFinish: () => setDeletingId(null),
         });
     };
 
@@ -560,6 +580,7 @@ export default function Management() {
                             rows.map((b) => {
                                 const isOpen = openId === b.id;
                                 const isSavingRow = saving.id === b.id;
+                                const isDeletingRow = deletingId === b.id;
 
                                 const paymentTone =
                                     b.payment_status === "paid"
@@ -744,6 +765,15 @@ export default function Management() {
                                                                     </>
                                                                 ) : null}
                                                             </div>
+
+                                                            <SmallButton
+                                                                type="button"
+                                                                className="border-red-300 text-red-700 hover:bg-red-50"
+                                                                disabled={isSavingRow || isDeletingRow}
+                                                                onClick={() => deleteBooking(b.id)}
+                                                            >
+                                                                {isDeletingRow ? "Deleting…" : "Delete booking"}
+                                                            </SmallButton>
                                                         </div>
                                                     </div>
                                                 </div>
