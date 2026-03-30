@@ -19,6 +19,9 @@
 
   $details = $booking->details?->keyBy('frontend_key') ?? collect();
   $getDetail = fn ($key) => $details->get($key)?->answer_text ?? null;
+  $qaRows = ($booking->details ?? collect())
+      ->filter(fn ($d) => !empty($d->question_snapshot) || !empty($d->frontend_key))
+      ->values();
 
   $products = $booking->products ?? collect();
   $primaryProduct = $products->first();
@@ -66,87 +69,103 @@
 @endphp
 
 <x-mail::message>
-{{-- Hero --}}
-<div style="padding: 18px 18px 8px; text-align:center;">
-  <div style="display:inline-block; width:52px; height:52px; border-radius:999px; background:#16a34a; line-height:52px; color:#fff; font-size:24px; font-weight:700;">✓</div>
-  <div style="margin-top:10px; font-size:20px; font-weight:700; color:#0f172a;">
-    Booking Confirmed
-  </div>
-  <div style="margin-top:4px; font-size:13px; color:#475569;">
-    Reference <strong>#{{ $booking->id }}</strong>
-  </div>
+<div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:20px 18px;margin:10px 0 14px;color:#fff;">
+  <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;">MD Gas Services</div>
+  <div style="margin-top:6px;font-size:24px;font-weight:800;line-height:1.2;">Booking confirmed</div>
+  <div style="margin-top:4px;font-size:13px;opacity:.9;">Reference #{{ $booking->id }}</div>
 </div>
 
-{{-- Summary card --}}
-<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; margin:12px 0;">
-  <div style="font-size:14px; color:#0f172a; font-weight:700;">Appointment</div>
-  <div style="margin-top:8px; font-size:13px; color:#334155;">
-    <div><strong>Service:</strong> {{ ucwords($type) }}</div>
-    <div><strong>Booked for:</strong> {{ $startsAt ?: '—' }}</div>
-    @if($bookedFor)
-      <div><strong>Issue:</strong> {{ $bookedFor }}</div>
-    @endif
-  </div>
-</div>
-
-{{-- Installation Summary --}}
-<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; margin:12px 0;">
-  <div style="font-size:14px; color:#0f172a; font-weight:700;">Installation Summary</div>
-  <div style="margin-top:8px; font-size:13px; color:#334155;">
-    <div><strong>Boiler:</strong> {{ $boilerSummary ?: '—' }}</div>
-    <div><strong>TRVs:</strong>
-      @if($trvAddon)
-        {{ $trvAddon->qty ? $trvAddon->qty . ' × ' : '' }}{{ $trvAddon->label ?: 'TRV supply & fit' }}
-      @else
-        No additional TRVs
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin:12px 0;">
+  <tr>
+    <td style="padding:14px 16px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#0f172a;">Appointment details</td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;font-size:13px;color:#334155;line-height:1.55;">
+      <div><strong>Service:</strong> {{ ucwords($type) }}</div>
+      <div><strong>Booked for:</strong> {{ $startsAt ?: '—' }}</div>
+      @if($bookedFor)
+        <div><strong>Issue:</strong> {{ $bookedFor }}</div>
       @endif
-    </div>
-    <div><strong>Flue type:</strong> {{ $flueType ? ucfirst($flueType) : '—' }}</div>
-    <div><strong>Boiler relocation:</strong> {{ $relocation ?: '—' }}</div>
-    @if(($relocation === 'Yes' || $relocation === 'yes') && $preferredLocation)
-      <div><strong>Preferred location:</strong> {{ $preferredLocation }}</div>
-    @endif
-  </div>
+    </td>
+  </tr>
+</table>
 
-@if($addOns && $addOns->count())
-<div style="margin-top:10px; font-size:12px; font-weight:700; color:#0f172a;">Add-ons included</div>
-<div style="margin-top:6px; font-size:13px; color:#334155;">
-@foreach($addOns as $addOn)
-  <div>• {{ $addOn->label ?: $addOn->key }}@if($addOn->qty) (x{{ $addOn->qty }})@endif</div>
-@endforeach
-</div>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin:12px 0;">
+  <tr>
+    <td style="padding:14px 16px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#0f172a;">Installation summary</td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;font-size:13px;color:#334155;line-height:1.55;">
+      <div><strong>Boiler:</strong> {{ $boilerSummary ?: '—' }}</div>
+      <div><strong>TRVs:</strong>
+        @if($trvAddon)
+          {{ $trvAddon->qty ? $trvAddon->qty . ' × ' : '' }}{{ $trvAddon->label ?: 'TRV supply & fit' }}
+        @else
+          No additional TRVs
+        @endif
+      </div>
+      <div><strong>Flue type:</strong> {{ $flueType ? ucfirst($flueType) : '—' }}</div>
+      <div><strong>Boiler relocation:</strong> {{ $relocation ?: '—' }}</div>
+      @if(($relocation === 'Yes' || $relocation === 'yes') && $preferredLocation)
+        <div><strong>Preferred location:</strong> {{ $preferredLocation }}</div>
+      @endif
+
+      @if($addOns && $addOns->count())
+        <div style="margin-top:8px;font-weight:700;color:#0f172a;">Add-ons included</div>
+        @foreach($addOns as $addOn)
+          <div>• {{ $addOn->label ?: $addOn->key }}@if($addOn->qty) (x{{ $addOn->qty }})@endif</div>
+        @endforeach
+      @endif
+    </td>
+  </tr>
+</table>
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin:12px 0;">
+  <tr>
+    <td style="padding:14px 16px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#0f172a;">Customer details</td>
+  </tr>
+  <tr>
+    <td style="padding:12px 16px;font-size:13px;color:#334155;line-height:1.55;">
+      <div><strong>Name:</strong> {{ $c?->full_name ?: '—' }}</div>
+      <div><strong>Email:</strong> {{ $c?->email ?: '—' }}</div>
+      <div><strong>Phone:</strong> {{ $c?->phone ?: '—' }}</div>
+      <div><strong>Postcode:</strong> {{ $c?->postcode ?: '—' }}</div>
+      <div><strong>Address:</strong> {{ $c?->address_full ?: '—' }}</div>
+    </td>
+  </tr>
+</table>
+
+@if($qaRows->count())
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin:12px 0;">
+  <tr>
+    <td style="padding:14px 16px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#0f172a;">Booking answers</td>
+  </tr>
+  @foreach($qaRows as $row)
+  <tr>
+    <td style="padding:10px 16px;border-bottom:1px solid #f8fafc;font-size:13px;color:#334155;line-height:1.5;">
+      <div style="font-weight:700;color:#0f172a;">{{ $row->question_snapshot ?: $row->frontend_key }}</div>
+      <div style="margin-top:2px;">
+        {{ $row->answer_text ?? (is_array($row->answer_json) ? json_encode($row->answer_json) : ($row->answer_json ?: (is_array($row->media) ? json_encode($row->media) : ($row->media ?: '—')))) }}
+      </div>
+    </td>
+  </tr>
+  @endforeach
+</table>
 @endif
-</div>
 
-{{-- Customer details --}}
-<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; margin:12px 0;">
-  <div style="font-size:14px; color:#0f172a; font-weight:700;">Customer Details</div>
-  <div style="margin-top:8px; font-size:13px; color:#334155;">
-    <div><strong>Name:</strong> {{ $c?->full_name ?: '—' }}</div>
-    <div><strong>Email:</strong> {{ $c?->email ?: '—' }}</div>
-    <div><strong>Phone:</strong> {{ $c?->phone ?: '—' }}</div>
-    <div><strong>Postcode:</strong> {{ $c?->postcode ?: '—' }}</div>
-    <div><strong>Address:</strong> {{ $c?->address_full ?: '—' }}</div>
-  </div>
-</div>
-
-{{-- Payment --}}
-<div style="background:#0f172a; color:#ffffff; border-radius:16px; padding:16px; margin:12px 0;">
-  <div style="font-size:14px; font-weight:700;">Payment</div>
-  <div style="margin-top:8px; font-size:13px; opacity:.95;">
+<div style="background:#0f172a;color:#ffffff;border-radius:14px;padding:14px 16px;margin:12px 0;">
+  <div style="font-size:13px;font-weight:700;">Payment</div>
+  <div style="margin-top:6px;font-size:13px;opacity:.95;line-height:1.5;">
     <div><strong>Status:</strong> {{ strtoupper($booking->payment_status) }}</div>
-    <div><strong>Paid Amount:</strong> {{ $currency }} {{ $paidAmount }}</div>
+    <div><strong>Paid amount:</strong> {{ $currency }} {{ $paidAmount }}</div>
   </div>
 </div>
 
-
-
-{{-- CTA --}}
 <x-mail::button :url="url('/')">
 View Website
 </x-mail::button>
 
-<div style="font-size:12px; color:#64748b; margin-top:14px;">
+<div style="font-size:12px;color:#64748b;margin-top:12px;line-height:1.6;">
   If you need to change your appointment, reply to this email or contact support.
 </div>
 
