@@ -5,7 +5,11 @@
   $paid = $booking->payment_status === 'paid';
   $paidAmount = number_format((float)$booking->total, 2);
 
-  $startsAt = $a?->starts_at ? \Carbon\Carbon::parse($a->starts_at)->timezone(config('app.timezone'))->format('D, d M Y • h:i A') : null;
+  $startsAt = null;
+  if ($a && ($a->getRawOriginal('starts_at') || $a->starts_at)) {
+      $rawStartsAt = $a->getRawOriginal('starts_at') ?: $a->starts_at;
+      $startsAt = \Carbon\Carbon::parse($rawStartsAt, 'UTC')->timezone(config('app.timezone'))->format('D, d M Y • h:i A');
+  }
   $type = $a?->type ? str_replace('_',' ', $a->type) : 'Service';
 
   // Pull a compact “Booked for” summary from booking_details (optional)

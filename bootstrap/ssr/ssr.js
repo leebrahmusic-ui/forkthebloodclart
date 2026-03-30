@@ -2302,7 +2302,8 @@ function money$1(amount, currency = "GBP") {
 }
 function formatUkDateTime(value) {
   if (!value) return "—";
-  const d = new Date(value);
+  const normalized = typeof value === "string" && !/(Z|[+-]\d{2}:\d{2})$/i.test(value) ? `${value.replace(" ", "T")}Z` : value;
+  const d = new Date(normalized);
   if (Number.isNaN(d.getTime())) return "—";
   return new Intl.DateTimeFormat("en-GB", {
     weekday: "short",
@@ -2310,7 +2311,8 @@ function formatUkDateTime(value) {
     month: "short",
     year: "numeric",
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
+    timeZone: "Europe/London"
   }).format(d);
 }
 function formatUkDate(value) {
