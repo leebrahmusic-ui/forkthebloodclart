@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
@@ -15,7 +16,6 @@ class Appointment extends Model
     ];
 
     protected $casts = [
-        'starts_at' => 'datetime',
         'appointment_date' => 'date',
     ];
 
@@ -55,5 +55,17 @@ class Appointment extends Model
         return $this->relationLoaded('serviceRelation')
             ? $this->serviceRelation
             : $this->serviceRelation()->first();
+    }
+
+    /**
+     * Stored in DB as UTC; always read as UTC Carbon instance.
+     */
+    public function getStartsAtAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return Carbon::parse($value, 'UTC');
     }
 }
